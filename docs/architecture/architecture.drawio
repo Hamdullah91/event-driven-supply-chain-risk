@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="fJ8E9OBklRCj74XligR4">
-    <mxGraphModel dx="920" dy="651" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="920" dy="674" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -59,14 +59,14 @@
             <mxGeometry height="73" width="159" x="488.11" y="450" as="geometry" />
           </mxCell>
         </UserObject>
-        <UserObject label="&lt;b&gt;NLP + DATA TRANSFORMATION&lt;/b&gt;&lt;div&gt;&lt;br&gt;Entity Extraction&lt;br&gt;Relation Extraction&lt;br&gt;Event Extraction&lt;br&gt;Entity Resolution&lt;br&gt;Validation&lt;/div&gt;" mermaidId="n:NLP" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;NLP / ETL&lt;/b&gt;&#xa;&#xa;Entity Extraction&#xa;Relation Extraction&#xa;Event Extraction&#xa;Entity Resolution&#xa;Validation" id="aZRYM_krAX8M5frutS2n-11">
+        <UserObject label="&lt;b&gt;NLP + DATA TRANSFORMATION&lt;/b&gt;&lt;div&gt;&lt;br&gt;Entity Extraction&lt;br&gt;Relation Extraction&lt;br&gt;Event Extraction&lt;br&gt;Entity Resolution&lt;br&gt;Validation&lt;/div&gt;&lt;div&gt;&lt;div&gt;Canonicalization&lt;/div&gt;&lt;div&gt;Provenance&lt;/div&gt;&lt;/div&gt;" mermaidId="n:NLP" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;NLP / ETL&lt;/b&gt;&#xa;&#xa;Entity Extraction&#xa;Relation Extraction&#xa;Event Extraction&#xa;Entity Resolution&#xa;Validation" id="aZRYM_krAX8M5frutS2n-11">
           <mxCell parent="aZRYM_krAX8M5frutS2n-4" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
             <mxGeometry height="210" width="240" x="315" y="610" as="geometry" />
           </mxCell>
         </UserObject>
-        <UserObject label="&lt;b&gt;NEO4J&lt;/b&gt;&lt;br&gt;&lt;br&gt;Knowledge Graph&lt;div&gt;(&lt;span style=&quot;background-color: transparent;&quot;&gt;Companies&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Suppliers&lt;/div&gt;&lt;div&gt;Foundries&lt;/div&gt;&lt;div&gt;Facilities&lt;/div&gt;&lt;div&gt;Materials&lt;/div&gt;&lt;div&gt;Products&lt;/div&gt;&lt;div&gt;Countries&lt;/div&gt;&lt;div&gt;Events&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;Relationships&lt;/span&gt;)&lt;/div&gt;" mermaidId="n:NEO4J" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;NEO4J&lt;/b&gt;&#xa;&#xa;Knowledge Graph" id="aZRYM_krAX8M5frutS2n-12">
+        <UserObject label="&lt;b&gt;NEO4J&lt;/b&gt;&lt;br&gt;&lt;br&gt;Knowledge Graph&lt;div&gt;(&lt;span style=&quot;background-color: transparent;&quot;&gt;Companies&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Suppliers&lt;/div&gt;&lt;div&gt;Foundries&lt;/div&gt;&lt;div&gt;Facilities&lt;/div&gt;&lt;div&gt;Materials&lt;/div&gt;&lt;div&gt;Products&lt;/div&gt;&lt;div&gt;Countries&lt;/div&gt;&lt;div&gt;Events&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;Relationships&lt;/span&gt;)&lt;/div&gt;&lt;div&gt;&lt;div&gt;Source&lt;/div&gt;&lt;div&gt;Timestamp&lt;/div&gt;&lt;div&gt;Confidence&lt;/div&gt;&lt;/div&gt;" mermaidId="n:NEO4J" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;NEO4J&lt;/b&gt;&#xa;&#xa;Knowledge Graph" id="aZRYM_krAX8M5frutS2n-12">
           <mxCell parent="aZRYM_krAX8M5frutS2n-4" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
-            <mxGeometry height="290" width="185" x="342.5" y="975" as="geometry" />
+            <mxGeometry height="312.5" width="185" x="342.5" y="975" as="geometry" />
           </mxCell>
         </UserObject>
         <mxCell id="aZRYM_krAX8M5frutS2n-62" edge="1" parent="aZRYM_krAX8M5frutS2n-4" source="aZRYM_krAX8M5frutS2n-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="aZRYM_krAX8M5frutS2n-59">
@@ -74,7 +74,7 @@
         </mxCell>
         <UserObject label="&lt;b&gt;RISK ENGINE&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;Multi-hop Traversal&lt;/div&gt;&lt;div&gt;BFS&lt;/div&gt;&lt;div&gt;PageRank&lt;/div&gt;&lt;div&gt;Path Weighting&lt;/div&gt;&lt;div&gt;Risk Propagation&lt;/div&gt;&lt;div&gt;Blast Radius&lt;/div&gt;" mermaidId="n:RISK" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;RISK ENGINE&lt;/b&gt;&#xa;&#xa;BFS&#xa;PageRank&#xa;Path Weighting&#xa;Risk Propagation" id="aZRYM_krAX8M5frutS2n-13">
           <mxCell parent="aZRYM_krAX8M5frutS2n-4" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
-            <mxGeometry height="220" width="178" x="346" y="1315" as="geometry" />
+            <mxGeometry height="220" width="178" x="346" y="1340" as="geometry" />
           </mxCell>
         </UserObject>
         <UserObject label="&lt;b&gt;FASTAPI&lt;/b&gt;&#xa;&#xa;Graph API&#xa;Risk API&#xa;Event API" mermaidId="n:FASTAPI" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;FASTAPI&lt;/b&gt;&#xa;&#xa;Graph API&#xa;Risk API&#xa;Event API" id="aZRYM_krAX8M5frutS2n-14">
@@ -136,7 +136,7 @@
         <mxCell id="aZRYM_krAX8M5frutS2n-63" edge="1" parent="aZRYM_krAX8M5frutS2n-4" source="aZRYM_krAX8M5frutS2n-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="aZRYM_krAX8M5frutS2n-12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <UserObject label="&lt;font style=&quot;font-size: 14px;&quot;&gt;Risk State Update&lt;/font&gt;" mermaidId="n:NEO4J" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;NEO4J&lt;/b&gt;&#xa;&#xa;Knowledge Graph" id="aZRYM_krAX8M5frutS2n-59">
+        <UserObject label="&lt;font style=&quot;font-size: 14px;&quot;&gt;Risk Assessment Update&lt;/font&gt;" mermaidId="n:NEO4J" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="&lt;b&gt;NEO4J&lt;/b&gt;&#xa;&#xa;Knowledge Graph" id="aZRYM_krAX8M5frutS2n-59">
           <mxCell parent="aZRYM_krAX8M5frutS2n-4" style="html=1;whiteSpace=wrap;strokeWidth=1;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" vertex="1">
             <mxGeometry height="35" width="150" x="575" y="1270" as="geometry" />
           </mxCell>
@@ -155,7 +155,7 @@
             <mxGeometry height="3660" width="755" as="geometry" />
           </mxCell>
         </UserObject>
-        <UserObject label="&lt;div&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;b&gt;VISUALIZATION&lt;/b&gt;" mermaidId="n:DS" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="DATA SOURCES" id="aZRYM_krAX8M5frutS2n-87">
+        <UserObject label="&lt;div&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;b&gt;EVENT PROCESSING &amp;amp; RISK PROPAGATION&lt;/b&gt;" mermaidId="n:DS" mermaidBaseStyle="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;" mermaidBaseValue="DATA SOURCES" id="aZRYM_krAX8M5frutS2n-87">
           <mxCell parent="aZRYM_krAX8M5frutS2n-73" style="html=1;whiteSpace=wrap;strokeWidth=1;verticalAlign=top;fillColor=light-dark(#ffffde,#1f2020);strokeColor=light-dark(#aaaa33,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontSize=16;container=0;" vertex="1">
             <mxGeometry height="1390" width="640" x="105" y="2260" as="geometry" />
           </mxCell>
