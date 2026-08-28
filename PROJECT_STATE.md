@@ -17,12 +17,11 @@ Build a knowledge-graph-driven system that models semiconductor supply-chain dep
 
 **Current Milestone:** Day 5 — Graph Infrastructure
 
-**Current Git Commit:** `c30aee2`
+**Current Git Commit:** `c21b45a`
 
 **Current Branch:** `main`
 
-**Remote Status:** `main` is synchronized with `origin/main`.
-
+**Remote Status:** `main` is ahead of `origin/main` by 2 commits.
 ---
 
 ## 3. Architectural Overview
@@ -240,6 +239,8 @@ bd9a7aa  chore: set up Python environment and dependencies
 dda0dc6  feat: add supply chain event domain models
 fc9002d  feat: add event factory and serialization
 c30aee2  feat: integrate Neo4j graph database
+9ea5140  docs: add project state tracking
+c21b45a  feat: add Neo4j graph repository
 ```
 
 ---
@@ -265,9 +266,10 @@ Currently implemented:
 
 ```text
 src/graph/
+
 ├── connection.py
+├── repository.py
 └── README.md
-```
 
 The connection layer is responsible only for establishing and closing the Neo4j driver connection and verifying connectivity.
 
@@ -307,14 +309,16 @@ Documentation contains a few textual/encoding artifacts in `architecture_notes.m
 
 ## 12. Immediate Next Objective
 
-Continue Day 5 by designing and implementing the graph persistence/repository layer on top of the existing:
+Day 5 graph persistence has been implemented and verified.
+
+Current architecture:
 
 ```text
 SupplyChainEvent
         +
 Neo4jConnection
         ↓
-Graph Repository
+GraphRepository
         ↓
 Neo4j Knowledge Graph
 ```
