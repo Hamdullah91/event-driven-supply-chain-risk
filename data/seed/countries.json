@@ -1,0 +1,32 @@
+[
+  {
+    "country_id": "taiwan",
+    "name": "Taiwan",
+    "iso_code": "TW"
+  },
+  {
+    "country_id": "united_states",
+    "name": "United States",
+    "iso_code": "US"
+  },
+  {
+    "country_id": "ireland",
+    "name": "Ireland",
+    "iso_code": "IE"
+  },
+  {
+    "country_id": "singapore",
+    "name": "Singapore",
+    "iso_code": "SG"
+  },
+  {
+    "country_id": "germany",
+    "name": "Germany",
+    "iso_code": "DE"
+  },
+  {
+    "country_id": "netherlands",
+    "name": "Netherlands",
+    "iso_code": "NL"
+  }
+]

@@ -1,0 +1,404 @@
+[
+  {
+    "company_id": "tsmc",
+    "name": "TSMC",
+    "legal_name": "Taiwan Semiconductor Manufacturing Company Limited",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "samsung_electronics",
+    "name": "Samsung Electronics",
+    "legal_name": "Samsung Electronics Co., Ltd.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "intel",
+    "name": "Intel",
+    "legal_name": "Intel Corporation",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "nvidia",
+    "name": "NVIDIA",
+    "legal_name": "NVIDIA Corporation",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "amd",
+    "name": "AMD",
+    "legal_name": "Advanced Micro Devices, Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "qualcomm",
+    "name": "Qualcomm",
+    "legal_name": "QUALCOMM Incorporated",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "broadcom",
+    "name": "Broadcom",
+    "legal_name": "Broadcom Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "micron",
+    "name": "Micron Technology",
+    "legal_name": "Micron Technology, Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "sk_hynix",
+    "name": "SK Hynix",
+    "legal_name": "SK hynix Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "texas_instruments",
+    "name": "Texas Instruments",
+    "legal_name": "Texas Instruments Incorporated",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "analog_devices",
+    "name": "Analog Devices",
+    "legal_name": "Analog Devices, Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "nxp",
+    "name": "NXP Semiconductors",
+    "legal_name": "NXP Semiconductors N.V.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "infineon",
+    "name": "Infineon Technologies",
+    "legal_name": "Infineon Technologies AG",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "stmicroelectronics",
+    "name": "STMicroelectronics",
+    "legal_name": "STMicroelectronics N.V.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "globalfoundries",
+    "name": "GlobalFoundries",
+    "legal_name": "GlobalFoundries Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "asml",
+    "name": "ASML",
+    "legal_name": "ASML Holding N.V.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "applied_materials",
+    "name": "Applied Materials",
+    "legal_name": "Applied Materials, Inc.",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "lam_research",
+    "name": "Lam Research",
+    "legal_name": "Lam Research Corporation",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "kla",
+    "name": "KLA",
+    "legal_name": "KLA Corporation",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "tokyo_electron",
+    "name": "Tokyo Electron",
+    "legal_name": "Tokyo Electron Limited",
+    "industry_id": "semiconductors",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+
+  {
+    "company_id": "tesla",
+    "name": "Tesla",
+    "legal_name": "Tesla, Inc.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "byd",
+    "name": "BYD",
+    "legal_name": "BYD Company Limited",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "catl",
+    "name": "CATL",
+    "legal_name": "Contemporary Amperex Technology Co., Limited",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "lg_energy_solution",
+    "name": "LG Energy Solution",
+    "legal_name": "LG Energy Solution, Ltd.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "panasonic_energy",
+    "name": "Panasonic Energy",
+    "legal_name": "Panasonic Energy Co., Ltd.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "samsung_sdi",
+    "name": "Samsung SDI",
+    "legal_name": "Samsung SDI Co., Ltd.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "sk_on",
+    "name": "SK On",
+    "legal_name": "SK On Co., Ltd.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "rivian",
+    "name": "Rivian",
+    "legal_name": "Rivian Automotive, Inc.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "lucid",
+    "name": "Lucid",
+    "legal_name": "Lucid Group, Inc.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "general_motors",
+    "name": "General Motors",
+    "legal_name": "General Motors Company",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "ford",
+    "name": "Ford",
+    "legal_name": "Ford Motor Company",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "volkswagen",
+    "name": "Volkswagen",
+    "legal_name": "Volkswagen AG",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "bmw",
+    "name": "BMW",
+    "legal_name": "Bayerische Motoren Werke AG",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "albemarle",
+    "name": "Albemarle",
+    "legal_name": "Albemarle Corporation",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "sqm",
+    "name": "SQM",
+    "legal_name": "Sociedad Quimica y Minera de Chile S.A.",
+    "industry_id": "ev_batteries",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+
+  {
+    "company_id": "boeing",
+    "name": "Boeing",
+    "legal_name": "The Boeing Company",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "airbus",
+    "name": "Airbus",
+    "legal_name": "Airbus SE",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "lockheed_martin",
+    "name": "Lockheed Martin",
+    "legal_name": "Lockheed Martin Corporation",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "rtx",
+    "name": "RTX",
+    "legal_name": "RTX Corporation",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "northrop_grumman",
+    "name": "Northrop Grumman",
+    "legal_name": "Northrop Grumman Corporation",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "general_dynamics",
+    "name": "General Dynamics",
+    "legal_name": "General Dynamics Corporation",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "honeywell",
+    "name": "Honeywell",
+    "legal_name": "Honeywell International Inc.",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "ge_aerospace",
+    "name": "GE Aerospace",
+    "legal_name": "GE Aerospace",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "safran",
+    "name": "Safran",
+    "legal_name": "Safran S.A.",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "rolls_royce",
+    "name": "Rolls-Royce Holdings",
+    "legal_name": "Rolls-Royce Holdings plc",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "l3harris",
+    "name": "L3Harris Technologies",
+    "legal_name": "L3Harris Technologies, Inc.",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "bae_systems",
+    "name": "BAE Systems",
+    "legal_name": "BAE Systems plc",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "thales",
+    "name": "Thales",
+    "legal_name": "Thales S.A.",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "teledyne",
+    "name": "Teledyne Technologies",
+    "legal_name": "Teledyne Technologies Incorporated",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  },
+  {
+    "company_id": "transdigm",
+    "name": "TransDigm",
+    "legal_name": "TransDigm Group Incorporated",
+    "industry_id": "aerospace_electronics",
+    "entity_type": "core",
+    "seed_source": "manual_baseline"
+  }
+]

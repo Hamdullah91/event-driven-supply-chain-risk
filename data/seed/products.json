@@ -1,0 +1,52 @@
+[
+  {
+    "product_id": "semiconductor_chip",
+    "name": "Semiconductor Chip",
+    "category": "semiconductor"
+  },
+  {
+    "product_id": "microprocessor",
+    "name": "Microprocessor",
+    "category": "semiconductor"
+  },
+  {
+    "product_id": "memory_chip",
+    "name": "Memory Chip",
+    "category": "semiconductor"
+  },
+  {
+    "product_id": "gpu",
+    "name": "Graphics Processing Unit",
+    "category": "semiconductor"
+  },
+  {
+    "product_id": "lithium_ion_battery",
+    "name": "Lithium-Ion Battery",
+    "category": "ev_battery"
+  },
+  {
+    "product_id": "battery_cell",
+    "name": "Battery Cell",
+    "category": "ev_battery"
+  },
+  {
+    "product_id": "electric_vehicle",
+    "name": "Electric Vehicle",
+    "category": "automotive"
+  },
+  {
+    "product_id": "aircraft",
+    "name": "Aircraft",
+    "category": "aerospace"
+  },
+  {
+    "product_id": "aircraft_engine",
+    "name": "Aircraft Engine",
+    "category": "aerospace"
+  },
+  {
+    "product_id": "avionics_system",
+    "name": "Avionics System",
+    "category": "aerospace_electronics"
+  }
+]

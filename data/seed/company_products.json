@@ -1,0 +1,26 @@
+[
+  {
+    "company_id": "nvidia",
+    "product_id": "gpu",
+    "source_type": "official_company_source",
+    "source_url": "https://www.nvidia.com/en-us/geforce/",
+    "verification_status": "verified",
+    "confidence": 1.0
+  },
+  {
+    "company_id": "boeing",
+    "product_id": "aircraft",
+    "source_type": "official_company_source",
+    "source_url": "https://www.boeing.com/commercial",
+    "verification_status": "verified",
+    "confidence": 1.0
+  },
+  {
+    "company_id": "ge_aerospace",
+    "product_id": "aircraft_engine",
+    "source_type": "official_company_source",
+    "source_url": "https://www.geaerospace.com/commercial/engines",
+    "verification_status": "verified",
+    "confidence": 1.0
+  }
+]

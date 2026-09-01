@@ -1,0 +1,18 @@
+[
+  {
+    "company_id": "tsmc",
+    "technology_id": "advanced_packaging",
+    "source_type": "official_company_source",
+    "source_url": "https://www.tsmc.com/english/dedicatedFoundry/services/advanced-packaging",
+    "verification_status": "verified",
+    "confidence": 1.0
+  },
+  {
+    "company_id": "intel",
+    "technology_id": "finfet",
+    "source_type": "official_company_source",
+    "source_url": "https://www.intel.com/content/www/us/en/foundry/process.html",
+    "verification_status": "verified",
+    "confidence": 1.0
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "company_id": "albemarle",
+    "material_id": "lithium",
+    "source_type": "manual_verified_baseline",
+    "verification_status": "verified",
+    "confidence": 1.0
+  },
+  {
+    "company_id": "sqm",
+    "material_id": "lithium",
+    "source_type": "manual_verified_baseline",
+    "verification_status": "verified",
+    "confidence": 1.0
+  },
+  {
+    "company_id": "boeing",
+    "material_id": "titanium",
+    "source_type": "manual_verified_baseline",
+    "verification_status": "verified",
+    "confidence": 1.0
+  }
+]

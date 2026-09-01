@@ -1,0 +1,52 @@
+[
+  {
+    "technology_id": "euv_lithography",
+    "name": "Extreme Ultraviolet Lithography",
+    "category": "semiconductor_manufacturing"
+  },
+  {
+    "technology_id": "duv_lithography",
+    "name": "Deep Ultraviolet Lithography",
+    "category": "semiconductor_manufacturing"
+  },
+  {
+    "technology_id": "advanced_packaging",
+    "name": "Advanced Semiconductor Packaging",
+    "category": "semiconductor_manufacturing"
+  },
+  {
+    "technology_id": "finfet",
+    "name": "FinFET",
+    "category": "semiconductor_design"
+  },
+  {
+    "technology_id": "lithium_ion_battery_technology",
+    "name": "Lithium-Ion Battery Technology",
+    "category": "battery"
+  },
+  {
+    "technology_id": "lfp_battery",
+    "name": "Lithium Iron Phosphate Battery Technology",
+    "category": "battery"
+  },
+  {
+    "technology_id": "nmc_battery",
+    "name": "Nickel Manganese Cobalt Battery Technology",
+    "category": "battery"
+  },
+  {
+    "technology_id": "electric_powertrain",
+    "name": "Electric Powertrain Technology",
+    "category": "electric_vehicle"
+  },
+  {
+    "technology_id": "turbofan_engine",
+    "name": "Turbofan Engine Technology",
+    "category": "aerospace"
+  },
+  {
+    "technology_id": "avionics",
+    "name": "Avionics Technology",
+    "category": "aerospace_electronics"
+  }
+]

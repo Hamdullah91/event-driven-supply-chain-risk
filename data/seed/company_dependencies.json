@@ -1,0 +1,18 @@
+[
+  {
+    "supplier_company_id": "asml",
+    "customer_company_id": "tsmc",
+    "source_type": "official_company_source",
+    "source_url": "https://www.asml.com/en/news/press-releases/2010/tsmc-to-take-delivery-of-an-asml-euv-lithography-system",
+    "verification_status": "verified",
+    "confidence": 1.0
+  },
+  {
+    "supplier_company_id": "tsmc",
+    "customer_company_id": "nvidia",
+    "source_type": "official_company_source",
+    "source_url": "https://blogs.nvidia.com/blog/tsmc-blackwell-manufacturing/",
+    "verification_status": "verified",
+    "confidence": 1.0
+  }
+]

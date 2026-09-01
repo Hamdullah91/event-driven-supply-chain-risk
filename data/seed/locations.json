@@ -1,0 +1,68 @@
+[
+  {
+    "location_id": "tainan_tw",
+    "city": "Tainan",
+    "region": "Tainan",
+    "country_id": "taiwan"
+  },
+  {
+    "location_id": "phoenix_az_us",
+    "city": "Phoenix",
+    "region": "Arizona",
+    "country_id": "united_states"
+  },
+  {
+    "location_id": "chandler_az_us",
+    "city": "Chandler",
+    "region": "Arizona",
+    "country_id": "united_states"
+  },
+  {
+    "location_id": "hillsboro_or_us",
+    "city": "Hillsboro",
+    "region": "Oregon",
+    "country_id": "united_states"
+  },
+  {
+    "location_id": "leixlip_ie",
+    "city": "Leixlip",
+    "region": "County Kildare",
+    "country_id": "ireland"
+  },
+  {
+    "location_id": "boise_id_us",
+    "city": "Boise",
+    "region": "Idaho",
+    "country_id": "united_states"
+  },
+  {
+    "location_id": "manassas_va_us",
+    "city": "Manassas",
+    "region": "Virginia",
+    "country_id": "united_states"
+  },
+  {
+    "location_id": "singapore_sg",
+    "city": "Singapore",
+    "region": "Singapore",
+    "country_id": "singapore"
+  },
+  {
+    "location_id": "malta_ny_us",
+    "city": "Malta",
+    "region": "New York",
+    "country_id": "united_states"
+  },
+  {
+    "location_id": "dresden_de",
+    "city": "Dresden",
+    "region": "Saxony",
+    "country_id": "germany"
+  },
+  {
+    "location_id": "veldhoven_nl",
+    "city": "Veldhoven",
+    "region": "North Brabant",
+    "country_id": "netherlands"
+  }
+]

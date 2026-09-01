@@ -1,0 +1,57 @@
+[
+  {
+    "material_id": "silicon",
+    "name": "Silicon",
+    "category": "semiconductor_material"
+  },
+  {
+    "material_id": "copper",
+    "name": "Copper",
+    "category": "industrial_metal"
+  },
+  {
+    "material_id": "aluminum",
+    "name": "Aluminum",
+    "category": "industrial_metal"
+  },
+  {
+    "material_id": "lithium",
+    "name": "Lithium",
+    "category": "battery_material"
+  },
+  {
+    "material_id": "nickel",
+    "name": "Nickel",
+    "category": "battery_material"
+  },
+  {
+    "material_id": "cobalt",
+    "name": "Cobalt",
+    "category": "battery_material"
+  },
+  {
+    "material_id": "graphite",
+    "name": "Graphite",
+    "category": "battery_material"
+  },
+  {
+    "material_id": "manganese",
+    "name": "Manganese",
+    "category": "battery_material"
+  },
+  {
+    "material_id": "titanium",
+    "name": "Titanium",
+    "category": "aerospace_material"
+  },
+  {
+    "material_id": "carbon_fiber",
+    "name": "Carbon Fiber",
+    "category": "aerospace_composite"
+  },
+  {
+    "material_id": "rare_earth_elements",
+    "name": "Rare Earth Elements",
+    "category": "critical_material"
+  }
+]
