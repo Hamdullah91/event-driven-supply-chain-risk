@@ -17,8 +17,8 @@ from .models import (
 
 ITEM_PATTERN = re.compile(
     r"^\s*ITEM\s+"
-    r"(1A|1B|1C|1|2|3|4|5|6|7A|7|8|9A|9B|9C|9|10|11|12|13|14|15|16)"
-    r"\s*[.\-:]?",
+    r"(1A|1B|1C|7A|9A|9B|9C|10|11|12|13|14|15|16|1|2|3|4|5|6|7|8|9)"
+    r"\b\s*[.\-:]?",
     re.IGNORECASE | re.MULTILINE,
 )
 
