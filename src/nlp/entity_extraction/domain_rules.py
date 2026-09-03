@@ -1,0 +1,1 @@
+DOMAIN_RULES: dict[str, str] = {}
