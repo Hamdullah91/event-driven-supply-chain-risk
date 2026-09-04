@@ -2,7 +2,10 @@ from typing import Iterable
 
 from .models import ResolvedEntity
 from .resolver import resolve_companies
-
+from src.graph.provenance.models import (
+    ExtractedRelationship,
+    ProvenanceMetadata,
+)
 
 def resolve_extracted_companies(
     company_names: Iterable[str],
@@ -36,3 +39,33 @@ def get_resolution_stats(
         "unresolved": unresolved,
         "resolution_rate": resolution_rate,
     }
+
+def build_provenanced_relationship(
+    source_entity: str,
+    relationship_type: str,
+    target_entity: str,
+    *,
+    source: str,
+    source_document: str,
+    extraction_method: str,
+    confidence: float,
+    source_url: str | None = None,
+    filing_date=None,
+) -> ExtractedRelationship:
+    """
+    Build a resolved relationship while preserving extraction provenance.
+    """
+
+    return ExtractedRelationship(
+        source_entity=source_entity,
+        relationship_type=relationship_type,
+        target_entity=target_entity,
+        provenance=ProvenanceMetadata(
+            source=source,
+            source_document=source_document,
+            source_url=source_url,
+            filing_date=filing_date,
+            extraction_method=extraction_method,
+            confidence=confidence,
+        ),
+    )
