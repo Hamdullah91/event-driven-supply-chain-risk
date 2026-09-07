@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-09-07T07:35:06.157038+00:00",
+  "dataset": "data\\event_classifier\\raw\\events.jsonl",
+  "total_examples": 437,
+  "class_distribution": {
+    "FACILITY_OUTAGE": 71,
+    "QUOTA_CHANGE": 76,
+    "REGULATION_CHANGE": 71,
+    "SUPPLY_DISRUPTION": 71,
+    "TECHNOLOGY_EMBARGO": 71,
+    "TRADE_POLICY_CHANGE": 77
+  },
+  "source_distribution": {
+    "Reuters": 5,
+    "manual": 120,
+    "synthetic": 312
+  },
+  "text_length_words": {
+    "minimum": 7,
+    "maximum": 32,
+    "average": 15.99
+  },
+  "integrity": {
+    "unique_ids": 437,
+    "unique_texts": 437,
+    "duplicate_ids": 0,
+    "duplicate_texts": 0
+  },
+  "day_27_status": "complete"
+}

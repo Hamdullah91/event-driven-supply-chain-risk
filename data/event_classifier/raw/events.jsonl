@@ -1,0 +1,437 @@
+{"id":"evt_000001","text":"A shortage of semiconductor components has delayed vehicle production at several manufacturers.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000002","text":"Battery manufacturers are facing delays after suppliers failed to deliver enough lithium material.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000003","text":"Shipping disruptions have prevented electronic components from reaching manufacturers on schedule.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000004","text":"A shortage of aerospace-grade titanium is constraining aircraft component production.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000005","text":"The government introduced stricter environmental requirements for battery manufacturers.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000006","text":"New safety regulations require aerospace suppliers to perform additional component inspections.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000007","text":"Regulators introduced new recycling requirements for electric vehicle batteries.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000008","text":"Semiconductor manufacturers must comply with newly introduced chemical handling regulations.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000009","text":"A fire forced a semiconductor fabrication plant to suspend operations.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000010","text":"Flooding shut down operations at a major battery manufacturing facility.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000011","text":"A power failure halted production at an aerospace electronics factory.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000012","text":"An explosion temporarily closed a manufacturing facility producing electronic components.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000013","text":"The government banned exports of advanced semiconductor manufacturing equipment.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000014","text":"New restrictions prohibit domestic companies from supplying advanced chip technology to foreign firms.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000015","text":"Export controls prevent companies from selling advanced AI processors to the restricted market.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000016","text":"A technology embargo restricts access to specialized semiconductor fabrication machinery.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000017","text":"The government imposed a new tariff on imported electric vehicle batteries.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000018","text":"New trade sanctions were announced against several industrial suppliers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000019","text":"Authorities introduced additional import duties on semiconductor components.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000020","text":"Changes to customs policy increased restrictions on imported aerospace components.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000021","text":"The government reduced the annual export quota for rare-earth materials.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000022","text":"Authorities increased the permitted lithium export quota for the coming year.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000023","text":"A new production quota will limit the amount of cobalt supplied to international markets.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000024","text":"The country lowered its graphite export quota following increased domestic demand.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000025","text":"A key chip supplier warned that production constraints would prevent it from meeting customer orders this quarter.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000026","text":"Severe congestion at Asian ports delayed shipments of semiconductor wafers to electronics manufacturers.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000027","text":"Automakers are struggling to secure enough microcontrollers after suppliers reported insufficient production capacity.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000028","text":"Unexpected logistics problems have pushed back deliveries of silicon wafers to several chip manufacturers.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000029","text":"Battery cell manufacturers received fewer cathode materials than ordered after a major supplier failed to meet its delivery commitments.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000030","text":"Limited availability of battery-grade graphite is constraining production schedules at electric vehicle battery manufacturers.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000031","text":"Several electric vehicle manufacturers reported longer battery delivery times because suppliers could not keep pace with demand.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000032","text":"Transportation bottlenecks disrupted the movement of nickel materials to battery processing companies.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000033","text":"An aircraft manufacturer postponed assembly after a supplier failed to deliver critical avionics components on schedule.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000034","text":"A shortage of specialized electronic connectors is slowing production across several aerospace suppliers.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000035","text":"Delivery problems at a tier-two supplier left an aerospace manufacturer without enough flight-control components.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000036","text":"Manufacturers are experiencing extended lead times for aerospace-grade electronic components because supplier capacity remains constrained.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000037","text":"Cargo transportation delays interrupted the flow of electronic components between Asian suppliers and European assembly plants.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000038","text":"A supplier's inability to obtain sufficient raw materials has reduced component deliveries to downstream manufacturers.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000039","text":"Manufacturers were forced to revise production schedules after critical components failed to arrive by their expected delivery dates.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000040","text":"Limited supplier capacity has created extended lead times for components used across semiconductor and electronics manufacturing.","label":"SUPPLY_DISRUPTION","source":"manual"}
+{"id":"evt_000041","text":"New environmental rules require semiconductor fabrication plants to reduce hazardous chemical emissions.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000042","text":"Regulators introduced stricter reporting requirements for semiconductor manufacturers handling toxic production materials.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000043","text":"Chip manufacturers must comply with new water treatment standards introduced by environmental authorities.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000044","text":"New workplace safety requirements require semiconductor facilities to strengthen protections for employees handling hazardous chemicals.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000045","text":"Battery producers must meet stricter recycling standards under newly introduced environmental regulations.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000046","text":"Regulators introduced new safety requirements governing the transportation of lithium-ion batteries.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000047","text":"New regulations require electric vehicle battery manufacturers to disclose the environmental impact of battery production.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000048","text":"Authorities adopted stricter waste disposal requirements for companies processing battery materials.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000049","text":"Aviation regulators introduced additional certification requirements for electronic systems installed in commercial aircraft.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000050","text":"New aerospace safety standards require suppliers to perform additional testing of flight-control electronics.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000051","text":"Aircraft component manufacturers must comply with revised quality-control regulations introduced by aviation authorities.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000052","text":"Regulators updated cybersecurity requirements for electronic systems used in commercial aircraft.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000053","text":"Manufacturers must provide additional documentation under newly revised industrial product safety rules.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000054","text":"Environmental authorities introduced stricter limits on industrial wastewater discharged by advanced manufacturing facilities.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000055","text":"Companies using hazardous manufacturing materials will face new monitoring and compliance requirements next year.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000056","text":"Regulators revised mandatory inspection procedures for manufacturers producing safety-critical electronic components.","label":"REGULATION_CHANGE","source":"manual"}
+{"id":"evt_000057","text":"An earthquake forced a semiconductor fabrication facility to halt production while engineers inspected equipment for damage.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000058","text":"A cooling system failure temporarily suspended operations at a major chip manufacturing plant.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000059","text":"A prolonged power failure stopped wafer production at a semiconductor fabrication facility.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000060","text":"A chemical leak caused workers to evacuate a chip manufacturing facility and production was suspended.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000061","text":"A fire at a lithium-ion battery plant forced the manufacturer to shut down several production lines.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000062","text":"Flood damage temporarily closed a facility responsible for processing battery-grade lithium.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000063","text":"An equipment malfunction halted battery cell production at a large manufacturing plant.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000064","text":"An explosion at a battery materials facility forced the operator to suspend production pending a safety investigation.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000065","text":"Severe storm damage caused an aerospace electronics factory to cease operations temporarily.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000066","text":"A machinery failure shut down an aircraft component manufacturing facility for emergency repairs.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000067","text":"A fire in an avionics production facility interrupted manufacturing operations and forced an evacuation.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000068","text":"Electrical problems forced an aerospace component plant to suspend its production lines.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000069","text":"Production was suspended at a manufacturing site after structural damage made part of the facility unsafe.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000070","text":"Emergency maintenance forced a critical materials processing facility to remain offline for several days.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000071","text":"Operations at the manufacturing complex were suspended after its industrial cooling infrastructure unexpectedly failed.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000072","text":"A production facility remained closed after inspectors discovered significant damage to essential manufacturing equipment.","label":"FACILITY_OUTAGE","source":"manual"}
+{"id":"evt_000073","text":"New export controls prohibit companies from selling advanced semiconductor lithography systems to restricted countries.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000074","text":"The government blocked overseas sales of equipment used to manufacture the most advanced semiconductor chips.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000075","text":"Chip design firms are prohibited from providing advanced processor technology to companies in the sanctioned market.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000076","text":"Restrictions prevent semiconductor manufacturers from transferring advanced fabrication technology to designated foreign firms.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000077","text":"Authorities banned exports of specialized equipment required to manufacture high-performance computing chips.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000078","text":"New controls prevent companies from supplying advanced chipmaking software to restricted semiconductor manufacturers.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000079","text":"Foreign companies were denied access to advanced electronic design automation technology under newly imposed export controls.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000080","text":"The government restricted the transfer of specialized semiconductor manufacturing know-how to designated overseas companies.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000081","text":"Export restrictions prohibit the sale of advanced battery manufacturing technology to companies in the targeted country.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000082","text":"Authorities blocked the transfer of specialized battery cell production equipment to sanctioned manufacturers.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000083","text":"Companies can no longer provide advanced battery management technology to entities covered by the technology restrictions.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000084","text":"New controls restrict foreign access to proprietary technology used in advanced battery material processing.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000085","text":"Aerospace suppliers were prohibited from exporting advanced navigation technology to designated foreign companies.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000086","text":"The government restricted overseas transfers of specialized avionics technology with potential military applications.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000087","text":"New export controls prevent targeted companies from obtaining advanced aerospace electronics manufacturing equipment.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000088","text":"Restrictions were introduced on transferring high-performance electronic systems and related technical know-how to sanctioned entities.","label":"TECHNOLOGY_EMBARGO","source":"manual"}
+{"id":"evt_000089","text":"The government introduced a new tariff on semiconductor components imported from overseas manufacturers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000090","text":"Authorities raised import duties on semiconductor manufacturing equipment entering the domestic market.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000091","text":"New customs rules require additional documentation for companies importing semiconductor materials.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000092","text":"The government imposed trade sanctions on several foreign semiconductor suppliers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000093","text":"New export licensing requirements were introduced for companies shipping semiconductor materials abroad.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000094","text":"Authorities removed an existing tariff exemption for imported electronic components.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000095","text":"The government increased import tariffs on lithium-ion battery cells produced overseas.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000096","text":"New customs procedures will apply to shipments of battery materials entering the country.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000097","text":"Trade sanctions were imposed on foreign companies supplying materials to electric vehicle battery manufacturers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000098","text":"Authorities introduced new licensing requirements for companies exporting processed graphite.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000099","text":"The government reduced import duties on selected battery components to encourage domestic electric vehicle production.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000100","text":"A new trade agreement eliminated tariffs on certain critical minerals used by battery manufacturers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000101","text":"New import duties were imposed on aerospace electronic components purchased from foreign suppliers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000102","text":"Authorities introduced additional customs restrictions for aerospace components crossing the national border.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000103","text":"The government announced trade sanctions affecting foreign suppliers of aircraft manufacturing materials.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000104","text":"A revised trade agreement changed the tariff treatment of electronic components used by aerospace manufacturers.","label":"TRADE_POLICY_CHANGE","source":"manual"}
+{"id":"evt_000105","text":"Authorities reduced the annual export quota for gallium used in semiconductor manufacturing.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000106","text":"The government increased the permitted export volume of germanium for the coming year.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000107","text":"A new quota limits the amount of semiconductor-grade silicon that producers may export each quarter.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000108","text":"Officials lowered the annual allocation of rare-earth materials available for overseas semiconductor customers.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000109","text":"The permitted export volume of battery-grade lithium was reduced under a newly announced quota.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000110","text":"Authorities increased the annual export quota for processed graphite used in electric vehicle batteries.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000111","text":"The government established a maximum annual production quota for cobalt supplied by domestic mining companies.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000112","text":"Nickel producers were assigned lower production quotas for the next reporting period.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000113","text":"The country raised the amount of lithium that domestic producers are permitted to export this year.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000114","text":"A revised allocation system reduced the quantity of battery-grade graphite available for export markets.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000115","text":"Authorities introduced an annual export ceiling for a rare-earth element used in aerospace electronics.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000116","text":"The government lowered the permitted export volume of titanium feedstock supplied to overseas aerospace manufacturers.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000117","text":"Domestic producers received higher production allowances for aerospace-grade titanium under the revised quota system.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000118","text":"Officials capped annual exports of specialized rare-earth materials used in advanced electronic systems.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000119","text":"The maximum quantity of critical minerals permitted for overseas shipment was reduced by twenty percent.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000120","text":"Authorities expanded the yearly allocation of strategic metals available to international manufacturers.","label":"QUOTA_CHANGE","source":"manual"}
+{"id":"evt_000121","text":"China will allow producers to ship only 80,000 tonnes of graphite overseas during the next calendar year.","label":"QUOTA_CHANGE","source":"synthetic"}
+{"id":"evt_000122","text":"Authorities reduced the amount of battery-grade lithium that domestic companies may sell abroad by twenty percent.","label":"QUOTA_CHANGE","source":"synthetic"}
+{"id":"evt_000123","text":"Rare-earth producers will be permitted to send a maximum of 50,000 tonnes to foreign customers this year.","label":"QUOTA_CHANGE","source":"synthetic"}
+{"id":"evt_000124","text":"The government raised the yearly amount of cobalt available for overseas buyers from 40,000 to 55,000 tonnes.","label":"QUOTA_CHANGE","source":"synthetic"}
+{"id":"evt_000125","text":"Domestic suppliers may now export fewer shipments of aerospace-grade titanium than they were allowed last year.","label":"QUOTA_CHANGE","source":"synthetic"}
+{"id":"evt_000126","text":"Officials capped overseas sales of a critical semiconductor material at 30,000 tonnes for the next twelve months.","label":"QUOTA_CHANGE","source":"synthetic"}
+{"id":"evt_000127","text":"Imported EV battery cells will face an additional fifteen percent charge at the border beginning next month.","label":"TRADE_POLICY_CHANGE","source":"synthetic"}
+{"id":"evt_000128","text":"Companies shipping processed graphite overseas must obtain government approval before the goods can leave the country.","label":"TRADE_POLICY_CHANGE","source":"synthetic"}
+{"id":"evt_000129","text":"Foreign semiconductor suppliers will pay a higher border charge on components entering the domestic market.","label":"TRADE_POLICY_CHANGE","source":"synthetic"}
+{"id":"evt_000130","text":"Several overseas industrial suppliers were barred from conducting commercial transactions with domestic firms.","label":"TRADE_POLICY_CHANGE","source":"synthetic"}
+{"id":"evt_000131","text":"New border rules require semiconductor importers to provide additional origin documentation before shipments are released.","label":"TRADE_POLICY_CHANGE","source":"synthetic"}
+{"id":"evt_000132","text":"The government removed a previous exemption that allowed certain aerospace components to enter the country without an additional charge.","label":"TRADE_POLICY_CHANGE","source":"synthetic"}
+{"id": "evt_000133", "text": "Some Chinese rare-earth suppliers stopped shipments to U.S. customers amid geopolitical concerns, tightening access to critical materials used in aerospace and semiconductor manufacturing.", "label": "SUPPLY_DISRUPTION", "source": "Reuters", "source_url": "https://www.reuters.com/business/aerospace-defense/china-rare-earth-firms-halt-some-us-shipments-over-geopolitical-worries-sources-2026-09-04/", "published_at": "2026-09-04"}
+{"id": "evt_000134", "text": "Hungary announced stronger environmental oversight of EV battery plants, including substantially higher pollution penalties and a new authority monitoring battery manufacturing and recycling.", "label": "REGULATION_CHANGE", "source": "Reuters", "source_url": "https://www.reuters.com/sustainability/climate-energy/hungary-create-watchdog-oversee-ev-battery-plants-boost-fines-polluters-2026-09-03/", "published_at": "2026-09-03"}
+{"id": "evt_000135", "text": "A major earthquake in Taiwan disrupted TSMC operations and caused production-related losses, although the company reported no structural damage to its fabrication plants.", "label": "FACILITY_OUTAGE", "source": "Reuters", "source_url": "https://www.reuters.com/technology/tsmc-estimates-losses-924-mln-due-taiwan-earthquake-2024-04-18/", "published_at": "2024-04-18"}
+{"id": "evt_000136", "text": "The United States removed TSMC's fast-track authorization for shipments of U.S.-origin chipmaking equipment to its Nanjing facility, requiring individual export licenses for future shipments.", "label": "TECHNOLOGY_EMBARGO", "source": "Reuters", "source_url": "https://www.reuters.com/world/china/us-revokes-tsmcs-fast-track-china-export-status-controls-tighten-2025-09-02/", "published_at": "2025-09-02"}
+{"id": "evt_000137", "text": "The United States announced higher tariffs on Chinese semiconductors, electric vehicle batteries, battery components and critical minerals as part of changes to its import policy.", "label": "TRADE_POLICY_CHANGE", "source": "Reuters", "source_url": "https://www.reuters.com/world/what-are-bidens-new-tariffs-china-goods-2024-05-14/", "published_at": "2024-05-14"}
+{"id": "evt_000138", "text": "Smoke was reported inside a fabrication building shortly before midnight, and the site has not resumed normal operations since.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000139", "text": "Any chip-grade polymer crossing the border will now be taxed at a rate double the previous level.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000140", "text": "A dockworkers' slowdown at a major transshipment port has left crates of packaging substrates sitting unclaimed, and two chipmakers say their lines will run dry within days.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000141", "text": "Industry consultants say the update effectively doubles the paperwork fabs must keep on hazardous-chemical disposal.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000142", "text": "A components shortage has forced a contract manufacturer to halt several assembly lines.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000143", "text": "The export quota for rare-earth materials has been cut by 15 percent for the coming year.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000144", "text": "The transfer of proprietary battery-recycling technology to foreign partners has been blocked.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000145", "text": "Structural damage from a storm has closed an aircraft-component warehouse until repairs are complete.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000146", "text": "Deliveries of a specialized adhesive used in composite wing panels have been pushed back indefinitely, and the affected manufacturer has not named a replacement source.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000147", "text": "A trade agreement easing tariffs on aircraft parts has been ratified by both legislatures.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000148", "text": "Persistent supply-chain disruption has left several fabless design firms unable to secure enough advanced packaging capacity.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000149", "text": "The permitted export volume of specialty aerospace resins has been increased by 40 percent.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000150", "text": "An earthquake forced a Taiwanese chip plant to suspend operations while engineers inspected equipment.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000151", "text": "A retaliatory tariff on imported chipmaking equipment has been announced.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000152", "text": "A bilateral trade agreement will eliminate duties on aircraft components traded between the two countries.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000153", "text": "A strict output cap now limits how much gallium a single refiner may produce each month.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000154", "text": "Industry groups had lobbied for looser limits ahead of the review, but the board set next year's titanium export ceiling below even this year's reduced level.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000155", "text": "A graphite supplier's missed deliveries have left a battery maker without enough anode material to meet orders.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000156", "text": "A toolmaker has been ordered to stop shipping its most advanced chipmaking machines to certain customers abroad.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000157", "text": "The government has banned the export of advanced AI training chips to a list of restricted destinations.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000158", "text": "The finance ministry unveiled a revised customs schedule this week, and chip-grade ceramics will now face a new border levy when entering the country.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000159", "text": "Battery pack lines in three countries slowed this week after cathode shipments from a South American supplier failed to arrive on schedule.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000160", "text": "Nickel exporters face longer customs queues under new rule.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000161", "text": "No more than 40,000 wafers may leave the country's ports each month under new guidance issued this week.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000162", "text": "Maintenance crews were testing a new ventilation system when it failed catastrophically, and the plant has not resumed operations since.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000163", "text": "An electrical fault damaged several furnaces beyond immediate repair, and the plant has produced nothing this week, management says.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000164", "text": "A new trade pact lowers duties on cross-border aerospace component shipments.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000165", "text": "The two governments finalized a new customs arrangement this week; chip components will now clear the border under a simplified inspection process, though goods from a third country face new scrutiny.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000166", "text": "Any facility etching wafers below a certain size will now need a dedicated safety officer on-site during every shift, per updated plant rules.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000167", "text": "A supplier's failure to deliver landing-gear components on time has delayed aircraft assembly at a US plant.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000168", "text": "Spodumene export cap set well below last year's shipments.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000169", "text": "An emergency shutdown was ordered at an avionics plant after a chemical spill was detected.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000170", "text": "Specialized radar technology can no longer be licensed to manufacturers outside a short list of approved nations.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000171", "text": "Assembly plants in Southeast Asia say they are running through their last reserves of a specialty solder after a supplier's shipments stopped arriving without explanation.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000172", "text": "A revised customs code now applies to battery separators, subjecting them to an additional review before they can cross the border.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000173", "text": "Photomask design tools pulled from foreign customer list.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000174", "text": "Overseas lithium allocation shrinks by a third.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000175", "text": "Flooding forced a battery-cell plant to halt production and begin an emergency cleanup.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000176", "text": "A mine supplying battery-grade lithium has suspended operations after flooding damaged equipment on-site.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000177", "text": "A shortage of bonding wire has disrupted chip packaging operations at several plants.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000178", "text": "The government has set a new annual limit of 5,000 tonnes on titanium sponge exports.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000179", "text": "A trade dispute has led to retaliatory tariffs on semiconductor testing equipment.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000180", "text": "The permitted volume of gallium exports has been reduced for the second consecutive year.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000181", "text": "Environmental requirements for cobalt refining wastewater have been tightened by the ministry.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000182", "text": "A new quota limits silicon carbide wafer exports to 25,000 units per quarter.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000183", "text": "A fire broke out at a semiconductor fab in Japan, halting production for several days.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000184", "text": "Cell makers overseas say their planned imports have been slashed after the exporting country capped annual shipments at half of last year's volume.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000185", "text": "Engineers at the joint venture can no longer access the source code behind the aircraft's flight-management software.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000186", "text": "Goods originating from the flagged region can no longer clear customs at the port, effective immediately.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000187", "text": "New safety certification standards for avionics software have been finalized by the civil aviation authority.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000188", "text": "Orders for a niche photoresist chemical have gone unfilled for six weeks, and buyers in South Korea say they have no backup source.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000189", "text": "Titanium sponge export ceiling lowered for second year running.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000190", "text": "A regional carrier says spare parts for one of its aircraft types have not arrived in over two months, grounding three planes.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000191", "text": "Import tariffs on foreign-made lithography chemicals have been raised sharply.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000192", "text": "Titanium forge dark after weekend equipment failure.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000193", "text": "All output at the facility was suspended after a chemical containment failure was discovered during a routine inspection.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000194", "text": "The administration has widened its ban on shipping advanced AI processors to a broader list of destinations.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000195", "text": "A power failure shut down operations at an aircraft-parts factory for most of the day.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000196", "text": "A new annual ceiling of 15,000 tonnes has been placed on exports of high-purity quartz.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000197", "text": "A cloud-based chip simulation platform has stopped granting new accounts to users connecting from a list of restricted countries.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000198", "text": "The countries signed a memorandum easing restrictions on cross-border component trade, and aerospace fasteners are among the first goods to benefit from the streamlined customs process.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000199", "text": "Shipping a completed landing-gear assembly across the border now requires sign-off from two separate customs agencies instead of one.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000200", "text": "The order was placed four months ago; it still has not shipped, and the buyer's line has been running on borrowed inventory ever since.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000201", "text": "The materials board met twice this month to review overseas allocations, and aerospace-grade titanium shipments will now be held to a fixed ceiling of 8,000 tonnes a year.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000202", "text": "Customs officials will now require pre-shipment inspection certificates for any avionics component leaving the country.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000203", "text": "Officials announced a review of import channels for specialty chemicals, and companies bringing the chemicals across the border will now need prior written approval.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000204", "text": "Customs delays mount as new chip-chemical certificate rule kicks in.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000205", "text": "Flooding has forced the temporary closure of a components-assembly plant.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000206", "text": "A new industrial standard requires battery makers to disclose the full material composition of every cell sold domestically.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000207", "text": "Sanctions have been imposed on a nickel exporter, barring its shipments from entering the bloc.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000208", "text": "Fastener drought slows jet-engine final assembly.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000209", "text": "Coolant leak forces emergency shutdown at chip plant.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000210", "text": "The annual manganese export quota has been reduced by a quarter.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000211", "text": "Foreign buyers will be able to purchase no more than a fixed share of the country's neon gas output starting this quarter, down from unrestricted access previously.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000212", "text": "Sanctions targeting a graphite producer now prevent its exports from reaching several major markets.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000213", "text": "Chip packaging lines in Vietnam sit idle as promised wire-bonding equipment parts remain stuck en route.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000214", "text": "A gas leak triggered an emergency shutdown at a semiconductor plant.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000215", "text": "Facilities producing battery separators will need to secure a renewed safety license every two years instead of every five, under an updated compliance schedule.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000216", "text": "Buyers say their orders have been rationed since the exporting nation set a fixed annual cap on rare-earth magnet shipments.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000217", "text": "Access to the design files needed to tape out chips below a certain size has been cut off for engineers without domestic citizenship.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000218", "text": "Overseas shipments of a specialty etching gas will be held to 1,200 tonnes this year, roughly half of what was allowed twelve months ago.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000219", "text": "The formulas behind the company's newest battery chemistry are now off-limits to any manufacturer lacking a security clearance.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000220", "text": "Cathode recipe access shut off to overseas licensees.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000221", "text": "A new certificate will be required at customs for any aerospace-grade alloy crossing the border, adding several days to typical clearance times.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000222", "text": "An explosion at a chemical storage unit has forced the closure of a wafer-processing plant.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000223", "text": "New export licensing requirements now apply to shipments of aircraft-grade titanium.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000224", "text": "Shipments of battery-grade lithium hydroxide bound for a European gigafactory have been stuck at a transfer hub for nearly a month.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000225", "text": "Rare-earth magnet allocation for aerospace buyers cut sharply.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000226", "text": "Buyers overseas will receive a fixed allotment of high-purity silicon each quarter, replacing the previously unlimited purchase arrangement.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000227", "text": "Sensor-parts makers brace for stricter calibration audits.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000228", "text": "Wafer-thinning process specs deemed too sensitive to export.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000229", "text": "The ministry finished its annual review of critical-mineral exports, and producers will now be restricted to shipping no more than 100,000 tonnes of spodumene concentrate abroad this year.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000230", "text": "Border charge on imported chip substrates takes effect.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000231", "text": "Cathode plants ordered to log every batch for a decade.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000232", "text": "Battery recyclers across the bloc will soon be required to prove at least 95 percent of lithium is recovered from every cell they process.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000233", "text": "The plant's main assembly hall has been closed since water from a burst pipe damaged wiring throughout the building.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000234", "text": "Avionics testers must now log every calibration to the minute.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000235", "text": "Border tax added to imported cathode precursor.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000236", "text": "Cell assembly plants will be required to pass an annual structural inspection under revised manufacturing rules taking effect next year.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000237", "text": "Restrictions now bar the transfer of proprietary battery-management software to manufacturers in the region.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000238", "text": "Wafer plants face new rules on chemical spill reporting.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000239", "text": "A free-trade agreement covering semiconductor components has been signed by the two countries.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000240", "text": "Customs rules for chip-manufacturing chemicals crossing the border have been tightened.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000241", "text": "De-icing control unit specs locked from overseas manufacturers.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000242", "text": "Battery-pack assembly lines will be required to undergo an independent fire-risk assessment before their domestic production license can be renewed.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000243", "text": "Cathode plant shutters after weekend structural failure.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000244", "text": "A supplier of cockpit displays has fallen more than ten weeks behind on orders, and two customers say they are now looking elsewhere.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000245", "text": "A cobalt shortage has left a battery-cell producer unable to meet its second-quarter targets.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000246", "text": "Recycling requirements for semiconductor-grade silicon scrap have been formalized under updated industrial rules.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000247", "text": "Aircraft-parts makers must retain full traceability records for a decade under updated recordkeeping requirements.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000248", "text": "Compliance requirements for aircraft wiring insulation have been updated by the civil aviation authority.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000249", "text": "A materials-processing site that supplies cathode precursor has not reopened since inspectors found cracks in a structural support beam.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000250", "text": "After talks stalled for weeks, one side announced it would impose a new border tax on incoming chip components starting next month.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000251", "text": "Advanced packaging know-how kept in-house under new rules.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000252", "text": "A licensing deal for next-generation solid-state cell technology fell through this week after the supplier cited new restrictions on sharing its process know-how with overseas partners.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000253", "text": "The country will allow no more than 90,000 tonnes of refined lithium carbonate to leave its ports next year, down from an uncapped total previously.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000254", "text": "Companies wishing to sell battery cells into the country must now register with customs officials before each shipment clears the border.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000255", "text": "Output at a cathode-material plant has been suspended since equipment on its main line seized up early Tuesday.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000256", "text": "Aerospace fastener imports face new customs scrutiny.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000257", "text": "The government has reduced the annual gallium export quota by 20 percent.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000258", "text": "The company told investors that one of its packaging sites has been idle since a fire alarm triggered an evacuation that has yet to be lifted.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000259", "text": "Graphite anode material shortages have pushed back cell production at a mid-sized battery maker.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000260", "text": "Cell line stopped cold after fire-suppression system triggers unexpectedly.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000261", "text": "Chip plants told to overhaul chemical storage within a year.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000262", "text": "The trade bureau finalized new export tables this week, and germanium shipments abroad will now be capped at 600 tonnes annually, a steep drop from recent years.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000263", "text": "Photomask orders pile up as vendor falls silent on delivery.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000264", "text": "Two European battery plants have trimmed output because the nickel sulfate they rely on has not been delivered in full for over a month.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000265", "text": "Any plant recycling lithium-ion packs will need an updated environmental permit before restarting idle lines, under rules taking effect this quarter.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000266", "text": "Safety standards for handling specialty gases in wafer fabs have been strengthened.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000267", "text": "A materials science lab has been barred from publishing details of its new anode coating process in any venue accessible to foreign researchers.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000268", "text": "The list of countries facing export controls on raw gallium has been expanded by trade officials.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000269", "text": "A battery-pack assembler has burned through its buffer stock of separator film and has yet to line up a new supplier.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000270", "text": "No more than 70 percent of last year's lithium hydroxide export volume will be allowed to leave the country this year.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000271", "text": "Component testers will need to recalibrate their equipment against a new reference standard before certifying any further flight-control parts.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000272", "text": "Buyers abroad will be limited to a fixed tonnage of polysilicon each quarter, industry sources confirm, down sharply from current levels.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000273", "text": "Tariffs on imported avionics parts have been raised as part of a broader trade dispute.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000274", "text": "Sanctions have cut off a lithium producer's access to several export markets.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000275", "text": "Inspection requirements for battery-pack thermal management systems have been strengthened.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000276", "text": "A battery-testing laboratory has been told it can no longer share its degradation-analysis methodology with clients based overseas.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000277", "text": "Chipmakers operating in the state will need to cut wastewater discharge levels by half under a new environmental rule effective next year.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000278", "text": "The cobalt export allowance has been increased from 30,000 to 45,000 tonnes annually.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000279", "text": "Updated inspection protocols for jet-engine turbine blades have taken effect.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000280", "text": "A shortage of ultra-pure water treatment chemicals is constraining chip production in Taiwan.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000281", "text": "A structural collapse at a components warehouse has suspended all outbound shipments from the site.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000282", "text": "Aircraft-parts backlogs have worsened after a connector supplier could not keep pace with demand.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000283", "text": "Wafer output has been zero at the site since a power substation serving the plant failed during a storm.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000284", "text": "Customs backlog builds as new battery-material certificate rule begins.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000285", "text": "A shortage of packaging substrates has forced a Malaysian chip assembler to scale back weekend shifts.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000286", "text": "Cross-border shipments of navigation modules have slowed since customs began requiring a newly introduced compliance declaration.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000287", "text": "Battery-grade materials recipe kept from foreign cell makers.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000288", "text": "The number of advanced packaging substrates a single buyer may import each quarter will now be capped at a set figure, down from no limit at all.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000289", "text": "Several fabs have begun installing new scrubber systems after inspectors raised the minimum standard for volatile-compound capture.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000290", "text": "A new round of tariffs targets imported chip-packaging materials.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000291", "text": "New industrial standards govern the testing of flight-control actuators.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000292", "text": "Shipments crossing into the bloc will now carry an added charge equal to a tenth of their declared value.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000293", "text": "A leading chipmaker has been barred from installing its most advanced memory-fabrication tools at an overseas plant.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000294", "text": "Delivery delays for avionics wiring harnesses have disrupted final assembly at an aircraft manufacturer.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000295", "text": "An aircraft-seat maker says it has been unable to secure enough specialized foam for its cushions since late last month, pushing back deliveries to two airlines.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000296", "text": "Gigafactory line paused indefinitely after equipment fire.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000297", "text": "Analysts expect compliance costs to rise after inspectors gained authority to test emissions at any fab without advance notice.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000298", "text": "A ceiling of 2,000 tonnes has been placed on annual exports of the specialty alloy used in turbine blades.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000299", "text": "A fixed monthly allocation will now govern how much aerospace-grade titanium may be shipped to any single buyer.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000300", "text": "The two firms had planned to co-develop a new radar module, but that plan is now on hold after regulators restricted the sharing of the underlying signal-processing technology.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000301", "text": "Cathode-grade nickel allocation trimmed by a fifth.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000302", "text": "Environmental standards for fab cooling-water discharge have been made stricter.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000303", "text": "A new tariff of 25 percent will apply to imported semiconductor components starting next quarter.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000304", "text": "Flight-control chip blueprints locked away from foreign buyers.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000305", "text": "Aerostructures site closed indefinitely after structural inspection.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000306", "text": "A production quota has been introduced limiting how much polysilicon a single plant may output monthly.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000307", "text": "A foundry's plans to install next-generation etching tools have collapsed after the toolmaker was barred from shipping the equipment to the site.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000308", "text": "Analysts note that lead times for a critical flight-control sensor have stretched past five months, with the manufacturer citing an unnamed supplier's ongoing shortfall.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000309", "text": "The automaker's battery line ran two shifts short this week; it cited a supplier that has not delivered separator film since early last month.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000310", "text": "Fixed shipment ceiling introduced for specialty aerospace alloys.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000311", "text": "A processing plant in Africa that refines a rare gas used in chipmaking has fallen behind on outbound shipments for two months, and several fabs abroad say their reserves are nearly gone.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000312", "text": "A warehouse storing battery components was damaged by fire, halting shipments from the site.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000313", "text": "A battery-recycling plant has not processed a single pack since a fire broke out in its shredding area two weeks ago.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000314", "text": "Restrictions on sharing chip-design intellectual property with foreign entities have been expanded.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000315", "text": "Shippers say clearing the border now takes twice as long after customs began requiring an additional certificate of origin for every battery shipment.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000316", "text": "After several thermal-runaway incidents were reported industry-wide, cell makers must now install additional temperature sensors in every module before sale.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000317", "text": "Cross-border paperwork burden grows for aircraft-parts shippers.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000318", "text": "Technology-transfer restrictions now cover next-generation solid-state battery production methods.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000319", "text": "Production at a wafer fab has been suspended following what the company described only as an unplanned electrical event overnight.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000320", "text": "A malfunctioning press damaged critical tooling beyond quick repair, and the plant has not shipped a single cell since.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000321", "text": "Detailed process parameters for a new electrode-binder formulation have been withheld from a planned overseas joint venture following a government review.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000322", "text": "A fire has shut down a lithium processing plant, and the company has not given a timeline for reopening.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000323", "text": "A power outage has forced a battery-cell plant to suspend production for the second time this month.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000324", "text": "Only 500 units of the flight-control module may leave the country each month under updated allocation guidance.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000325", "text": "Nickel supply shortages are limiting how many battery packs a cell maker can produce this quarter.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000326", "text": "Because two nearby residential areas raised air-quality complaints, fabs in the district must now install additional filtration before year's end.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000327", "text": "Composite-panel maker waits on resin shipment that never came.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000328", "text": "A transformer at the plant failed just after 3 a.m., and repair crews say the assembly hall will remain without power, and thus without output, until at least Friday.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000329", "text": "Advanced semiconductor manufacturing equipment has been added to the list of items requiring special export authorization.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000330", "text": "The export limit on aircraft-grade aluminum alloys has been raised by a third.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000331", "text": "Avionics plant goes idle after roof failure.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000332", "text": "Chip-design software access has been restricted for engineers working in certain countries.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000333", "text": "A flight-simulation software company has stopped issuing licenses that would let foreign engineering teams model its newest cockpit-display system.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000334", "text": "Import duties on raw silicon wafers have been raised by the finance ministry.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000335", "text": "Nickel allocation to shrink for third straight year.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000336", "text": "A fire has damaged a chip-packaging facility, halting output indefinitely.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000337", "text": "Cell makers will need to redesign their quality-control paperwork after inspectors began requiring full traceability for every battery cell produced.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000338", "text": "A production ceiling has been set on monthly polysilicon output for domestic plants.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000339", "text": "Connector-grade rare-earth exports face new annual cap.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000340", "text": "Workers were evacuated from an aerostructures plant after a section of roofing collapsed onto the main assembly floor.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000341", "text": "The industrial ministry says every fab must file a quarterly water-use report starting in the coming year, part of a broader push to modernize plant oversight.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000342", "text": "A French aerostructures firm reports it cannot source enough titanium fasteners to keep pace with its delivery schedule.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000343", "text": "A revised bilateral accord will remove the licensing step currently required before chip-testing equipment can be shipped across the border.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000344", "text": "A landslide blocked the only access road to a remote lithium site in the Andes for eleven days, and cell makers downstream say they are rationing stock while shipments catch up.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000345", "text": "A key patent covering high-density cell architecture has been placed under a technology-control order, barring its licensing abroad.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000346", "text": "The maintenance manual for the navigation system included proprietary calibration steps that foreign repair shops have now lost access to entirely.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000347", "text": "Inspectors visited twelve fabs last quarter without prior notice; under revised rules, such unannounced visits will now happen at every site at least twice a year.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000348", "text": "The startup had hoped to license its chip-cooling technique overseas, but officials have since deemed the technique sensitive enough to require a special license for any foreign transfer.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000349", "text": "Foundries in the country must now log every water sample taken from onsite treatment ponds; the requirement takes effect at the start of the next fiscal year.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000350", "text": "The materials authority set a hard limit of 3,500 tonnes on titanium billet exports for the year ahead.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000351", "text": "Maximum production limits for a key chipmaking chemical have been established by regulators.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000352", "text": "A chip-design software vendor has quietly stopped renewing licenses for customers based in the sanctioned jurisdiction.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000353", "text": "Cell producers setting up in the country will need to pass a new fire-suppression inspection before their first shipment can leave the plant.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000354", "text": "New import duties on foreign aircraft components have been announced by the trade ministry.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000355", "text": "A fire at a battery recycling facility has forced an indefinite suspension of operations.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000356", "text": "A newly signed accord removes the licensing step previously required before lithium salts could be shipped between the two countries.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000357", "text": "Updated safety standards for cleanroom chemical storage have been issued for chip fabrication plants.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000358", "text": "Composite-curing recipe locked down for exports.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000359", "text": "Fab evacuated after overnight fire alarm, restart date unclear.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000360", "text": "A prolonged shortage of gallium arsenide wafers is affecting several specialty chip producers.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000361", "text": "A bilateral agreement removes tariffs on battery components traded between the two markets.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000362", "text": "Specialized avionics technology transfer has been blocked for a state-owned aircraft maker.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000363", "text": "Chipmakers are reporting extended lead times for microcontrollers due to component shortages.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000364", "text": "The process used to manufacture silicon-anode material has been classified as sensitive, and licensing it to overseas partners now requires special approval.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000365", "text": "Export allowances for high-purity silicon have been cut in half.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000366", "text": "Advanced chip-packaging equipment now requires a special license before it can be shipped overseas.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000367", "text": "Manufacturing standards for flight-control wiring have been revised by the aviation authority.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000368", "text": "Know-how for producing a next-generation electrolyte additive has been designated too sensitive to license abroad.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000369", "text": "Fab operators face tighter chemical-handling audits from next spring.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000370", "text": "Manufacturing standards for lithography chemical handling have been revised nationwide.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000371", "text": "Maintenance shops overhauling landing gear will need a second sign-off from an independent inspector before returning parts to service.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000372", "text": "A cobalt exporter in central Africa has been unable to move material out of the region for weeks, and refiners overseas say their stockpiles are thinning fast.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000373", "text": "Recycling requirements for used photoresist chemicals have been tightened by regulators.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000374", "text": "Any component crossing into the country will now be subject to a new inspection fee levied at the point of entry.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000375", "text": "Navigation-chip know-how walled off from foreign partners.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000376", "text": "Chemical leak halts operations at wafer plant.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000377", "text": "A hard cap of 6,500 tonnes will apply to exports of a specialty semiconductor-grade gas starting next quarter.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000378", "text": "A newly formed oversight panel will review every avionics supplier's quality system; suppliers that fail the review will lose their certification within ninety days.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000379", "text": "In a note to investors, the company said it has been unable to source enough battery-grade manganese sulfate to run its cathode line at full rate.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000380", "text": "Buyers abroad must now file for a permit before any shipment of processed nickel can leave the port.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000381", "text": "Cleanroom certification overhaul to hit local chip plants.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000382", "text": "Import restrictions on refined cobalt from the sanctioned country have taken effect.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000383", "text": "Smartphone assembly at one plant has slowed to half capacity; the company blames unfilled orders for a display driver chip that has not arrived since July.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000384", "text": "Shops that overhaul navigation units will need certification from a newly created inspection body before they can accept further work.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000385", "text": "The list of chipmaking equipment requiring export authorization has been expanded to include newer etching tools.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000386", "text": "In an internal memo, the supplier said it will need to retrain its entire quality team to meet updated recordkeeping requirements set by the aviation regulator.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000387", "text": "A supplier of composite manufacturing tooling has been told it can no longer share its layup process specifications with customers outside a short list of allied countries.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000388", "text": "After a regional trucking strike stretched into its second week, several fabs report they have run low on bulk chemicals needed for etching.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000389", "text": "Cell assembly stalls in Poland as promised electrolyte batch fails to show.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000390", "text": "The technical drawings needed to manufacture a new generation of jet-engine turbine blades have been restricted from release to non-domestic suppliers.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000391", "text": "The export allowance for aerospace-grade carbon fiber has been raised from 10,000 to 14,000 tonnes.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000392", "text": "Production has been suspended at the plant since a section of the cleanroom ceiling gave way over the weekend.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000393", "text": "Engineers had hoped to bring the fast-charging technology to a plant abroad, but new rules classify the underlying charge-control algorithm as too sensitive to transfer.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000394", "text": "Sales of advanced lithography systems to certain overseas chipmakers are now prohibited under updated government rules.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000395", "text": "Chip production has slowed after a key raw-wafer supplier failed to meet delivery commitments.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000396", "text": "A planned technology exchange for next-generation avionics sensors was called off after officials placed the underlying chip design on a restricted list.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000397", "text": "Composite-material suppliers will be subject to quarterly on-site audits rather than the current annual review, starting in the new year.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000398", "text": "Export restrictions on aerospace-grade titanium alloys have been tightened by trade officials.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000399", "text": "Titanium backlog leaves jet-engine parts maker scrambling.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000400", "text": "Inspectors found hairline cracks in a load-bearing wall of the plant, and the site has been closed to production while a full structural review is carried out.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000401", "text": "Access to classified flight-control system schematics has been cut off for a foreign contractor.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000402", "text": "A simulation tool used to certify new avionics designs has been reclassified, meaning foreign engineering teams can no longer run it.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000403", "text": "An industry group's latest survey found that more than half of aerostructure suppliers have had at least one order go unfilled by their upstream material provider this year.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000404", "text": "A ban on exporting chip-design automation tools to a specific country has been expanded.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000405", "text": "The government has doubled the annual export allowance for battery-grade nickel sulfate.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000406", "text": "Battery-grade cobalt shipments held to fixed annual figure.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000407", "text": "Sensor calibration technique off-limits to overseas maintenance shops.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000408", "text": "An explosion at a materials-processing facility used by an aerospace supplier has halted operations there.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000409", "text": "Titanium forgers face new heat-treatment documentation rules.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000410", "text": "Shipments of processed cobalt will be restricted to a set tonnage each month, roughly two-thirds of the previous pace.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000411", "text": "A planned technology-sharing agreement for advanced cathode coating collapsed after officials classified the process as export-restricted.", "label": "TECHNOLOGY_EMBARGO", "source": "synthetic"}
+{"id": "evt_000412", "text": "Overseas buyers have begun rationing existing stock after the producing country fixed graphite exports at a fraction of last year's total.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000413", "text": "Recycling mandates now require battery makers to recover a minimum share of nickel and cobalt from spent packs.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000414", "text": "Persistent shortages of specialty gases have slowed wafer output at several Taiwanese foundries.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000415", "text": "A backup generator caught fire during a routine test, cutting power to the entire cleanroom, and the plant has been dark since.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000416", "text": "Chip substrate tariff hike rattles regional supply chains.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000417", "text": "Equipment malfunction has forced a chip plant to suspend a portion of its production lines.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000418", "text": "New paperwork rule slows lithium shipments at the border.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000419", "text": "Export quotas for tantalum capacitor materials have been tightened.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000420", "text": "Battery plant goes dark after overnight incident.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000421", "text": "A Chinese wafer producer says a lack of available neon gas is constraining its output.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000422", "text": "Graphite shipments capped at 60,000 tonnes annually.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000423", "text": "The fab's cleanroom was taken offline after a cooling system failure damaged sensitive equipment overnight.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000424", "text": "A gigafactory has gone quiet for the third day running after what local officials called an internal safety incident.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000425", "text": "Cathode buyers turn to spot market as contracted tonnes fail to arrive.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000426", "text": "A supplier missed three consecutive shipment windows, leaving a chipmaker short of the specialty resin used in packaging.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000427", "text": "A Japanese sensor-parts maker has gone quiet on delivery dates after saying its own inputs are running low, leaving two aircraft manufacturers waiting.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000428", "text": "The two nations agreed to let each other's aerospace components cross the border duty-free starting next quarter.", "label": "TRADE_POLICY_CHANGE", "source": "synthetic"}
+{"id": "evt_000429", "text": "Orders for a specialized battery-can component have gone unfulfilled since the spring, and the buyer has been forced to draw down inventory it had planned to keep in reserve.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000430", "text": "A quarterly export cap on specialty photoresist chemicals has been introduced.", "label": "QUOTA_CHANGE", "source": "synthetic"}
+{"id": "evt_000431", "text": "Aviation authorities have updated inspection requirements for composite fuselage sections.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000432", "text": "The agency finished a two-year review of maintenance recordkeeping; shops overhauling flight-control components must now retain digital logs for fifteen years instead of seven.", "label": "REGULATION_CHANGE", "source": "synthetic"}
+{"id": "evt_000433", "text": "A processing plant that refines rare gases used in chipmaking has been offline since a containment breach was reported over the weekend.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000434", "text": "Alarms sounded at the facility just before dawn, and by the time the fire was contained, the entire production floor had been evacuated and operations remain suspended.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000435", "text": "An earthquake has damaged an aerospace-components factory, halting production there.", "label": "FACILITY_OUTAGE", "source": "synthetic"}
+{"id": "evt_000436", "text": "Connector backlog grounds assembly at avionics supplier.", "label": "SUPPLY_DISRUPTION", "source": "synthetic"}
+{"id": "evt_000437", "text": "Manufacturing rules for battery-pack fire safety have been tightened following a series of independent reviews.", "label": "REGULATION_CHANGE", "source": "synthetic"}
