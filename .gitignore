@@ -43,3 +43,10 @@ data/processed/*
 dist/
 build/
 *.egg-info/
+
+# Trained ML model weights
+models/**/model.safetensors
+models/**/pytorch_model.bin
+
+# Training checkpoints
+models/**/checkpoints/

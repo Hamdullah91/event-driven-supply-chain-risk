@@ -1,0 +1,12 @@
+{
+  "best_checkpoint": "/content/checkpoints/checkpoint-66",
+  "best_validation_macro_f1": 0.7850598719019772,
+  "train_metrics": {
+    "train_runtime": 30.2022,
+    "train_samples_per_second": 34.666,
+    "train_steps_per_second": 2.185,
+    "total_flos": 9183336511248.0,
+    "train_loss": 1.5220218716245708,
+    "epoch": 3.0
+  }
+}
