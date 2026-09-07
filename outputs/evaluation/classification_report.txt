@@ -1,0 +1,12 @@
+                     precision    recall  f1-score   support
+
+  SUPPLY_DISRUPTION       1.00      0.86      0.92         7
+  REGULATION_CHANGE       0.75      0.86      0.80         7
+    FACILITY_OUTAGE       0.88      1.00      0.93         7
+ TECHNOLOGY_EMBARGO       1.00      0.86      0.92         7
+TRADE_POLICY_CHANGE       1.00      0.50      0.67         8
+       QUOTA_CHANGE       0.67      1.00      0.80         8
+
+           accuracy                           0.84        44
+          macro avg       0.88      0.85      0.84        44
+       weighted avg       0.88      0.84      0.84        44
