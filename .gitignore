@@ -50,3 +50,8 @@ models/**/pytorch_model.bin
 
 # Training checkpoints
 models/**/checkpoints/
+
+#for new ingestion pipeline
+.env
+data/news/*.db
+logs/*.log
