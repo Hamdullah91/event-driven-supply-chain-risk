@@ -1,62 +1,62 @@
 CANONICAL_COMPANIES: dict[str, dict[str, str]] = {
-    "company_tsmc": {
+    "tsmc": {
         "name": "Taiwan Semiconductor Manufacturing Company",
         "entity_type": "Company",
     },
-    "company_nvidia": {
+    "nvidia": {
         "name": "NVIDIA Corporation",
         "entity_type": "Company",
     },
-    "company_intel": {
+    "intel": {
         "name": "Intel Corporation",
         "entity_type": "Company",
     },
-    "company_boeing": {
+    "boeing": {
         "name": "The Boeing Company",
         "entity_type": "Company",
     },
-    "company_general_motors": {
+    "general_motors": {
         "name": "General Motors Company",
         "entity_type": "Company",
     },
-    "company_rtx": {
-    "name": "RTX Corporation",
-    "entity_type": "Company",
+    "rtx": {
+        "name": "RTX Corporation",
+        "entity_type": "Company",
     },
-    "company_samsung_electronics": {
+    "samsung_electronics": {
         "name": "Samsung Electronics",
         "entity_type": "Company",
     },
-    "company_sk_hynix": {
+    "sk_hynix": {
         "name": "SK Hynix",
         "entity_type": "Company",
     },
-    "company_micron": {
+    "micron": {
         "name": "Micron Technology",
         "entity_type": "Company",
     },
-    "company_amd": {
+    "amd": {
         "name": "Advanced Micro Devices",
         "entity_type": "Company",
     },
-    "company_broadcom": {
+    "broadcom": {
         "name": "Broadcom",
         "entity_type": "Company",
     },
-    "company_qualcomm": {
+    "qualcomm": {
         "name": "Qualcomm",
         "entity_type": "Company",
     },
-    "company_tesla": {
+    "tesla": {
         "name": "Tesla",
         "entity_type": "Company",
     },
-    "company_texas_instruments": {
+    "texas_instruments": {
         "name": "Texas Instruments",
         "entity_type": "Company",
     },
-    "company_asml": {
-    "name": "ASML Holding N.V.",
-    "entity_type": "Company",
+    "asml": {
+        "name": "ASML Holding N.V.",
+        "entity_type": "Company",
     },
 }

@@ -73,8 +73,8 @@ def test_news_nlp_resolves_companies() -> None:
         for company in result.resolved_companies
     }
 
-    assert resolved["ASML"] == "company_asml"
-    assert resolved["TSMC"] == "company_tsmc"
+    assert resolved["ASML"] == "asml"
+    assert resolved["TSMC"] == "tsmc"
 
 
 def test_news_nlp_extracts_supply_relationship() -> None:

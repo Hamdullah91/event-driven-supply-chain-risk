@@ -13,6 +13,10 @@ from src.ingestion.news.repository import NewsRepository
 from src.ingestion.news.classification import NewsClassificationService
 from src.ml.event_classifier import EventClassifier
 
+from src.events.pipeline import EventPipeline
+from src.graph.connection import Neo4jConnection
+from src.graph.repository import GraphRepository
+from src.ingestion.news.nlp_processor import NewsNLPProcessor
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -98,7 +102,16 @@ async def main() -> None:
     classification_service = NewsClassificationService(
         classifier=classifier
     )
+    nlp_processor = NewsNLPProcessor()
 
+    neo4j_connection = Neo4jConnection()
+    graph_repository = GraphRepository(
+        neo4j_connection
+    )
+
+    event_pipeline = EventPipeline(
+        graph_repository=graph_repository
+    )
     query = (
         '"semiconductor" OR '
         '"chip shortage" OR '
@@ -126,9 +139,9 @@ async def main() -> None:
             poll_interval_seconds=(
                 settings.news_poll_interval_seconds
             ),
-            classification_service=(
-                classification_service
-            ),
+            nlp_processor=nlp_processor,
+            classification_service=classification_service,
+            event_pipeline=event_pipeline,
         )
 
         loop = asyncio.get_running_loop()
@@ -149,7 +162,10 @@ async def main() -> None:
             "Starting Day 34 news classification service."
         )
 
-        await poller.run_forever()
+        try:
+            await poller.run_forever()
+        finally:
+            neo4j_connection.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

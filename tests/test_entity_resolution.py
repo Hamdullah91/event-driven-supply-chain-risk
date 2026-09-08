@@ -13,7 +13,7 @@ def test_normalize_entity_name():
 def test_resolve_tsmc_alias():
     result = resolve_company("TSMC")
 
-    assert result.canonical_id == "company_tsmc"
+    assert result.canonical_id == "tsmc"
     assert result.canonical_name == "Taiwan Semiconductor Manufacturing Company"
     assert result.confidence == 1.0
     assert result.resolution_method == "alias_exact"
@@ -24,13 +24,13 @@ def test_resolve_tsmc_full_name():
         "Taiwan Semiconductor Manufacturing Company"
     )
 
-    assert result.canonical_id == "company_tsmc"
+    assert result.canonical_id == "tsmc"
 
 
 def test_resolve_nvidia():
     result = resolve_company("NVIDIA Corp.")
 
-    assert result.canonical_id == "company_nvidia"
+    assert result.canonical_id == "nvidia"
     assert result.canonical_name == "NVIDIA Corporation"
 
 
@@ -42,10 +42,11 @@ def test_unresolved_company():
     assert result.confidence == 0.0
     assert result.resolution_method == "unresolved"
 
+
 def test_fuzzy_resolve_nvidia_typo():
     result = resolve_company("Nvidia Corporaton")
 
-    assert result.canonical_id == "company_nvidia"
+    assert result.canonical_id == "nvidia"
     assert result.canonical_name == "NVIDIA Corporation"
     assert result.resolution_method == "alias_fuzzy"
     assert result.confidence >= 0.85
@@ -54,7 +55,7 @@ def test_fuzzy_resolve_nvidia_typo():
 def test_fuzzy_resolve_general_motors():
     result = resolve_company("General Motor Company")
 
-    assert result.canonical_id == "company_general_motors"
+    assert result.canonical_id == "general_motors"
     assert result.resolution_method == "alias_fuzzy"
     assert result.confidence >= 0.85
 
@@ -65,6 +66,7 @@ def test_bad_match_stays_unresolved():
     assert result.canonical_id is None
     assert result.canonical_name is None
     assert result.resolution_method == "unresolved"
+
 
 def test_resolve_multiple_companies():
     from src.nlp.entity_resolution.resolver import resolve_companies
@@ -78,12 +80,13 @@ def test_resolve_multiple_companies():
 
     assert len(results) == 4
 
-    assert results[0].canonical_id == "company_tsmc"
-    assert results[1].canonical_id == "company_nvidia"
-    assert results[2].canonical_id == "company_intel"
+    assert results[0].canonical_id == "tsmc"
+    assert results[1].canonical_id == "nvidia"
+    assert results[2].canonical_id == "intel"
 
     assert results[3].canonical_id is None
     assert results[3].resolution_method == "unresolved"
+
 
 from src.nlp.entity_resolution.integration import (
     resolve_extracted_companies,
@@ -98,8 +101,9 @@ def test_resolve_extracted_companies_removes_duplicates():
     ])
 
     assert len(results) == 2
-    assert results[0].canonical_id == "company_tsmc"
-    assert results[1].canonical_id == "company_nvidia"
+    assert results[0].canonical_id == "tsmc"
+    assert results[1].canonical_id == "nvidia"
+
 
 def test_resolution_stats():
     from src.nlp.entity_resolution.integration import (
@@ -120,10 +124,11 @@ def test_resolution_stats():
     assert stats["unresolved"] == 1
     assert stats["resolution_rate"] == 2 / 3
 
+
 def test_resolve_amd():
     result = resolve_company("AMD")
 
-    assert result.canonical_id == "company_amd"
+    assert result.canonical_id == "amd"
     assert result.canonical_name == "Advanced Micro Devices"
     assert result.resolution_method == "alias_exact"
 
@@ -131,23 +136,23 @@ def test_resolve_amd():
 def test_resolve_rtx():
     result = resolve_company("RTX")
 
-    assert result.canonical_id == "company_rtx"
+    assert result.canonical_id == "rtx"
     assert result.canonical_name == "RTX Corporation"
 
 
 def test_resolve_samsung():
     result = resolve_company("Samsung Electronics")
 
-    assert result.canonical_id == "company_samsung_electronics"
+    assert result.canonical_id == "samsung_electronics"
 
 
 def test_resolve_sk_hynix():
     result = resolve_company("SK Hynix")
 
-    assert result.canonical_id == "company_sk_hynix"
+    assert result.canonical_id == "sk_hynix"
 
 
 def test_resolve_texas_instruments():
     result = resolve_company("Texas Instruments")
 
-    assert result.canonical_id == "company_texas_instruments"
+    assert result.canonical_id == "texas_instruments"

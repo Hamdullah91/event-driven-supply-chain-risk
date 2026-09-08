@@ -5,10 +5,12 @@ import logging
 from datetime import UTC, datetime, timedelta
 from time import monotonic
 
+from src.events.pipeline import EventPipeline
 from src.ingestion.news.classification import NewsClassificationService
 from src.ingestion.news.client import NewsAPIClient, NewsAPIError
 from src.ingestion.news.nlp_processor import NewsNLPProcessor
 from src.ingestion.news.repository import NewsRepository
+
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,7 @@ class NewsPoller:
         poll_interval_seconds: int = 900,
         nlp_processor: NewsNLPProcessor | None = None,
         classification_service: NewsClassificationService | None = None,
+        event_pipeline: EventPipeline | None = None,
     ) -> None:
         if poll_interval_seconds <= 0:
             raise ValueError(
@@ -35,6 +38,7 @@ class NewsPoller:
         self.poll_interval_seconds = poll_interval_seconds
         self.nlp_processor = nlp_processor
         self.classification_service = classification_service
+        self.event_pipeline = event_pipeline
 
         self._stop_event = asyncio.Event()
         self._last_poll_time: datetime | None = None
@@ -82,7 +86,13 @@ class NewsPoller:
         classification_failed_count = 0
         review_count = 0
 
+        event_created_count = 0
+        event_failed_count = 0
+
         for article in articles:
+            nlp_result = None
+            classified = None
+
             saved = self.repository.save(article)
 
             if not saved:
@@ -109,7 +119,7 @@ class NewsPoller:
 
             if self.nlp_processor is not None:
                 try:
-                    result = await asyncio.to_thread(
+                    nlp_result = await asyncio.to_thread(
                         self.nlp_processor.process,
                         article,
                     )
@@ -123,9 +133,9 @@ class NewsPoller:
                         "resolved_companies=%d "
                         "triplets=%d",
                         article.article_id,
-                        len(result.entities),
-                        len(result.resolved_companies),
-                        len(result.triplets),
+                        len(nlp_result.entities),
+                        len(nlp_result.resolved_companies),
+                        len(nlp_result.triplets),
                     )
 
                 except Exception:
@@ -176,6 +186,54 @@ class NewsPoller:
                         article.article_id,
                     )
 
+            if (
+                self.event_pipeline is not None
+                and nlp_result is not None
+                and classified is not None
+                and not classified.requires_review
+            ):
+                try:
+                    pipeline_result = await asyncio.to_thread(
+                        self.event_pipeline.process,
+                        classified=classified,
+                        nlp_result=nlp_result,
+                    )
+
+                    event_created_count += 1
+
+                    logger.info(
+                        "Dynamic event created "
+                        "article_id=%s "
+                        "event_id=%s "
+                        "linked_companies=%d",
+                        article.article_id,
+                        pipeline_result.event.event_id,
+                        pipeline_result.linked_companies,
+                    )
+
+                except Exception:
+                    event_failed_count += 1
+
+                    logger.exception(
+                        "Dynamic event pipeline failed "
+                        "article_id=%s",
+                        article.article_id,
+                    )
+            elif (
+                classified is not None
+                and classified.requires_review
+            ):
+                logger.info(
+                    "Dynamic event skipped because classification "
+                    "requires review "
+                    "article_id=%s "
+                    "event_type=%s "
+                    "confidence=%.4f",
+                    classified.article_id,
+                    classified.event_type,
+                    classified.confidence,
+                )
+                
         self._last_poll_time = started_at
 
         duration = monotonic() - cycle_started
@@ -190,6 +248,8 @@ class NewsPoller:
             "classified=%d "
             "classification_failed=%d "
             "requires_review=%d "
+            "events_created=%d "
+            "events_failed=%d "
             "duration_seconds=%.3f",
             len(articles),
             new_count,
@@ -199,6 +259,8 @@ class NewsPoller:
             classified_count,
             classification_failed_count,
             review_count,
+            event_created_count,
+            event_failed_count,
             duration,
         )
 
