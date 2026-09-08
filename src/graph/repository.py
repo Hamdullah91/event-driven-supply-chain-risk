@@ -335,3 +335,101 @@ class GraphRepository:
                 query,
                 company_dependencies=company_dependencies,
             ).consume()
+
+    def link_event_to_company(
+        self,
+        *,
+        event_id: str,
+        company_id: str,
+        confidence: float,
+        link_method: str = "entity_resolution",
+    ) -> bool:
+        """
+        Link an existing Event node to an existing Company node.
+
+        Returns True when both nodes exist and the relationship
+        is created or already exists.
+        """
+
+        query = """
+        MATCH (event:Event {event_id: $event_id})
+        MATCH (company:Company {company_id: $company_id})
+
+        MERGE (event)-[relationship:AFFECTS]->(company)
+
+        ON CREATE SET
+            relationship.confidence = $confidence,
+            relationship.link_method = $link_method,
+            relationship.linked_at = datetime()
+
+        ON MATCH SET
+            relationship.confidence =
+                CASE
+                    WHEN relationship.confidence IS NULL
+                        OR $confidence > relationship.confidence
+                    THEN $confidence
+                    ELSE relationship.confidence
+                END
+
+        RETURN count(relationship) > 0 AS linked
+        """
+
+        with self.connection.driver.session() as session:
+            record = session.run(
+                query,
+                event_id=event_id,
+                company_id=company_id,
+                confidence=confidence,
+                link_method=link_method,
+            ).single()
+
+        return bool(record and record["linked"])
+
+    def link_event_to_facility(
+        self,
+        *,
+        event_id: str,
+        facility_id: str,
+        confidence: float,
+        link_method: str = "entity_resolution",
+    ) -> bool:
+        """
+        Link an existing Event node to an existing Facility node.
+
+        Returns True when both nodes exist and the relationship
+        is created or already exists.
+        """
+
+        query = """
+        MATCH (event:Event {event_id: $event_id})
+        MATCH (facility:Facility {facility_id: $facility_id})
+
+        MERGE (event)-[relationship:OCCURS_AT]->(facility)
+
+        ON CREATE SET
+            relationship.confidence = $confidence,
+            relationship.link_method = $link_method,
+            relationship.linked_at = datetime()
+
+        ON MATCH SET
+            relationship.confidence =
+                CASE
+                    WHEN relationship.confidence IS NULL
+                        OR $confidence > relationship.confidence
+                    THEN $confidence
+                    ELSE relationship.confidence
+                END
+
+        RETURN count(relationship) > 0 AS linked
+        """
+
+        with self.connection.driver.session() as session:
+            record = session.run(
+                query,
+                event_id=event_id,
+                facility_id=facility_id,
+                confidence=confidence,
+                link_method=link_method,
+            ).single()
+
+        return bool(record and record["linked"])
