@@ -10,6 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from src.ingestion.news.client import NewsAPIClient
 from src.ingestion.news.poller import NewsPoller
 from src.ingestion.news.repository import NewsRepository
+from src.ingestion.news.classification import NewsClassificationService
+from src.ml.event_classifier import EventClassifier
 
 
 class Settings(BaseSettings):
@@ -19,6 +21,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # News API settings
     news_api_key: str
     news_api_url: str = "https://newsapi.org/v2/everything"
 
@@ -28,6 +31,13 @@ class Settings(BaseSettings):
 
     news_database_path: str = "data/news/news.db"
     news_log_path: str = "logs/news_poller.log"
+
+    # DistilBERT event classifier settings
+    event_classifier_model_path: str = (
+        "models/event_classifier/distilbert_supply_chain"
+    )
+    event_classifier_max_length: int = 256
+    event_classifier_confidence_threshold: float = 0.70
 
 
 def configure_logging(log_path: str) -> None:
@@ -60,7 +70,6 @@ def configure_logging(log_path: str) -> None:
         ],
     )
 
-
 async def main() -> None:
     settings = Settings()
 
@@ -72,6 +81,22 @@ async def main() -> None:
 
     repository = NewsRepository(
         settings.news_database_path
+    )
+
+    classifier = EventClassifier(
+        model_path=(
+            settings.event_classifier_model_path
+        ),
+        max_length=(
+            settings.event_classifier_max_length
+        ),
+        confidence_threshold=(
+            settings.event_classifier_confidence_threshold
+        ),
+    )
+
+    classification_service = NewsClassificationService(
+        classifier=classifier
     )
 
     query = (
@@ -101,6 +126,9 @@ async def main() -> None:
             poll_interval_seconds=(
                 settings.news_poll_interval_seconds
             ),
+            classification_service=(
+                classification_service
+            ),
         )
 
         loop = asyncio.get_running_loop()
@@ -115,15 +143,13 @@ async def main() -> None:
                     poller.stop,
                 )
             except NotImplementedError:
-                # Expected on some Windows event loops.
                 pass
 
         logger.info(
-            "Starting Day 32 news polling service."
+            "Starting Day 34 news classification service."
         )
 
         await poller.run_forever()
-
 
 if __name__ == "__main__":
     asyncio.run(main())
