@@ -18,20 +18,25 @@ class GraphRepository:
     def save_event(self, event: SupplyChainEvent) -> None:
         """
         Persist a SupplyChainEvent as an Event node in Neo4j.
+
+        The operation is idempotent when event_id is deterministic.
         """
 
         event_data = event_to_dict(event)
 
         query = """
         MERGE (event:Event {event_id: $event_id})
+
+        ON CREATE SET
+            event.created_at = $created_at
+
         SET
             event.event_type = $event_type,
             event.source = $source,
             event.timestamp = $timestamp,
             event.entity_id = $entity_id,
             event.severity = $severity,
-            event.payload = $payload,
-            event.created_at = $created_at
+            event.payload = $payload
         """
 
         with self.connection.driver.session() as session:
@@ -45,7 +50,7 @@ class GraphRepository:
                 severity=event_data["severity"],
                 payload=json.dumps(event_data["payload"]),
                 created_at=event_data["created_at"],
-            )
+            ).consume()
 
     def seed_companies(self, companies: list[dict]) -> None:
         """
