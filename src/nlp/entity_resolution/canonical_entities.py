@@ -55,4 +55,8 @@ CANONICAL_COMPANIES: dict[str, dict[str, str]] = {
         "name": "Texas Instruments",
         "entity_type": "Company",
     },
+    "company_asml": {
+    "name": "ASML Holding N.V.",
+    "entity_type": "Company",
+    },
 }

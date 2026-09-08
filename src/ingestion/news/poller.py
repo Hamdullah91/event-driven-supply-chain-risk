@@ -7,7 +7,7 @@ from time import monotonic
 
 from src.ingestion.news.client import NewsAPIClient, NewsAPIError
 from src.ingestion.news.repository import NewsRepository
-
+from src.ingestion.news.nlp_processor import NewsNLPProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ class NewsPoller:
         repository: NewsRepository,
         query: str,
         poll_interval_seconds: int = 900,
+        nlp_processor: NewsNLPProcessor | None = None,
     ) -> None:
         if poll_interval_seconds <= 0:
             raise ValueError(
@@ -30,10 +31,10 @@ class NewsPoller:
         self.repository = repository
         self.query = query
         self.poll_interval_seconds = poll_interval_seconds
+        self.nlp_processor = nlp_processor
 
         self._stop_event = asyncio.Event()
         self._last_poll_time: datetime | None = None
-
     async def poll_once(self) -> None:
         cycle_started = monotonic()
         started_at = datetime.now(UTC)
@@ -72,6 +73,8 @@ class NewsPoller:
 
         new_count = 0
         duplicate_count = 0
+        nlp_processed_count = 0
+        nlp_failed_count = 0
 
         for article in articles:
             saved = self.repository.save(article)
@@ -88,6 +91,35 @@ class NewsPoller:
                     article.source,
                     article.title,
                 )
+                if self.nlp_processor is not None:
+                    try:
+                        result = await asyncio.to_thread(
+                            self.nlp_processor.process,
+                            article,
+                        )
+
+                        nlp_processed_count += 1
+
+                        logger.info(
+                            "News NLP processed "
+                            "article_id=%s "
+                            "entities=%d "
+                            "resolved_companies=%d "
+                            "triplets=%d",
+                            article.article_id,
+                            len(result.entities),
+                            len(result.resolved_companies),
+                            len(result.triplets),
+                        )
+
+                    except Exception:
+                        nlp_failed_count += 1
+
+                        logger.exception(
+                            "News NLP processing failed "
+                            "article_id=%s",
+                            article.article_id,
+                        )
 
             else:
                 duplicate_count += 1
@@ -151,7 +183,15 @@ class NewsPoller:
                 pass
 
         logger.info(
-            "News poller stopped."
+            "News poll finished "
+            "fetched=%d "
+            "new=%d "
+            "duplicates=%d "
+            "duration_seconds=%.3f",
+            len(articles),
+            new_count,
+            duplicate_count,
+            duration,
         )
 
     def stop(self) -> None:

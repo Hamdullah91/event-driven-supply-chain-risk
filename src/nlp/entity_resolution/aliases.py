@@ -48,4 +48,7 @@ COMPANY_ALIASES: dict[str, str] = {
     "texas instruments": "company_texas_instruments",
     "texas instruments inc": "company_texas_instruments",
 
+    "asml": "company_asml",
+    "asml holding": "company_asml",
+    "asml holding nv": "company_asml",
 }
