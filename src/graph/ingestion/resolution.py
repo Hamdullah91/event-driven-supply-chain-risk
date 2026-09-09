@@ -17,6 +17,8 @@ FILING_COMPANY_REFERENCES = {
     "our",
     "ours",
     "ourselves",
+    "company",
+    "the company",
 }
 
 
@@ -28,7 +30,8 @@ def _resolve_entity(
     """
     Resolve an extracted entity to a canonical company name.
 
-    First-person references in SEC filings refer to the filing company.
+    First-person references and SEC phrases such as "the Company"
+    refer to the company that filed the document.
     """
 
     cleaned_name = name.strip()
@@ -41,8 +44,8 @@ def _resolve_entity(
         if filing_company_result.canonical_name:
             return filing_company_result.canonical_name
 
-        # Metadata itself is trusted even if not present
-        # in the alias dictionary.
+        # Filing metadata itself is trusted even if the company
+        # has not yet been added to the alias dictionary.
         return filing_company
 
     resolution = resolve_company(cleaned_name)
@@ -86,8 +89,11 @@ def resolve_graph_candidates(
                 candidate.object,
             )
             continue
+
         relationship = candidate.predicate
 
+        # In a supply-chain filing, using a named external company
+        # for manufacturing/foundry services represents dependency.
         if relationship == "USES":
             relationship = "DEPENDS_ON"
 
