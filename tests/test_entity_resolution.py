@@ -156,3 +156,24 @@ def test_resolve_texas_instruments():
     result = resolve_company("Texas Instruments")
 
     assert result.canonical_id == "texas_instruments"
+
+def test_resolve_globalfoundries_aliases():
+    for name in ["GlobalFoundries", "GLOBALFOUNDRIES Inc.", "GF"]:
+        result = resolve_company(name)
+        assert result.canonical_id == "globalfoundries"
+        assert result.canonical_name == "GlobalFoundries"
+
+
+def test_resolve_umc_aliases():
+    for name in [
+        "United Microelectronics Corporation",
+        "UMC",
+    ]:
+        result = resolve_company(name)
+        assert result.canonical_id == "umc"
+        assert result.canonical_name == "United Microelectronics Corporation"
+
+
+def test_resolve_samsung_legal_name():
+    result = resolve_company("Samsung Electronics Co., Ltd.")
+    assert result.canonical_id == "samsung_electronics"
