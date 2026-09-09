@@ -177,3 +177,19 @@ def test_resolve_umc_aliases():
 def test_resolve_samsung_legal_name():
     result = resolve_company("Samsung Electronics Co., Ltd.")
     assert result.canonical_id == "samsung_electronics"
+
+
+def test_all_sec_10k_targets_resolve_to_expected_company_ids():
+    import json
+    from pathlib import Path
+
+    targets = json.loads(
+        Path("data/seed/sec_10k_targets.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    for target in targets:
+        result = resolve_company(target["name"])
+        assert result.canonical_id == target["company_id"], target
+        assert result.canonical_name is not None
