@@ -59,4 +59,12 @@ CANONICAL_COMPANIES: dict[str, dict[str, str]] = {
         "name": "ASML Holding N.V.",
         "entity_type": "Company",
     },
+    "globalfoundries": {
+        "name": "GlobalFoundries",
+        "entity_type": "Company",
+    },
+    "umc": {
+        "name": "United Microelectronics Corporation",
+        "entity_type": "Company",
+    },
 }
