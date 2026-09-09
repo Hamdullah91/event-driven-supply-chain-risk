@@ -1,6 +1,7 @@
 COMPANY_ALIASES: dict[str, str] = {
     "tsmc": "tsmc",
     "taiwan semiconductor manufacturing company": "tsmc",
+    "taiwan semiconductor manufacturing company limited": "tsmc",
     "taiwan semiconductor manufacturing co": "tsmc",
     "taiwan semiconductor manufacturing co ltd": "tsmc",
 
@@ -24,6 +25,7 @@ COMPANY_ALIASES: dict[str, str] = {
     "rtx corporation": "rtx",
 
     "samsung electronics": "samsung_electronics",
+    "samsung electronics co ltd": "samsung_electronics",
     "samsung": "samsung_electronics",
 
     "sk hynix": "sk_hynix",
@@ -51,4 +53,12 @@ COMPANY_ALIASES: dict[str, str] = {
     "asml": "asml",
     "asml holding": "asml",
     "asml holding nv": "asml",
+
+    "globalfoundries": "globalfoundries",
+    "globalfoundries inc": "globalfoundries",
+    "gf": "globalfoundries",
+
+    "united microelectronics corporation": "umc",
+    "united microelectronics corp": "umc",
+    "umc": "umc",
 }
