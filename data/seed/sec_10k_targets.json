@@ -1,0 +1,137 @@
+[
+  {
+    "company_id": "nvidia",
+    "name": "NVIDIA Corporation",
+    "cik": "1045810"
+  },
+  {
+    "company_id": "amd",
+    "name": "Advanced Micro Devices, Inc.",
+    "cik": "2488"
+  },
+  {
+    "company_id": "intel",
+    "name": "Intel Corporation",
+    "cik": "50863"
+  },
+  {
+    "company_id": "qualcomm",
+    "name": "QUALCOMM Incorporated",
+    "cik": "804328"
+  },
+  {
+    "company_id": "broadcom",
+    "name": "Broadcom Inc.",
+    "cik": "1730168"
+  },
+  {
+    "company_id": "micron",
+    "name": "Micron Technology, Inc.",
+    "cik": "723125"
+  },
+  {
+    "company_id": "texas_instruments",
+    "name": "Texas Instruments Incorporated",
+    "cik": "97476"
+  },
+  {
+    "company_id": "analog_devices",
+    "name": "Analog Devices, Inc.",
+    "cik": "6281"
+  },
+  {
+    "company_id": "applied_materials",
+    "name": "Applied Materials, Inc.",
+    "cik": "6951"
+  },
+  {
+    "company_id": "lam_research",
+    "name": "Lam Research Corporation",
+    "cik": "707549"
+  },
+  {
+    "company_id": "kla",
+    "name": "KLA Corporation",
+    "cik": "319201"
+  },
+  {
+    "company_id": "tesla",
+    "name": "Tesla, Inc.",
+    "cik": "1318605"
+  },
+  {
+    "company_id": "rivian",
+    "name": "Rivian Automotive, Inc.",
+    "cik": "1874178"
+  },
+  {
+    "company_id": "lucid",
+    "name": "Lucid Group, Inc.",
+    "cik": "1811210"
+  },
+  {
+    "company_id": "general_motors",
+    "name": "General Motors Company",
+    "cik": "1467858"
+  },
+  {
+    "company_id": "ford",
+    "name": "Ford Motor Company",
+    "cik": "37996"
+  },
+  {
+    "company_id": "albemarle",
+    "name": "Albemarle Corporation",
+    "cik": "915913"
+  },
+  {
+    "company_id": "boeing",
+    "name": "The Boeing Company",
+    "cik": "12927"
+  },
+  {
+    "company_id": "lockheed_martin",
+    "name": "Lockheed Martin Corporation",
+    "cik": "936468"
+  },
+  {
+    "company_id": "rtx",
+    "name": "RTX Corporation",
+    "cik": "101829"
+  },
+  {
+    "company_id": "northrop_grumman",
+    "name": "Northrop Grumman Corporation",
+    "cik": "1133421"
+  },
+  {
+    "company_id": "general_dynamics",
+    "name": "General Dynamics Corporation",
+    "cik": "40533"
+  },
+  {
+    "company_id": "honeywell",
+    "name": "Honeywell International Inc.",
+    "cik": "773840"
+  },
+  {
+    "company_id": "ge_aerospace",
+    "name": "GE Aerospace",
+    "cik": "40545"
+  },
+  {
+    "company_id": "l3harris",
+    "name": "L3Harris Technologies, Inc.",
+    "cik": "202058"
+  },
+  {
+    "company_id": "teledyne",
+    "name": "Teledyne Technologies Incorporated",
+    "cik": "1094285"
+  },
+  {
+    "company_id": "transdigm",
+    "name": "TransDigm Group Incorporated",
+    "cik": "1260221"
+  }
+]
