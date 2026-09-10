@@ -84,9 +84,6 @@ def main() -> None:
         else:
             print("  none")
 
-        # Deliberately machine-filterable summary lines. These are the only
-        # lines prefixed with AUDIT_SUMMARY, so PowerShell can extract a clean
-        # typed scorecard without matching verbose raw-triplet diagnostics.
         print(
             "AUDIT_SUMMARY | "
             f"company={filing['company_name']} | "
@@ -137,8 +134,6 @@ def main() -> None:
                 f"-[{candidate.relationship}]-> "
                 f"({candidate.object_type}) {candidate.object}"
             )
-            print(f"    confidence: {candidate.confidence:.3f}")
-            print(f"    sentence: {candidate.source_sentence}")
 
     print()
     print("=" * 80)
