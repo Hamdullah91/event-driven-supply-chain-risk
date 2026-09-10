@@ -20,6 +20,8 @@ class GraphCandidate:
     object: str
     source_sentence: str
     confidence: float = 1.0
+    subject_type: str | None = None
+    object_type: str | None = None
 
 
 class TripletExtractor:
@@ -41,6 +43,21 @@ class TripletExtractor:
                 return ent.text
 
         return token.text
+
+    @staticmethod
+    def _graph_entity_type(token) -> str | None:
+        """Map spaCy NER labels to graph ontology node types."""
+        for ent in token.doc.ents:
+            if ent.start <= token.i < ent.end:
+                return {
+                    "ORG": "Company",
+                    "FAC": "Facility",
+                    "GPE": "Location",
+                    "LOC": "Location",
+                    "PRODUCT": "Product",
+                }.get(ent.label_)
+
+        return None
 
     @staticmethod
     def _organization_entities_in_subtree(token) -> list[str]:
@@ -149,6 +166,7 @@ class TripletExtractor:
                     subject_text = self._full_entity_text(
                         subject
                     )
+                    subject_type = self._graph_entity_type(subject)
 
                     for obj in objects:
 
@@ -161,13 +179,19 @@ class TripletExtractor:
                         )
 
                         if organization_objects:
-                            object_names = organization_objects
+                            object_values = [
+                                (organization, "Company")
+                                for organization in organization_objects
+                            ]
                         else:
-                            object_names = [
-                                self._full_entity_text(obj)
+                            object_values = [
+                                (
+                                    self._full_entity_text(obj),
+                                    self._graph_entity_type(obj),
+                                )
                             ]
 
-                        for object_name in object_names:
+                        for object_name, object_type in object_values:
                             triplets.append(
                                 GraphCandidate(
                                     subject=subject_text,
@@ -177,6 +201,8 @@ class TripletExtractor:
                                         sentence.text.strip()
                                     ),
                                     confidence=1.0,
+                                    subject_type=subject_type,
+                                    object_type=object_type,
                                 )
                             )
 
@@ -189,6 +215,8 @@ class TripletExtractor:
                 triplet.subject,
                 triplet.predicate,
                 triplet.object,
+                triplet.subject_type,
+                triplet.object_type,
             )
 
             if key in seen:
