@@ -46,12 +46,35 @@ def main() -> None:
             filing_company=filing["company_name"],
         )
 
+        type_counts = Counter(
+            (
+                candidate.relationship,
+                candidate.subject_type,
+                candidate.object_type,
+            )
+            for candidate in resolved_candidates
+        )
+
         print()
         print("=" * 80)
         print(f"Company: {filing['company_name']}")
         print(f"Accession: {filing['accession_number']}")
         print(f"Raw triplets: {len(raw_candidates)}")
-        print(f"Resolved company-company candidates: {len(resolved_candidates)}")
+        print(f"Resolved graph candidates: {len(resolved_candidates)}")
+
+        print("Resolved candidate type counts:")
+        if type_counts:
+            for (
+                relationship,
+                subject_type,
+                object_type,
+            ), count in sorted(type_counts.items()):
+                print(
+                    f"  {relationship} | "
+                    f"{subject_type} -> {object_type}: {count}"
+                )
+        else:
+            print("  none")
 
         print("Raw predicate counts:")
         for predicate, count in sorted(
@@ -66,6 +89,10 @@ def main() -> None:
                 f"[{index}] "
                 f"{candidate.subject} -[{candidate.predicate}]-> {candidate.object}"
             )
+            print(
+                f"    types: {candidate.subject_type or 'unknown'} "
+                f"-> {candidate.object_type or 'unknown'}"
+            )
             print(f"    sentence: {candidate.source_sentence}")
 
         print()
@@ -76,8 +103,12 @@ def main() -> None:
         ):
             print(
                 f"[{index}] "
-                f"{candidate.subject} -[{candidate.relationship}]-> {candidate.object}"
+                f"({candidate.subject_type}) {candidate.subject} "
+                f"-[{candidate.relationship}]-> "
+                f"({candidate.object_type}) {candidate.object}"
             )
+            print(f"    confidence: {candidate.confidence:.3f}")
+            print(f"    sentence: {candidate.source_sentence}")
 
 
 if __name__ == "__main__":
