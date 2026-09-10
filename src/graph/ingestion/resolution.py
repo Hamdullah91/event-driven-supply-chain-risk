@@ -5,6 +5,7 @@ from typing import Iterable
 
 from src.nlp.entity_resolution.resolver import resolve_company
 from src.nlp.triplet_extractor import GraphCandidate
+from src.nlp.validation.relationship_rules import VALID_RELATIONSHIPS
 from src.nlp.validation.validator import RelationshipCandidate
 
 
@@ -192,6 +193,7 @@ def _resolve_object(
     filing_company: str,
 ) -> tuple[str, str] | None:
     cleaned = candidate.object.strip()
+    normalized = " ".join(cleaned.lower().split())
 
     if candidate.object_type == "Company":
         resolved = _resolve_company_name(
@@ -200,7 +202,31 @@ def _resolve_object(
         )
         return (resolved, "Company") if resolved else None
 
-    # Preserve trusted spaCy ontology-compatible types directly.
+    # Predicate-aware correction takes precedence over spaCy's entity label.
+    # Short technology terms such as "AI" are sometimes mislabeled as GPE/LOC.
+    if candidate.predicate == "USES":
+        if normalized in MATERIAL_TERMS:
+            return cleaned, "Material"
+        if normalized in TECHNOLOGY_TERMS:
+            return cleaned, "Technology"
+
+    # OPERATES/OWNS are valid only for facilities in the current ontology.
+    # A geographic location such as "U.S." must not become an OWNS target.
+    if candidate.predicate in {"OPERATES", "OWNS"}:
+        if candidate.object_type == "Facility":
+            if normalized in GENERIC_OBJECTS:
+                return None
+            return cleaned, "Facility"
+        inferred_type = _infer_non_company_type(
+            cleaned,
+            candidate.predicate,
+        )
+        if inferred_type == "Facility":
+            return cleaned, "Facility"
+        return None
+
+    # Preserve trusted spaCy ontology-compatible types directly. Final
+    # predicate/type compatibility is checked in resolve_graph_candidates.
     if candidate.object_type in {
         "Facility",
         "Product",
@@ -208,7 +234,7 @@ def _resolve_object(
         "Technology",
         "Location",
     }:
-        if cleaned.lower() in GENERIC_OBJECTS:
+        if normalized in GENERIC_OBJECTS:
             return None
         return cleaned, candidate.object_type
 
@@ -271,6 +297,18 @@ def resolve_graph_candidates(
         # relationships remain USES and are validated by the ontology.
         if relationship == "USES" and object_type == "Company":
             relationship = "DEPENDS_ON"
+
+        rule = (subject_type, relationship, object_type)
+        if rule not in VALID_RELATIONSHIPS:
+            logger.warning(
+                "Ontology-incompatible resolved candidate skipped: %s -[%s]-> %s (%s -> %s)",
+                subject_name,
+                relationship,
+                object_name,
+                subject_type,
+                object_type,
+            )
+            continue
 
         resolved_candidates.append(
             RelationshipCandidate(
