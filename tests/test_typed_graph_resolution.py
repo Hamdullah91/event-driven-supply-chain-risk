@@ -104,3 +104,33 @@ def test_unknown_company_is_not_invented() -> None:
     )
 
     assert result == []
+
+
+def test_ai_mislabeled_as_location_is_corrected_for_uses() -> None:
+    result = resolve_graph_candidates(
+        [_candidate("USES", "AI", object_type="Location")],
+        filing_company="Tesla, Inc.",
+    )
+
+    assert len(result) == 1
+    assert result[0].relationship == "USES"
+    assert result[0].object == "AI"
+    assert result[0].object_type == "Technology"
+
+
+def test_location_is_rejected_for_supplies() -> None:
+    result = resolve_graph_candidates(
+        [_candidate("SUPPLIES", "AI", object_type="Location")],
+        filing_company="NVIDIA Corporation",
+    )
+
+    assert result == []
+
+
+def test_location_is_rejected_for_owns() -> None:
+    result = resolve_graph_candidates(
+        [_candidate("OWNS", "U.S.", object_type="Location")],
+        filing_company="Lucid Group, Inc.",
+    )
+
+    assert result == []
