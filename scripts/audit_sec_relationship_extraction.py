@@ -26,6 +26,10 @@ def main() -> None:
     nlp = spacy.load("en_core_web_sm")
     extractor = TripletExtractor(nlp)
 
+    global_type_counts: Counter[tuple[str, str, str]] = Counter()
+    total_raw = 0
+    total_resolved = 0
+
     for processed_file in processed_files:
         filing = json.loads(
             processed_file.read_text(encoding="utf-8")
@@ -55,6 +59,10 @@ def main() -> None:
             for candidate in resolved_candidates
         )
 
+        global_type_counts.update(type_counts)
+        total_raw += len(raw_candidates)
+        total_resolved += len(resolved_candidates)
+
         print()
         print("=" * 80)
         print(f"Company: {filing['company_name']}")
@@ -75,6 +83,28 @@ def main() -> None:
                 )
         else:
             print("  none")
+
+        # Deliberately machine-filterable summary lines. These are the only
+        # lines prefixed with AUDIT_SUMMARY, so PowerShell can extract a clean
+        # typed scorecard without matching verbose raw-triplet diagnostics.
+        print(
+            "AUDIT_SUMMARY | "
+            f"company={filing['company_name']} | "
+            f"raw={len(raw_candidates)} | "
+            f"resolved={len(resolved_candidates)}"
+        )
+        for (
+            relationship,
+            subject_type,
+            object_type,
+        ), count in sorted(type_counts.items()):
+            print(
+                "AUDIT_SUMMARY_TYPE | "
+                f"company={filing['company_name']} | "
+                f"relationship={relationship} | "
+                f"types={subject_type}->{object_type} | "
+                f"count={count}"
+            )
 
         print("Raw predicate counts:")
         for predicate, count in sorted(
@@ -109,6 +139,24 @@ def main() -> None:
             )
             print(f"    confidence: {candidate.confidence:.3f}")
             print(f"    sentence: {candidate.source_sentence}")
+
+    print()
+    print("=" * 80)
+    print("GLOBAL AUDIT SUMMARY")
+    print(f"Filings: {len(processed_files)}")
+    print(f"Raw triplets: {total_raw}")
+    print(f"Resolved graph candidates: {total_resolved}")
+    for (
+        relationship,
+        subject_type,
+        object_type,
+    ), count in sorted(global_type_counts.items()):
+        print(
+            "AUDIT_GLOBAL_TYPE | "
+            f"relationship={relationship} | "
+            f"types={subject_type}->{object_type} | "
+            f"count={count}"
+        )
 
 
 if __name__ == "__main__":
