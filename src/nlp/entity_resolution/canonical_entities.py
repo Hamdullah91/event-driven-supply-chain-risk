@@ -19,7 +19,7 @@ CANONICAL_COMPANIES: dict[str, dict[str, str]] = {
     "albemarle": {"name": "Albemarle", "entity_type": "Company"},
     "boeing": {"name": "Boeing", "entity_type": "Company"},
     "lockheed_martin": {"name": "Lockheed Martin", "entity_type": "Company"},
-    "rtx": {"name": "RTX", "entity_type": "Company"},
+    "rtx": {"name": "RTX Corporation", "entity_type": "Company"},
     "northrop_grumman": {"name": "Northrop Grumman", "entity_type": "Company"},
     "general_dynamics": {"name": "General Dynamics", "entity_type": "Company"},
     "honeywell": {"name": "Honeywell", "entity_type": "Company"},
