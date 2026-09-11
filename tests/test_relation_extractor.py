@@ -21,7 +21,13 @@ def _nlp(words, heads, deps, pos, lemmas, ents=()):
         )
         spans = []
         for start, end, label in ents:
-            spans.append(doc.char_span(doc[start:end].start_char, doc[start:end].end_char, label=label))
+            spans.append(
+                doc.char_span(
+                    doc[start:end].start_char,
+                    doc[start:end].end_char,
+                    label=label,
+                )
+            )
         doc.ents = tuple(span for span in spans if span is not None)
         return doc
 
@@ -60,6 +66,22 @@ def test_extracts_supply_destination_not_supplied_product():
     assert candidate.object == "NVIDIA"
 
 
+def test_extracts_direct_company_supply():
+    nlp = _nlp(
+        ["TSMC", "supplies", "NVIDIA"],
+        [1, 1, 1],
+        ["nsubj", "ROOT", "dobj"],
+        ["PROPN", "VERB", "PROPN"],
+        ["TSMC", "supply", "NVIDIA"],
+        [(0, 1, "ORG"), (2, 3, "ORG")],
+    )
+    candidate = RelationExtractor(nlp).extract("ignored")[0]
+    assert candidate.relationship == "SUPPLIES"
+    assert candidate.subject == "TSMC"
+    assert candidate.object == "NVIDIA"
+    assert candidate.object_type == "Company"
+
+
 def test_passive_supply_inverts_direction():
     nlp = _nlp(
         ["NVIDIA", "is", "supplied", "by", "TSMC"],
@@ -91,6 +113,42 @@ def test_passive_manufacture_assigns_company_as_producer():
     assert candidate.object == "Processors"
     assert candidate.object_type == "Product"
     assert candidate.voice == "passive"
+
+
+def test_owned_product_passive_manufacturing_implies_dependency():
+    nlp = _nlp(
+        ["Our", "processors", "are", "manufactured", "by", "TSMC"],
+        [1, 3, 3, 3, 3, 4],
+        ["poss", "nsubjpass", "auxpass", "ROOT", "agent", "pobj"],
+        ["PRON", "NOUN", "AUX", "VERB", "ADP", "PROPN"],
+        ["our", "processor", "be", "manufacture", "by", "TSMC"],
+        [(0, 2, "PRODUCT"), (5, 6, "ORG")],
+    )
+    candidates = RelationExtractor(nlp).extract("ignored")
+    assert any(
+        c.relationship == "DEPENDS_ON"
+        and c.subject == "Our"
+        and c.object == "TSMC"
+        for c in candidates
+    )
+
+
+def test_owned_product_active_manufacturing_implies_dependency():
+    nlp = _nlp(
+        ["TSMC", "manufactures", "our", "processors"],
+        [1, 1, 3, 1],
+        ["nsubj", "ROOT", "poss", "dobj"],
+        ["PROPN", "VERB", "PRON", "NOUN"],
+        ["TSMC", "manufacture", "our", "processor"],
+        [(0, 1, "ORG"), (2, 4, "PRODUCT")],
+    )
+    candidates = RelationExtractor(nlp).extract("ignored")
+    assert any(
+        c.relationship == "DEPENDS_ON"
+        and c.subject == "our"
+        and c.object == "TSMC"
+        for c in candidates
+    )
 
 
 def test_relative_clause_uses_company_antecedent():
