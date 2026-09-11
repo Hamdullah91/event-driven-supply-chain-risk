@@ -55,6 +55,11 @@
     "cik": "319201"
   },
   {
+    "company_id": "nxp",
+    "name": "NXP Semiconductors N.V.",
+    "cik": "1413447"
+  },
+  {
     "company_id": "tesla",
     "name": "Tesla, Inc.",
     "cik": "1318605"
