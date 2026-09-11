@@ -3,6 +3,9 @@ from __future__ import annotations
 import logging
 from typing import Iterable
 
+from src.nlp.entity_resolution.organizational_identity import (
+    resolve_organizational_identity,
+)
 from src.nlp.entity_resolution.resolver import resolve_company
 from src.nlp.triplet_extractor import GraphCandidate
 from src.nlp.validation.relationship_rules import VALID_RELATIONSHIPS
@@ -115,6 +118,18 @@ def _resolve_company_name(
 
         return filing_company
 
+    organizational_identity = resolve_organizational_identity(cleaned_name)
+    if organizational_identity is not None:
+        if organizational_identity.identity_type == "BUSINESS_UNIT":
+            return organizational_identity.normalized_name
+
+        if organizational_identity.identity_type == "VERIFIED_EXTERNAL":
+            logger.info(
+                "Verified external company withheld until external-company persistence is enabled: %s",
+                cleaned_name,
+            )
+            return None
+
     resolution = resolve_company(cleaned_name)
 
     if resolution.canonical_id is None:
@@ -175,8 +190,6 @@ def _resolve_subject(
         )
         return (resolved, "Company") if resolved else None
 
-    # Most SEC dependency statements use the filing company or a named ORG
-    # as subject. Do not promote arbitrary noun phrases into graph entities.
     resolved = _resolve_company_name(
         cleaned,
         filing_company=filing_company,
@@ -202,16 +215,12 @@ def _resolve_object(
         )
         return (resolved, "Company") if resolved else None
 
-    # Predicate-aware correction takes precedence over spaCy's entity label.
-    # Short technology terms such as "AI" are sometimes mislabeled as GPE/LOC.
     if candidate.predicate == "USES":
         if normalized in MATERIAL_TERMS:
             return cleaned, "Material"
         if normalized in TECHNOLOGY_TERMS:
             return cleaned, "Technology"
 
-    # OPERATES/OWNS are valid only for facilities in the current ontology.
-    # A geographic location such as "U.S." must not become an OWNS target.
     if candidate.predicate in {"OPERATES", "OWNS"}:
         if candidate.object_type == "Facility":
             if normalized in GENERIC_OBJECTS:
@@ -225,8 +234,6 @@ def _resolve_object(
             return cleaned, "Facility"
         return None
 
-    # Preserve trusted spaCy ontology-compatible types directly. Final
-    # predicate/type compatibility is checked in resolve_graph_candidates.
     if candidate.object_type in {
         "Facility",
         "Product",
@@ -238,7 +245,6 @@ def _resolve_object(
             return None
         return cleaned, candidate.object_type
 
-    # An untyped object may still be a known company alias.
     resolved_company = _resolve_company_name(
         cleaned,
         filing_company=filing_company,
@@ -292,9 +298,6 @@ def resolve_graph_candidates(
         object_name, object_type = object_value
         relationship = candidate.predicate
 
-        # Using a named external company for manufacturing/foundry services
-        # represents a company dependency. Typed Material/Technology USES
-        # relationships remain USES and are validated by the ontology.
         if relationship == "USES" and object_type == "Company":
             relationship = "DEPENDS_ON"
 
