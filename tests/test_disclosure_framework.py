@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import date
 from pathlib import Path
-
-import pytest
 
 from src.ingestion.disclosures.models import (
     Company,
@@ -226,64 +225,72 @@ def build_fake_service(
     )
 
 
-@pytest.mark.asyncio
-async def test_ingestion_service_deduplicates_same_source_occurrence(
+def test_ingestion_service_deduplicates_same_source_occurrence(
     tmp_path: Path,
 ) -> None:
-    provider = FakeProvider()
-    service, _ = build_fake_service(
-        tmp_path,
-        providers=[provider],
-        bindings=[CompanySourceBinding(company_id="example", source_id="fake")],
-    )
+    async def run() -> None:
+        provider = FakeProvider()
+        service, _ = build_fake_service(
+            tmp_path,
+            providers=[provider],
+            bindings=[
+                CompanySourceBinding(company_id="example", source_id="fake")
+            ],
+        )
 
-    first = await service.ingest_company("example")
-    second = await service.ingest_company("example")
+        first = await service.ingest_company("example")
+        second = await service.ingest_company("example")
 
-    assert first[0].normalized is not None
-    assert first[0].duplicate is False
-    assert second[0].duplicate is True
-    assert second[0].normalized is not None
+        assert first[0].normalized is not None
+        assert first[0].duplicate is False
+        assert second[0].duplicate is True
+        assert second[0].normalized is not None
+
+    asyncio.run(run())
 
 
-@pytest.mark.asyncio
-async def test_identical_bytes_from_two_sources_keep_two_representations(
+def test_identical_bytes_from_two_sources_keep_two_representations(
     tmp_path: Path,
 ) -> None:
-    first_provider = FakeProvider(
-        provider_id="regulator",
-        provider_document_id="reg-2025",
-        source_url="https://regulator.example/report",
-    )
-    second_provider = FakeProvider(
-        provider_id="issuer",
-        provider_document_id="issuer-2025",
-        source_url="https://issuer.example/report",
-    )
-    service, registry = build_fake_service(
-        tmp_path,
-        providers=[first_provider, second_provider],
-        bindings=[
-            CompanySourceBinding(company_id="example", source_id="regulator"),
-            CompanySourceBinding(company_id="example", source_id="issuer"),
-        ],
-    )
+    async def run() -> None:
+        first_provider = FakeProvider(
+            provider_id="regulator",
+            provider_document_id="reg-2025",
+            source_url="https://regulator.example/report",
+        )
+        second_provider = FakeProvider(
+            provider_id="issuer",
+            provider_document_id="issuer-2025",
+            source_url="https://issuer.example/report",
+        )
+        service, registry = build_fake_service(
+            tmp_path,
+            providers=[first_provider, second_provider],
+            bindings=[
+                CompanySourceBinding(
+                    company_id="example", source_id="regulator"
+                ),
+                CompanySourceBinding(company_id="example", source_id="issuer"),
+            ],
+        )
 
-    results = await service.ingest_company("example")
+        results = await service.ingest_company("example")
 
-    assert len(results) == 2
-    assert all(result.normalized is not None for result in results)
-    first_row = registry.representation_by_occurrence(
-        source_id="regulator",
-        provider_document_id="reg-2025",
-        source_url="https://regulator.example/report",
-    )
-    second_row = registry.representation_by_occurrence(
-        source_id="issuer",
-        provider_document_id="issuer-2025",
-        source_url="https://issuer.example/report",
-    )
-    assert first_row is not None
-    assert second_row is not None
-    assert first_row["content_sha256"] == second_row["content_sha256"]
-    assert first_row["representation_id"] != second_row["representation_id"]
+        assert len(results) == 2
+        assert all(result.normalized is not None for result in results)
+        first_row = registry.representation_by_occurrence(
+            source_id="regulator",
+            provider_document_id="reg-2025",
+            source_url="https://regulator.example/report",
+        )
+        second_row = registry.representation_by_occurrence(
+            source_id="issuer",
+            provider_document_id="issuer-2025",
+            source_url="https://issuer.example/report",
+        )
+        assert first_row is not None
+        assert second_row is not None
+        assert first_row["content_sha256"] == second_row["content_sha256"]
+        assert first_row["representation_id"] != second_row["representation_id"]
+
+    asyncio.run(run())
