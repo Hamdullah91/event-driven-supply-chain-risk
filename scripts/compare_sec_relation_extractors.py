@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from collections import Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
 import spacy
@@ -51,6 +51,15 @@ def _key(candidate) -> tuple[str, str, str, str, str]:
     )
 
 
+def _evidence_map(candidates) -> dict[tuple[str, str, str, str, str], list[str]]:
+    evidence: dict[tuple[str, str, str, str, str], list[str]] = defaultdict(list)
+    for candidate in candidates:
+        sentence = (getattr(candidate, "source_sentence", "") or "").strip()
+        if sentence and sentence not in evidence[_key(candidate)]:
+            evidence[_key(candidate)].append(sentence)
+    return evidence
+
+
 def main() -> None:
     target_names = _load_target_names()
     processed_files = sorted(PROCESSED_SEC_ROOT.rglob("processed.json"))
@@ -92,6 +101,9 @@ def main() -> None:
 
         legacy_keys = {_key(candidate) for candidate in legacy_resolved}
         new_keys = {_key(candidate) for candidate in new_resolved}
+        legacy_evidence = _evidence_map(legacy_resolved)
+        new_evidence = _evidence_map(new_resolved)
+
         overlap = legacy_keys & new_keys
         new_only = new_keys - legacy_keys
         legacy_only = legacy_keys - new_keys
@@ -116,16 +128,19 @@ def main() -> None:
             f"legacy_only={len(legacy_only)}"
         )
 
-        for label, values in (
-            ("NEW_ONLY", sorted(new_only)),
-            ("LEGACY_ONLY", sorted(legacy_only)),
+        for label, values, evidence_by_key in (
+            ("NEW_ONLY", sorted(new_only), new_evidence),
+            ("LEGACY_ONLY", sorted(legacy_only), legacy_evidence),
         ):
-            for subject, subject_type, relationship, object_name, object_type in values:
+            for key in values:
+                subject, subject_type, relationship, object_name, object_type = key
                 print(
                     f"{label} | company={company_name} | "
                     f"({subject_type}) {subject} -[{relationship}]-> "
                     f"({object_type}) {object_name}"
                 )
+                for sentence in evidence_by_key.get(key, [])[:3]:
+                    print(f"EVIDENCE | {sentence}")
 
     print()
     print("=" * 80)
