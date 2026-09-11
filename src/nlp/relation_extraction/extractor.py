@@ -78,21 +78,29 @@ class RelationExtractor:
     def _subject_mentions(cls, verb) -> list:
         subjects = cls._children(verb, {"nsubj", "nsubjpass"})
 
-        # Safe local relative-clause attribution only. For
-        # "TSMC, which supplies chips to NVIDIA", spaCy commonly attaches
-        # `supplies` as relcl to `TSMC` and uses `which` as its subject.
+        # Relative clauses are only accepted when their local antecedent is a
+        # typed Company. This prevents generic noun phrases such as
+        # "systems, which supply data..." from leaking into the graph.
         if verb.dep_ == "relcl":
             antecedent = verb.head
             antecedent_ent = cls._entity_for_token(antecedent)
-            if antecedent_ent is not None and cls._graph_type(antecedent_ent) == "Company":
-                relative_subjects = [
-                    subject
-                    for subject in subjects
-                    if subject.lemma_.lower() in RELATIVE_PRONOUNS
-                    or subject.text.lower() in RELATIVE_PRONOUNS
-                ]
-                if relative_subjects or not subjects:
-                    return [antecedent]
+            antecedent_is_company = (
+                antecedent_ent is not None
+                and cls._graph_type(antecedent_ent) == "Company"
+            )
+            if not antecedent_is_company:
+                return []
+
+            relative_subjects = [
+                subject
+                for subject in subjects
+                if subject.lemma_.lower() in RELATIVE_PRONOUNS
+                or subject.text.lower() in RELATIVE_PRONOUNS
+            ]
+            if relative_subjects or not subjects:
+                return [antecedent]
+
+            return []
 
         return subjects
 
