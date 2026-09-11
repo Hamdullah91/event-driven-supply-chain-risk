@@ -115,6 +115,24 @@ def test_generic_object_is_not_promoted_to_graph_node() -> None:
     assert result == []
 
 
+def test_vague_spacy_product_is_not_promoted_to_graph_node() -> None:
+    result = resolve_graph_candidates(
+        [_candidate("PRODUCES", "that", object_type="Product")],
+        filing_company="Tesla, Inc.",
+    )
+
+    assert result == []
+
+
+def test_company_self_dependency_is_rejected() -> None:
+    result = resolve_graph_candidates(
+        [_candidate("DEPENDS_ON", "Tesla", object_type="Company")],
+        filing_company="Tesla, Inc.",
+    )
+
+    assert result == []
+
+
 def test_unknown_company_is_not_invented() -> None:
     result = resolve_graph_candidates(
         [
