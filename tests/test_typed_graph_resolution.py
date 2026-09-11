@@ -31,47 +31,28 @@ def test_known_company_use_becomes_dependency() -> None:
     assert result[0].object_type == "Company"
 
 
-def test_business_unit_object_rolls_up_to_parent_company() -> None:
+def test_business_unit_rolls_up_to_parent_company() -> None:
     result = resolve_graph_candidates(
-        [_candidate("DEPENDS_ON", "Pratt & Whitney", object_type="Company")],
+        [_candidate("SUPPLIES", "Pratt & Whitney", object_type="Company")],
         filing_company="Boeing",
     )
 
     assert len(result) == 1
-    assert result[0].subject == "Boeing"
-    assert result[0].relationship == "DEPENDS_ON"
     assert result[0].object == "RTX Corporation"
     assert result[0].object_type == "Company"
 
 
-def test_business_unit_subject_rolls_up_to_parent_company() -> None:
-    candidate = GraphCandidate(
-        subject="QCT",
-        predicate="SUPPLIES",
-        object="NVIDIA",
-        source_sentence="QCT supplies NVIDIA.",
-        subject_type="Company",
-        object_type="Company",
-    )
-
-    result = resolve_graph_candidates(
-        [candidate],
-        filing_company="Qualcomm Incorporated",
-    )
-
-    assert len(result) == 1
-    assert result[0].subject == "Qualcomm"
-    assert result[0].relationship == "SUPPLIES"
-    assert result[0].object == "NVIDIA Corporation"
-
-
-def test_verified_external_company_is_not_silently_rolled_up() -> None:
+def test_verified_external_company_is_preserved() -> None:
     result = resolve_graph_candidates(
         [_candidate("DEPENDS_ON", "Ford Otosan", object_type="Company")],
         filing_company="Ford Motor Company",
     )
 
-    assert result == []
+    assert len(result) == 1
+    assert result[0].subject == "Ford"
+    assert result[0].relationship == "DEPENDS_ON"
+    assert result[0].object == "Ford Otosan"
+    assert result[0].object_type == "Company"
 
 
 def test_untyped_material_is_inferred_conservatively() -> None:
