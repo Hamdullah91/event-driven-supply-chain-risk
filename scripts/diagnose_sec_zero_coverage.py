@@ -224,44 +224,30 @@ def main() -> None:
 
         zero_coverage.append(company)
 
+        top_objects = ", ".join(
+            f"{name}({count})"
+            for name, count in unresolved_objects.most_common(5)
+        ) or "none"
+        predicates = ",".join(
+            f"{name}:{count}"
+            for name, count in sorted(predicate_counts.items())
+        ) or "none"
+        object_types = ",".join(
+            f"{name}:{count}"
+            for name, count in sorted(object_type_counts.items())
+        ) or "none"
+
         print(
-            "ZERO_COVERAGE | "
+            "ZERO_DIAG | "
             f"company={company} | "
             f"raw={len(raw_candidates)} | "
             f"subject_reject={subject_rejections} | "
             f"object_reject={object_rejections} | "
-            f"ontology_reject={ontology_rejections}"
+            f"ontology_reject={ontology_rejections} | "
+            f"predicates={predicates} | "
+            f"object_types={object_types} | "
+            f"top_unresolved={top_objects}"
         )
-        print(
-            "  predicates="
-            + ", ".join(
-                f"{name}:{count}"
-                for name, count in sorted(predicate_counts.items())
-            )
-        )
-        print(
-            "  object_types="
-            + ", ".join(
-                f"{name}:{count}"
-                for name, count in sorted(object_type_counts.items())
-            )
-        )
-        if unresolved_objects:
-            print(
-                "  top_unresolved_objects="
-                + " | ".join(
-                    f"{name} ({count})"
-                    for name, count in unresolved_objects.most_common(10)
-                )
-            )
-
-        for index, candidate in enumerate(raw_candidates[:5], start=1):
-            print(
-                f"  sample[{index}] {candidate.subject} "
-                f"-[{candidate.predicate}]-> {candidate.object} "
-                f"({candidate.subject_type or 'unknown'} -> "
-                f"{candidate.object_type or 'unknown'})"
-            )
 
     print()
     print(
