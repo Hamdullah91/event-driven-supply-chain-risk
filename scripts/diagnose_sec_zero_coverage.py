@@ -29,11 +29,33 @@ def _load_target_names() -> set[str]:
     return {str(target["name"]).strip() for target in targets}
 
 
+def _normalize_company_name(value: str) -> str:
+    return " ".join(value.strip().lower().split())
+
+
 def _normalize_type(value: str) -> str | None:
     cleaned = value.strip()
     if not cleaned or cleaned.lower() == "unknown":
         return None
     return cleaned
+
+
+def _read_audit_text(path: Path) -> str:
+    data = path.read_bytes()
+
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return data.decode("utf-16")
+
+    if b"\x00" in data[:200]:
+        try:
+            return data.decode("utf-16")
+        except UnicodeDecodeError:
+            pass
+
+    try:
+        return data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data.decode("utf-16")
 
 
 def _parse_audit(path: Path) -> list[dict]:
@@ -42,7 +64,7 @@ def _parse_audit(path: Path) -> list[dict]:
             f"Audit file not found: {path}. Run the SEC audit first."
         )
 
-    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    lines = _read_audit_text(path).splitlines()
     filings: list[dict] = []
     current: dict | None = None
     in_raw = False
@@ -134,13 +156,22 @@ def _parse_audit(path: Path) -> list[dict]:
 
 def main() -> None:
     target_names = _load_target_names()
+    normalized_targets = {
+        _normalize_company_name(name): name
+        for name in target_names
+    }
     filings = _parse_audit(AUDIT_PATH)
     zero_coverage: list[str] = []
 
+    print(f"AUDIT_FILINGS_PARSED | count={len(filings)}")
+
     for filing in filings:
         company = filing["company"]
-        if company not in target_names:
+        normalized_company = _normalize_company_name(company)
+        if normalized_company not in normalized_targets:
             continue
+
+        canonical_target_name = normalized_targets[normalized_company]
 
         if filing["resolved_count"] not in {0, None}:
             continue
@@ -148,7 +179,7 @@ def main() -> None:
         raw_candidates: list[GraphCandidate] = filing["raw_candidates"]
         resolved = resolve_graph_candidates(
             raw_candidates,
-            filing_company=company,
+            filing_company=canonical_target_name,
         )
 
         if resolved:
@@ -165,12 +196,18 @@ def main() -> None:
             predicate_counts[candidate.predicate] += 1
             object_type_counts[candidate.object_type or "unknown"] += 1
 
-            subject = _resolve_subject(candidate, filing_company=company)
+            subject = _resolve_subject(
+                candidate,
+                filing_company=canonical_target_name,
+            )
             if subject is None:
                 subject_rejections += 1
                 continue
 
-            object_value = _resolve_object(candidate, filing_company=company)
+            object_value = _resolve_object(
+                candidate,
+                filing_company=canonical_target_name,
+            )
             if object_value is None:
                 object_rejections += 1
                 unresolved_objects[candidate.object.strip()] += 1
