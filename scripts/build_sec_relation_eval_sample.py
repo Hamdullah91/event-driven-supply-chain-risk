@@ -16,8 +16,7 @@ from src.nlp.triplet_extractor import GraphCandidate
 PROCESSED_SEC_ROOT = Path("data/processed/sec")
 OUTPUT_PATH = Path("data/evaluation/sec_relation_balanced_annotation_sample.jsonl")
 SAMPLE_SIZE = 100
-POSITIVE_SIZE = 50
-NEGATIVE_SIZE = 50
+MAX_POSITIVE_SIZE = 50
 RANDOM_SEED = 38
 NLP_BATCH_SIZE = 16
 
@@ -132,7 +131,7 @@ def _collect_sentences(nlp, extractor: RelationExtractor) -> list[dict]:
     return rows
 
 
-def _sample(rows: list[dict]) -> list[dict]:
+def _sample(rows: list[dict]) -> tuple[list[dict], int, int]:
     rng = random.Random(RANDOM_SEED)
     predicted_positive = [row for row in rows if row["prediction_hint"]]
     hard_negative = [
@@ -146,22 +145,26 @@ def _sample(rows: list[dict]) -> list[dict]:
         if not row["prediction_hint"] and not row["lexical_relation_trigger"]
     ]
 
-    if len(predicted_positive) < POSITIVE_SIZE:
-        raise RuntimeError(
-            "Not enough production-positive SEC sentences for a 50-positive benchmark. "
-            f"Found {len(predicted_positive)}. Do not synthesize positives; manually review "
-            "all available production positives and supplement with independently selected "
-            "real SEC sentences if needed."
-        )
+    positive_count = min(MAX_POSITIVE_SIZE, len(predicted_positive), SAMPLE_SIZE)
+    negative_count = SAMPLE_SIZE - positive_count
 
-    positives = rng.sample(predicted_positive, POSITIVE_SIZE)
-    hard_count = min(NEGATIVE_SIZE, len(hard_negative))
+    # When positives are sparse, keep every real production-positive candidate.
+    # The rest of the benchmark is filled with trigger-rich hard negatives so
+    # manual review can discover false negatives and produce a meaningful recall.
+    positives = (
+        list(predicted_positive)
+        if len(predicted_positive) <= positive_count
+        else rng.sample(predicted_positive, positive_count)
+    )
+
+    hard_count = min(negative_count, len(hard_negative))
     negatives = rng.sample(hard_negative, hard_count)
-    if len(negatives) < NEGATIVE_SIZE:
-        negatives.extend(rng.sample(easy_negative, NEGATIVE_SIZE - len(negatives)))
+    if len(negatives) < negative_count:
+        needed = negative_count - len(negatives)
+        negatives.extend(rng.sample(easy_negative, min(needed, len(easy_negative))))
 
-    selected = [("POSITIVE_CANDIDATE", row) for row in positives]
-    selected.extend(("HARD_NEGATIVE_CANDIDATE", row) for row in negatives)
+    selected = [("PREDICTED_POSITIVE", row) for row in positives]
+    selected.extend(("HARD_NEGATIVE", row) for row in negatives)
     rng.shuffle(selected)
 
     output: list[dict] = []
@@ -178,7 +181,7 @@ def _sample(rows: list[dict]) -> list[dict]:
                 "gold_relations": None,
             }
         )
-    return output
+    return output, positive_count, len(negatives)
 
 
 def main() -> None:
@@ -193,20 +196,23 @@ def main() -> None:
         if not row["prediction_hint"] and row["lexical_relation_trigger"]
     )
 
-    print("===== BALANCED SEC EVALUATION POOLS =====")
+    print("===== SEC RELATION EVALUATION POOLS =====")
     print(f"Available sentences: {len(rows)}")
     print(f"Production-positive candidates: {predicted_positive_count}")
     print(f"Hard-negative candidates: {hard_negative_count}")
 
-    sample = _sample(rows)
+    sample, sampled_positive, sampled_negative = _sample(rows)
+    if not sample:
+        raise RuntimeError("No SEC evaluation sentences were available.")
+
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT_PATH.open("w", encoding="utf-8") as file:
         for row in sample:
             file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     print(f"Sampled sentences: {len(sample)}")
-    print(f"Positive candidates: {POSITIVE_SIZE}")
-    print(f"Negative candidates: {NEGATIVE_SIZE}")
+    print(f"Predicted-positive stratum: {sampled_positive}")
+    print(f"Hard-negative stratum: {sampled_negative}")
     print(f"Random seed: {RANDOM_SEED}")
     print(f"Output: {OUTPUT_PATH}")
     print("IMPORTANT: prediction_hint is not gold. Manually review every row before evaluation.")
