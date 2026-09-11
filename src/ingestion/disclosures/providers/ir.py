@@ -7,6 +7,7 @@ from urllib.parse import urljoin, urlparse
 import httpx
 from bs4 import BeautifulSoup
 
+from ..http import get_with_retries
 from ..models import (
     Company,
     CompanySourceBinding,
@@ -123,8 +124,7 @@ class InvestorRelationsDisclosureProvider(DisclosureProvider):
                 continue
             visited.add(page_url)
 
-            response = await self.client.get(page_url)
-            response.raise_for_status()
+            response = await get_with_retries(self.client, page_url)
             soup = BeautifulSoup(response.text, "html.parser")
 
             for anchor in soup.find_all("a", href=True):
@@ -148,7 +148,10 @@ class InvestorRelationsDisclosureProvider(DisclosureProvider):
                 if (
                     depth < self.max_depth
                     and not parsed_path.endswith((".pdf", ".zip", ".xml"))
-                    and any(token in parsed_path for token in ("invest", "report", "financial", "result"))
+                    and any(
+                        token in parsed_path
+                        for token in ("invest", "report", "financial", "result")
+                    )
                     and absolute not in visited
                 ):
                     queue.append((absolute, depth + 1))
@@ -162,8 +165,15 @@ class InvestorRelationsDisclosureProvider(DisclosureProvider):
                 title=title,
                 source_url=url,
                 reporting_year=report_year,
-                language=(binding.preferred_languages or company.preferred_languages or ["en"])[0],
-                metadata={"discovery_url": root_url, "candidate_score": score},
+                language=(
+                    binding.preferred_languages
+                    or company.preferred_languages
+                    or ["en"]
+                )[0],
+                metadata={
+                    "discovery_url": root_url,
+                    "candidate_score": score,
+                },
             )
             for url, (score, title, family, report_year) in candidates.items()
             if report_year is None or report_year in years
@@ -178,17 +188,21 @@ class InvestorRelationsDisclosureProvider(DisclosureProvider):
         return documents
 
     async def fetch_document(self, document: RemoteDocument) -> RawArtifact:
-        response = await self.client.get(document.source_url)
-        response.raise_for_status()
+        response = await get_with_retries(self.client, document.source_url)
         mime_type = response.headers.get("content-type", "").split(";")[0].strip()
         if not mime_type:
-            mime_type = "application/pdf" if document.source_url.lower().endswith(".pdf") else "text/html"
+            mime_type = (
+                "application/pdf"
+                if document.source_url.lower().endswith(".pdf")
+                else "text/html"
+            )
         return RawArtifact(
             metadata=document,
             content=response.content,
             mime_type=mime_type,
             response_headers={
-                key: value for key, value in response.headers.items()
+                key: value
+                for key, value in response.headers.items()
                 if key.lower() in {"content-type", "etag", "last-modified"}
             },
         )
