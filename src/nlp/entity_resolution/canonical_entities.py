@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+
 CANONICAL_COMPANIES: dict[str, dict[str, str]] = {
     "tsmc": {"name": "Taiwan Semiconductor Manufacturing Company", "entity_type": "Company"},
     "nvidia": {"name": "NVIDIA Corporation", "entity_type": "Company"},
@@ -27,10 +33,39 @@ CANONICAL_COMPANIES: dict[str, dict[str, str]] = {
     "l3harris": {"name": "L3Harris Technologies", "entity_type": "Company"},
     "teledyne": {"name": "Teledyne Technologies", "entity_type": "Company"},
     "transdigm": {"name": "TransDigm", "entity_type": "Company"},
-
     "samsung_electronics": {"name": "Samsung Electronics", "entity_type": "Company"},
     "sk_hynix": {"name": "SK Hynix", "entity_type": "Company"},
     "asml": {"name": "ASML Holding N.V.", "entity_type": "Company"},
     "globalfoundries": {"name": "GlobalFoundries", "entity_type": "Company"},
     "umc": {"name": "United Microelectronics Corporation", "entity_type": "Company"},
 }
+
+
+def _baseline_company_path() -> Path:
+    return Path(__file__).resolve().parents[3] / "data" / "seed" / "companies.json"
+
+
+def _extend_from_baseline() -> None:
+    """Ensure every seeded baseline company has a canonical company ID.
+
+    Existing hand-curated canonical labels are preserved because they are used by
+    evaluated SEC relation outputs. Missing baseline companies inherit their
+    stable display name from the seed registry.
+    """
+    path = _baseline_company_path()
+    if not path.exists():
+        return
+
+    companies = json.loads(path.read_text(encoding="utf-8"))
+    for company in companies:
+        company_id = str(company["company_id"]).strip()
+        name = str(company["name"]).strip()
+        if not company_id or not name:
+            continue
+        CANONICAL_COMPANIES.setdefault(
+            company_id,
+            {"name": name, "entity_type": "Company"},
+        )
+
+
+_extend_from_baseline()
