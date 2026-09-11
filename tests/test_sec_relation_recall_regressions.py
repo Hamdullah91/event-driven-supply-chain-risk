@@ -3,7 +3,7 @@ from __future__ import annotations
 import spacy
 
 from src.graph.ingestion.resolution import resolve_graph_candidates
-from src.nlp.relation_extraction import RelationExtractor
+from src.nlp.relation_extraction.enhanced_extractor import RelationExtractor
 from src.nlp.triplet_extractor import GraphCandidate
 
 
