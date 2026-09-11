@@ -11,7 +11,7 @@ from src.graph.connection import Neo4jConnection
 from src.graph.ingestion.pipeline import GraphIngestionPipeline
 from src.graph.ingestion.repository import GraphIngestionRepository
 from src.graph.ingestion.service import SECGraphIngestionService
-from src.nlp.triplet_extractor import TripletExtractor
+from src.nlp.relation_extraction import RelationExtractor
 
 
 logging.basicConfig(
@@ -139,7 +139,7 @@ def main() -> None:
         )
 
     nlp = spacy.load("en_core_web_sm")
-    triplet_extractor = TripletExtractor(nlp)
+    relation_extractor = RelationExtractor(nlp)
 
     connection = Neo4jConnection()
 
@@ -150,7 +150,7 @@ def main() -> None:
         repository = GraphIngestionRepository(connection)
         pipeline = GraphIngestionPipeline(repository)
         service = SECGraphIngestionService(
-            triplet_extractor=triplet_extractor,
+            relation_extractor=relation_extractor,
             graph_pipeline=pipeline,
         )
 
