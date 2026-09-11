@@ -5,7 +5,6 @@ from collections.abc import Iterable
 from .models import RelationCandidate
 
 
-COMPANY_LABELS = {"ORG"}
 OBJECT_TYPES = {
     "ORG": "Company",
     "FAC": "Facility",
@@ -63,7 +62,9 @@ class RelationExtractor:
     def _prep_objects(token, prepositions: set[str]) -> list:
         objects = []
         for child in token.children:
-            if child.dep_ != "prep" or child.lemma_.lower() not in prepositions:
+            if child.dep_ not in {"prep", "agent"}:
+                continue
+            if child.lemma_.lower() not in prepositions and child.text.lower() not in prepositions:
                 continue
             objects.extend(
                 grandchild
@@ -140,6 +141,33 @@ class RelationExtractor:
                 )
         return candidates
 
+    @classmethod
+    def _emit_explicit(
+        cls,
+        *,
+        sentence,
+        subject_text: str,
+        subject_type: str | None,
+        object_text: str,
+        object_type: str | None,
+        relationship: str,
+        pattern_id: str,
+        extraction_confidence: float,
+    ) -> RelationCandidate:
+        attribution = 0.92 if subject_type == "Company" else 0.85
+        return RelationCandidate(
+            subject=subject_text,
+            relationship=relationship,
+            object=object_text,
+            source_sentence=sentence.text.strip(),
+            pattern_id=pattern_id,
+            voice="passive",
+            subject_type=subject_type,
+            object_type=object_type,
+            extraction_confidence=extraction_confidence,
+            attribution_confidence=attribution,
+        )
+
     def extract(self, text: str) -> list[RelationCandidate]:
         doc = self.nlp(text)
         candidates: list[RelationCandidate] = []
@@ -157,38 +185,85 @@ class RelationExtractor:
                 passive = any(subject.dep_ == "nsubjpass" for subject in subjects)
 
                 if lemma in DEPENDENCY_LEMMAS:
-                    preps = {"on", "upon", "from", "to"}
-                    objects = self._object_mentions(self._prep_objects(verb, preps))
+                    if passive:
+                        continue
+                    objects = self._object_mentions(
+                        self._prep_objects(verb, {"on", "upon", "from", "to"})
+                    )
                     if objects:
                         candidates.extend(self._emit(
                             sentence=sentence, subjects=subjects, objects=objects,
                             relationship="DEPENDS_ON", pattern_id=f"dependency_{lemma}_prep",
-                            voice="passive" if passive else "active", extraction_confidence=0.94,
+                            voice="active", extraction_confidence=0.94,
                         ))
 
                 elif lemma in SUPPLY_LEMMAS:
-                    destinations = self._object_mentions(self._prep_objects(verb, {"to", "for"}))
-                    if destinations and not passive:
-                        candidates.extend(self._emit(
-                            sentence=sentence, subjects=subjects, objects=destinations,
-                            relationship="SUPPLIES", pattern_id=f"supply_{lemma}_destination",
-                            voice="active", extraction_confidence=0.93,
-                        ))
+                    if passive:
+                        agents = self._object_mentions(self._prep_objects(verb, {"by"}))
+                        supplied = [self._mention(subject) for subject in subjects]
+                        for agent_text, agent_type in agents:
+                            if agent_type != "Company":
+                                continue
+                            for supplied_text, supplied_type in supplied:
+                                if supplied_type != "Company":
+                                    continue
+                                candidates.append(self._emit_explicit(
+                                    sentence=sentence,
+                                    subject_text=agent_text,
+                                    subject_type=agent_type,
+                                    object_text=supplied_text,
+                                    object_type=supplied_type,
+                                    relationship="SUPPLIES",
+                                    pattern_id=f"supply_{lemma}_passive_by",
+                                    extraction_confidence=0.97,
+                                ))
+                    else:
+                        destinations = self._object_mentions(
+                            self._prep_objects(verb, {"to", "for"})
+                        )
+                        if destinations:
+                            candidates.extend(self._emit(
+                                sentence=sentence, subjects=subjects, objects=destinations,
+                                relationship="SUPPLIES", pattern_id=f"supply_{lemma}_destination",
+                                voice="active", extraction_confidence=0.93,
+                            ))
 
                 elif lemma in PRODUCTION_LEMMAS:
-                    objects = self._object_mentions(self._direct_objects(verb))
-                    objects = [value for value in objects if value[1] == "Product"]
-                    if objects and not passive:
-                        candidates.extend(self._emit(
-                            sentence=sentence, subjects=subjects, objects=objects,
-                            relationship="PRODUCES", pattern_id=f"production_{lemma}_product",
-                            voice="active", extraction_confidence=0.95,
-                        ))
+                    if passive:
+                        agents = self._object_mentions(self._prep_objects(verb, {"by"}))
+                        products = [self._mention(subject) for subject in subjects]
+                        for agent_text, agent_type in agents:
+                            if agent_type != "Company":
+                                continue
+                            for product_text, product_type in products:
+                                if product_type != "Product":
+                                    continue
+                                candidates.append(self._emit_explicit(
+                                    sentence=sentence,
+                                    subject_text=agent_text,
+                                    subject_type=agent_type,
+                                    object_text=product_text,
+                                    object_type=product_type,
+                                    relationship="PRODUCES",
+                                    pattern_id=f"production_{lemma}_passive_by",
+                                    extraction_confidence=0.97,
+                                ))
+                    else:
+                        objects = self._object_mentions(self._direct_objects(verb))
+                        objects = [value for value in objects if value[1] == "Product"]
+                        if objects:
+                            candidates.extend(self._emit(
+                                sentence=sentence, subjects=subjects, objects=objects,
+                                relationship="PRODUCES", pattern_id=f"production_{lemma}_product",
+                                voice="active", extraction_confidence=0.95,
+                            ))
 
                 elif lemma in USE_LEMMAS:
+                    if passive:
+                        continue
                     objects = self._object_mentions(self._direct_objects(verb))
                     objects = [value for value in objects if value[1] in {"Product", None}]
-                    if objects and not passive:
+                    if objects:
                         candidates.extend(self._emit(
                             sentence=sentence, subjects=subjects, objects=objects,
                             relationship="USES", pattern_id=f"use_{lemma}_object",
@@ -196,9 +271,11 @@ class RelationExtractor:
                         ))
 
                 elif lemma in OPERATE_LEMMAS | OWN_LEMMAS:
+                    if passive:
+                        continue
                     objects = self._object_mentions(self._direct_objects(verb))
                     objects = [value for value in objects if value[1] == "Facility"]
-                    if objects and not passive:
+                    if objects:
                         relationship = "OPERATES" if lemma in OPERATE_LEMMAS else "OWNS"
                         candidates.extend(self._emit(
                             sentence=sentence, subjects=subjects, objects=objects,
