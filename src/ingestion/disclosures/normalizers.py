@@ -52,7 +52,15 @@ def _document_id(artifact: RawArtifact) -> str:
 
 
 def _representation_id(artifact: RawArtifact) -> str:
-    return sha256(artifact.content).hexdigest()
+    metadata = artifact.metadata
+    occurrence_identity = "|".join(
+        [
+            metadata.source_id,
+            metadata.provider_document_id or metadata.source_url,
+            sha256(artifact.content).hexdigest(),
+        ]
+    )
+    return sha256(occurrence_identity.encode("utf-8")).hexdigest()
 
 
 class DisclosureNormalizer(ABC):
@@ -77,6 +85,8 @@ class DisclosureNormalizer(ABC):
             document_id=_document_id(artifact),
             company_id=metadata.company_id,
             source_id=metadata.source_id,
+            provider_document_id=metadata.provider_document_id,
+            source_url=metadata.source_url,
             title=metadata.title,
             document_family=family,
             native_document_type=metadata.native_document_type,
