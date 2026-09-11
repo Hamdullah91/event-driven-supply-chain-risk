@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import logging
 import os
+from collections import defaultdict
 from pathlib import Path
 
 import spacy
@@ -14,6 +15,7 @@ from src.graph.ingestion.pipeline import GraphIngestionPipeline
 from src.graph.ingestion.repository import GraphIngestionRepository
 from src.graph.ingestion.service import DisclosureGraphIngestionService
 from src.ingestion.disclosures.graph_bridge import NormalizedDisclosureGraphBridge
+from src.ingestion.disclosures.models import IngestionStatus
 from src.ingestion.disclosures.normalizers import NormalizerRegistry
 from src.ingestion.disclosures.providers import (
     InvestorRelationsDisclosureProvider,
@@ -72,37 +74,58 @@ def build_company_registry() -> CompanyRegistry:
     )
 
 
+def selected_company_ids(
+    registry: CompanyRegistry,
+    requested: list[str] | None,
+) -> list[str]:
+    if requested:
+        for company_id in requested:
+            registry.get(company_id)
+        return list(dict.fromkeys(requested))
+    return [company.company_id for company in registry.enabled()]
+
+
 async def async_main(args: argparse.Namespace) -> int:
     load_dotenv()
     company_registry = build_company_registry()
     source_registry = SourceRegistry.from_json(SOURCES_PATH)
+    target_company_ids = selected_company_ids(company_registry, args.companies)
 
+    needs_sec = any(
+        any(
+            binding.source_id == "sec_edgar"
+            for binding in company_registry.bindings_for(company_id)
+        )
+        for company_id in target_company_ids
+    )
     sec_user_agent = os.getenv("SEC_USER_AGENT", "").strip()
-    if not sec_user_agent:
+    if needs_sec and not sec_user_agent:
         raise RuntimeError(
-            "SEC_USER_AGENT is required for the unified disclosure runner. "
-            "Set it in .env before running ingestion."
+            "SEC_USER_AGENT is required because the selected company set "
+            "contains SEC EDGAR routes. Set it in .env before running."
         )
 
-    sec_client = SECClient(user_agent=sec_user_agent)
+    sec_client: SECClient | None = None
+    providers = []
+    if needs_sec:
+        sec_client = SECClient(user_agent=sec_user_agent)
+        providers.append(SECDisclosureProvider(sec_client))
+
     dart_provider = OpenDARTDisclosureProvider()
     ir_provider = InvestorRelationsDisclosureProvider()
-    providers = [
-        SECDisclosureProvider(sec_client),
-        dart_provider,
-        ir_provider,
-    ]
+    providers.extend([dart_provider, ir_provider])
 
     router = SourceRouter(
         company_registry=company_registry,
         source_registry=source_registry,
         providers=providers,
     )
+    document_registry = DocumentRegistry(REGISTRY_DB)
     ingestion_service = DisclosureIngestionService(
         company_registry=company_registry,
         router=router,
         artifact_store=RawArtifactStore(RAW_ROOT),
-        document_registry=DocumentRegistry(REGISTRY_DB),
+        document_registry=document_registry,
         normalizers=NormalizerRegistry(),
         supported_languages={"en"},
     )
@@ -128,7 +151,7 @@ async def async_main(args: argparse.Namespace) -> int:
     try:
         if args.companies:
             all_results = []
-            for company_id in args.companies:
+            for company_id in target_company_ids:
                 all_results.extend(
                     await ingestion_service.ingest_company(
                         company_id,
@@ -148,38 +171,79 @@ async def async_main(args: argparse.Namespace) -> int:
         graph_totals = {"attempted": 0, "inserted": 0, "rejected": 0}
         if graph_bridge is not None:
             for result in all_results:
-                if result.normalized is None:
+                disclosure = result.normalized
+                if disclosure is None:
                     continue
-                counts = graph_bridge.ingest(result.normalized)
+                language = (disclosure.language or "").lower().split("-")[0]
+                if language != "en":
+                    continue
+                try:
+                    counts = graph_bridge.ingest(disclosure)
+                except Exception as exc:
+                    document_registry.set_status(
+                        company_id=result.company_id,
+                        source_id=result.source_id,
+                        provider_document_id=result.provider_document_id,
+                        status=IngestionStatus.FAILED_GRAPH,
+                        error=exc,
+                    )
+                    result.status = IngestionStatus.FAILED_GRAPH
+                    result.error = exc
+                    continue
+
                 for key in graph_totals:
                     graph_totals[key] += counts[key]
+                document_registry.set_status(
+                    company_id=result.company_id,
+                    source_id=result.source_id,
+                    provider_document_id=result.provider_document_id,
+                    status=IngestionStatus.GRAPH_COMPLETE,
+                )
+                result.status = IngestionStatus.GRAPH_COMPLETE
 
-        succeeded = sum(
-            result.status.value.startswith("normalized")
-            or result.duplicate
-            for result in all_results
-        )
-        failed = sum(result.error is not None for result in all_results)
+        results_by_company: dict[str, list] = defaultdict(list)
+        for result in all_results:
+            results_by_company[result.company_id].append(result)
+
+        successful_companies = {
+            company_id
+            for company_id in target_company_ids
+            if any(result.successful for result in results_by_company[company_id])
+        }
+        failed_companies = set(target_company_ids) - successful_companies
+        provider_failures = sum(result.error is not None for result in all_results)
         unsupported = sum(
-            result.status.value == "normalized_unsupported_language"
+            result.status == IngestionStatus.NORMALIZED_UNSUPPORTED_LANGUAGE
             for result in all_results
         )
+        successful_results = sum(result.successful for result in all_results)
 
         print()
         print("===== CORPORATE DISCLOSURE INGESTION =====")
-        print(f"Results: {len(all_results)}")
-        print(f"Successful/duplicate: {succeeded}")
+        print(f"Companies requested: {len(target_company_ids)}")
+        print(f"Companies with successful source: {len(successful_companies)}")
+        print(f"Companies with no successful source: {len(failed_companies)}")
+        print(f"Document/source results: {len(all_results)}")
+        print(f"Successful/duplicate results: {successful_results}")
         print(f"Unsupported-language normalized: {unsupported}")
-        print(f"Failed: {failed}")
+        print(f"Provider-level failures (fallback may succeed): {provider_failures}")
+        if failed_companies:
+            print("Companies with no successful source:")
+            for company_id in sorted(failed_companies):
+                print(f"  - {company_id}")
         if args.graph:
             print(f"Graph attempted: {graph_totals['attempted']}")
             print(f"Graph inserted: {graph_totals['inserted']}")
             print(f"Graph rejected: {graph_totals['rejected']}")
         print(f"Registry DB: {REGISTRY_DB}")
         print("==========================================")
-        return 1 if failed else 0
+
+        # A regulator can fail while a lower-priority official source succeeds.
+        # Exit failure only when a requested company has no successful route.
+        return 1 if failed_companies else 0
     finally:
-        await sec_client.close()
+        if sec_client is not None:
+            await sec_client.close()
         await dart_provider.close()
         await ir_provider.close()
         if graph_connection is not None:
