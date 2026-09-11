@@ -184,6 +184,16 @@ class DisclosureIngestionService:
             )
 
         now = datetime.now(timezone.utc)
+        existing_canonical = self.document_registry.current_representation_id(
+            normalized.document_id
+        )
+        is_canonical = existing_canonical is None
+        canonical_representation_id = (
+            normalized.source_representation_id
+            if is_canonical
+            else existing_canonical
+        )
+
         disclosure_document = DisclosureDocument(
             document_id=normalized.document_id,
             company_id=document.company_id,
@@ -195,7 +205,7 @@ class DisclosureIngestionService:
             filing_date=document.filing_date,
             language=document.language,
             logical_document_key=self._logical_key(document),
-            current_representation_id=normalized.source_representation_id,
+            current_representation_id=canonical_representation_id,
             created_at=now,
             updated_at=now,
         )
@@ -210,7 +220,7 @@ class DisclosureIngestionService:
             content_sha256=content_hash,
             byte_size=len(artifact.content),
             storage_uri=str(storage_path),
-            is_canonical_representation=True,
+            is_canonical_representation=is_canonical,
         )
         self.document_registry.upsert_document(disclosure_document)
         self.document_registry.insert_representation(representation)
