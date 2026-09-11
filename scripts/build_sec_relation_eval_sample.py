@@ -57,7 +57,7 @@ def _iter_filing_chunks() -> list[tuple[str, str, str]]:
     for path in sorted(PROCESSED_SEC_ROOT.rglob("processed.json")):
         filing = json.loads(path.read_text(encoding="utf-8"))
         company_name = str(filing.get("company_name", "")).strip()
-        if company_name not in target_names:
+        if company_name.casefold() not in target_names:
             continue
 
         accession = str(filing.get("accession_number", "")).strip()
