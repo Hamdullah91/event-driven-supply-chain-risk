@@ -7,7 +7,7 @@ from .models import FilingMetadata, FilingParagraph, FilingSection, ParsedFiling
 
 
 ITEM_PATTERN_20F = re.compile(
-    r"\bITEM\s*(3|4|5)\b\s*[.\-:]?",
+    r"\bITEM\s*(1[0-9]|[1-9])\b\s*[.\-:]?",
     re.IGNORECASE,
 )
 
@@ -27,10 +27,10 @@ MIN_SECTION_CHARS_20F = {
 class SEC20FParser(SEC10KParser):
     """Parse supply-chain-relevant sections from SEC Form 20-F filings.
 
-    Form 20-F uses a different item structure from Form 10-K. We retain
-    Items 3, 4, and 5 because they contain risk factors, business/sourcing
-    disclosures, facilities, and operating-review material used by the
-    downstream supply-chain extractor.
+    Form 20-F uses a different item structure from Form 10-K. We use every
+    numbered Item heading as a section boundary, then retain Items 3, 4, and 5
+    because they contain risk factors, business/sourcing disclosures,
+    facilities, and operating-review material used downstream.
     """
 
     @staticmethod
@@ -45,10 +45,8 @@ class SEC20FParser(SEC10KParser):
             start = match.end()
             end = len(text)
 
-            for next_match in matches[index + 1 :]:
-                if next_match.group(1).upper() != item:
-                    end = next_match.start()
-                    break
+            if index + 1 < len(matches):
+                end = matches[index + 1].start()
 
             section_text = text[start:end].strip()
             if section_text:
