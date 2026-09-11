@@ -4,7 +4,6 @@ import json
 import sqlite3
 from hashlib import sha256
 from pathlib import Path
-from typing import Any
 
 from .models import (
     DisclosureDocument,
@@ -39,12 +38,7 @@ class RawArtifactStore:
     def save(self, artifact: RawArtifact) -> tuple[str, Path]:
         digest = self.content_hash(artifact.content)
         extension = self.extension_for_mime(artifact.mime_type)
-        path = (
-            self.root
-            / artifact.metadata.source_id
-            / artifact.metadata.company_id
-            / f"{digest}{extension}"
-        )
+        path = self.root / digest[:2] / f"{digest}{extension}"
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
             path.write_bytes(artifact.content)
@@ -52,10 +46,11 @@ class RawArtifactStore:
 
 
 class DocumentRegistry:
-    """SQLite metadata/state registry.
+    """SQLite metadata/state registry for disclosure acquisition.
 
-    Neo4j remains graph truth. This registry tracks acquisition, deduplication,
-    versions, failures and normalized-document state.
+    Physical artifacts are content-addressed once, while representations record
+    every provider/source occurrence. This lets identical bytes discovered from
+    two authoritative sources share storage without losing either provenance.
     """
 
     def __init__(self, path: Path) -> None:
@@ -66,6 +61,7 @@ class DocumentRegistry:
     def _connect(self) -> sqlite3.Connection:
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA foreign_keys = ON")
         return connection
 
     def _initialize(self) -> None:
@@ -88,6 +84,13 @@ class DocumentRegistry:
                     updated_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS artifacts (
+                    content_sha256 TEXT PRIMARY KEY,
+                    mime_type TEXT NOT NULL,
+                    byte_size INTEGER NOT NULL,
+                    storage_uri TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS representations (
                     representation_id TEXT PRIMARY KEY,
                     document_id TEXT NOT NULL,
@@ -104,9 +107,12 @@ class DocumentRegistry:
                     supersedes_representation_id TEXT,
                     is_canonical_representation INTEGER NOT NULL DEFAULT 0,
                     UNIQUE(source_id, provider_document_id),
-                    UNIQUE(content_sha256),
-                    FOREIGN KEY(document_id) REFERENCES documents(document_id)
+                    FOREIGN KEY(document_id) REFERENCES documents(document_id),
+                    FOREIGN KEY(content_sha256) REFERENCES artifacts(content_sha256)
                 );
+
+                CREATE INDEX IF NOT EXISTS idx_representation_hash
+                ON representations(content_sha256);
 
                 CREATE TABLE IF NOT EXISTS ingestion_state (
                     company_id TEXT NOT NULL,
@@ -128,12 +134,55 @@ class DocumentRegistry:
                 """
             )
 
-    def representation_by_hash(self, content_sha256: str) -> sqlite3.Row | None:
+    def artifact_exists(self, content_sha256: str) -> bool:
         with self._connect() as connection:
-            return connection.execute(
-                "SELECT * FROM representations WHERE content_sha256 = ?",
+            row = connection.execute(
+                "SELECT 1 FROM artifacts WHERE content_sha256 = ?",
                 (content_sha256,),
             ).fetchone()
+            return row is not None
+
+    def representation_by_occurrence(
+        self,
+        *,
+        source_id: str,
+        provider_document_id: str | None,
+        source_url: str,
+    ) -> sqlite3.Row | None:
+        with self._connect() as connection:
+            if provider_document_id:
+                return connection.execute(
+                    """
+                    SELECT * FROM representations
+                    WHERE source_id = ? AND provider_document_id = ?
+                    """,
+                    (source_id, provider_document_id),
+                ).fetchone()
+            return connection.execute(
+                """
+                SELECT * FROM representations
+                WHERE source_id = ? AND source_url = ?
+                """,
+                (source_id, source_url),
+            ).fetchone()
+
+    def save_artifact(
+        self,
+        *,
+        content_sha256: str,
+        mime_type: str,
+        byte_size: int,
+        storage_uri: str,
+    ) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO artifacts (
+                    content_sha256, mime_type, byte_size, storage_uri
+                ) VALUES (?, ?, ?, ?)
+                """,
+                (content_sha256, mime_type, byte_size, storage_uri),
+            )
 
     def upsert_document(self, document: DisclosureDocument) -> None:
         payload = document.model_dump(mode="json")
@@ -214,6 +263,19 @@ class DocumentRegistry:
                     json.dumps(payload, ensure_ascii=False),
                 ),
             )
+
+    def load_normalized(self, representation_id: str) -> NormalizedDisclosure | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT payload_json FROM normalized_documents
+                WHERE representation_id = ?
+                """,
+                (representation_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return NormalizedDisclosure.model_validate_json(row["payload_json"])
 
     def set_status(
         self,
