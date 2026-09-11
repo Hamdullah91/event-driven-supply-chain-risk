@@ -7,19 +7,22 @@ from pathlib import Path
 
 import spacy
 
+from scripts.ingest_sec_graph import load_target_company_names
+from src.graph.ingestion.resolution import resolve_graph_candidates
+from src.nlp.relation_extraction import RelationExtractor
+from src.nlp.triplet_extractor import GraphCandidate
+
 
 PROCESSED_SEC_ROOT = Path("data/processed/sec")
-TARGETS_PATH = Path("data/seed/sec_10k_targets.json")
-OUTPUT_PATH = Path("data/evaluation/sec_relation_annotation_sample.jsonl")
-SAMPLE_SIZE = 250
-POSITIVE_FRACTION = 0.60
+OUTPUT_PATH = Path("data/evaluation/sec_relation_balanced_annotation_sample.jsonl")
+SAMPLE_SIZE = 100
+POSITIVE_SIZE = 50
+NEGATIVE_SIZE = 50
 RANDOM_SEED = 38
 NLP_BATCH_SIZE = 16
 
-# This is only used to stratify the manual annotation sample. It does not
-# generate gold labels and it is deliberately broader than the production
-# RelationExtractor so the sample contains both likely positives and hard
-# negatives without running spaCy twice over every SEC sentence.
+# Broad lexical screen used only to find hard negatives. Gold labels remain
+# manual: production predictions are included only as annotation hints.
 RELATION_TRIGGER_PATTERN = re.compile(
     r"\b("
     r"depend(?:s|ed|ing)?|rely|relies|relied|relying|"
@@ -36,13 +39,19 @@ RELATION_TRIGGER_PATTERN = re.compile(
 )
 
 
-def _target_names() -> set[str]:
-    payload = json.loads(TARGETS_PATH.read_text(encoding="utf-8"))
-    return {str(item["name"]).strip() for item in payload}
+def _relation_to_graph(candidate) -> GraphCandidate:
+    return GraphCandidate(
+        subject=candidate.subject,
+        predicate=candidate.relationship,
+        object=candidate.object,
+        source_sentence=candidate.source_sentence,
+        subject_type=candidate.subject_type,
+        object_type=candidate.object_type,
+    )
 
 
 def _iter_filing_chunks() -> list[tuple[str, str, str]]:
-    target_names = _target_names()
+    target_names = load_target_company_names()
     rows: list[tuple[str, str, str]] = []
 
     for path in sorted(PROCESSED_SEC_ROOT.rglob("processed.json")):
@@ -61,121 +70,147 @@ def _iter_filing_chunks() -> list[tuple[str, str, str]]:
     return rows
 
 
-def _collect_sentences(nlp) -> list[dict]:
+def _prediction_hint(extractor: RelationExtractor, sentence: str, company: str) -> list[dict]:
+    raw = [_relation_to_graph(candidate) for candidate in extractor.extract(sentence)]
+    resolved = resolve_graph_candidates(raw, filing_company=company)
+    return [
+        {
+            "subject": candidate.subject,
+            "subject_type": candidate.subject_type,
+            "relationship": candidate.relationship,
+            "object": candidate.object,
+            "object_type": candidate.object_type,
+        }
+        for candidate in resolved
+    ]
+
+
+def _collect_sentences(nlp, extractor: RelationExtractor) -> list[dict]:
     chunks = _iter_filing_chunks()
     seen: set[tuple[str, str, str]] = set()
     rows: list[dict] = []
-
-    print(f"SEC chunks discovered: {len(chunks)}", flush=True)
-    print("Segmenting sentences with spaCy...", flush=True)
-
     texts = [chunk_text for _, _, chunk_text in chunks]
 
+    print(f"SEC chunks discovered: {len(chunks)}", flush=True)
+    print("Segmenting production 10-K/20-F sentences...", flush=True)
+
     for index, (metadata, doc) in enumerate(
-        zip(
-            chunks,
-            nlp.pipe(texts, batch_size=NLP_BATCH_SIZE),
-            strict=True,
-        ),
+        zip(chunks, nlp.pipe(texts, batch_size=NLP_BATCH_SIZE), strict=True),
         start=1,
     ):
         company_name, accession, _ = metadata
-
         for sentence in doc.sents:
             text = sentence.text.strip()
             if len(text) < 40:
                 continue
-
             key = (company_name, accession, text)
             if key in seen:
                 continue
             seen.add(key)
-
             rows.append(
                 {
                     "company_name": company_name,
                     "accession_number": accession,
                     "source_sentence": text,
-                    "extractor_candidate": bool(
-                        RELATION_TRIGGER_PATTERN.search(text)
-                    ),
+                    "lexical_relation_trigger": bool(RELATION_TRIGGER_PATTERN.search(text)),
                 }
             )
 
         if index % 100 == 0 or index == len(chunks):
-            print(
-                f"Processed chunks: {index}/{len(chunks)} | "
-                f"unique sentences: {len(rows)}",
-                flush=True,
-            )
+            print(f"Processed chunks: {index}/{len(chunks)} | unique sentences: {len(rows)}", flush=True)
+
+    print("Running production extractor to identify resolvable positive candidates...", flush=True)
+    for index, row in enumerate(rows, start=1):
+        row["prediction_hint"] = _prediction_hint(
+            extractor,
+            row["source_sentence"],
+            row["company_name"],
+        )
+        if index % 1000 == 0 or index == len(rows):
+            print(f"Scored sentences: {index}/{len(rows)}", flush=True)
 
     return rows
 
 
 def _sample(rows: list[dict]) -> list[dict]:
     rng = random.Random(RANDOM_SEED)
-    positives = [row for row in rows if row["extractor_candidate"]]
-    negatives = [row for row in rows if not row["extractor_candidate"]]
-
-    desired_positive = round(SAMPLE_SIZE * POSITIVE_FRACTION)
-    positive_count = min(desired_positive, len(positives))
-    negative_count = min(SAMPLE_SIZE - positive_count, len(negatives))
-
-    remaining = SAMPLE_SIZE - positive_count - negative_count
-    if remaining > 0:
-        extra_positive = min(remaining, len(positives) - positive_count)
-        positive_count += extra_positive
-        remaining -= extra_positive
-    if remaining > 0:
-        negative_count += min(remaining, len(negatives) - negative_count)
-
-    selected = [
-        *rng.sample(positives, positive_count),
-        *rng.sample(negatives, negative_count),
+    predicted_positive = [row for row in rows if row["prediction_hint"]]
+    hard_negative = [
+        row
+        for row in rows
+        if not row["prediction_hint"] and row["lexical_relation_trigger"]
     ]
+    easy_negative = [
+        row
+        for row in rows
+        if not row["prediction_hint"] and not row["lexical_relation_trigger"]
+    ]
+
+    if len(predicted_positive) < POSITIVE_SIZE:
+        raise RuntimeError(
+            "Not enough production-positive SEC sentences for a 50-positive benchmark. "
+            f"Found {len(predicted_positive)}. Do not synthesize positives; manually review "
+            "all available production positives and supplement with independently selected "
+            "real SEC sentences if needed."
+        )
+
+    positives = rng.sample(predicted_positive, POSITIVE_SIZE)
+    hard_count = min(NEGATIVE_SIZE, len(hard_negative))
+    negatives = rng.sample(hard_negative, hard_count)
+    if len(negatives) < NEGATIVE_SIZE:
+        negatives.extend(rng.sample(easy_negative, NEGATIVE_SIZE - len(negatives)))
+
+    selected = [("POSITIVE_CANDIDATE", row) for row in positives]
+    selected.extend(("HARD_NEGATIVE_CANDIDATE", row) for row in negatives)
     rng.shuffle(selected)
 
     output: list[dict] = []
-    for index, row in enumerate(selected, start=1):
+    for index, (stratum, row) in enumerate(selected, start=1):
         output.append(
             {
-                "sample_id": f"sec-rel-{index:04d}",
+                "sample_id": f"sec-balanced-{index:04d}",
+                "stratum": stratum,
                 "company_name": row["company_name"],
                 "accession_number": row["accession_number"],
                 "source_sentence": row["source_sentence"],
+                "prediction_hint": row["prediction_hint"],
                 "annotation_status": "UNREVIEWED",
                 "gold_relations": None,
             }
         )
-
     return output
 
 
 def main() -> None:
     print("Loading spaCy model...", flush=True)
-    nlp = spacy.load("en_core_web_sm", disable=["ner"])
-    rows = _collect_sentences(nlp)
+    nlp = spacy.load("en_core_web_sm")
+    extractor = RelationExtractor(nlp)
+    rows = _collect_sentences(nlp, extractor)
+
+    predicted_positive_count = sum(1 for row in rows if row["prediction_hint"])
+    hard_negative_count = sum(
+        1 for row in rows
+        if not row["prediction_hint"] and row["lexical_relation_trigger"]
+    )
+
+    print("===== BALANCED SEC EVALUATION POOLS =====")
+    print(f"Available sentences: {len(rows)}")
+    print(f"Production-positive candidates: {predicted_positive_count}")
+    print(f"Hard-negative candidates: {hard_negative_count}")
+
     sample = _sample(rows)
-
-    if not sample:
-        raise RuntimeError("No SEC evaluation sentences were discovered.")
-
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT_PATH.open("w", encoding="utf-8") as file:
         for row in sample:
             file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
-    likely_positive = sum(
-        1 for row in rows if row["extractor_candidate"]
-    )
-
-    print("===== SEC RELATION EVALUATION SAMPLE =====")
-    print(f"Available sentences: {len(rows)}")
-    print(f"Likely-positive pool: {likely_positive}")
     print(f"Sampled sentences: {len(sample)}")
+    print(f"Positive candidates: {POSITIVE_SIZE}")
+    print(f"Negative candidates: {NEGATIVE_SIZE}")
     print(f"Random seed: {RANDOM_SEED}")
     print(f"Output: {OUTPUT_PATH}")
-    print("==========================================")
+    print("IMPORTANT: prediction_hint is not gold. Manually review every row before evaluation.")
+    print("=========================================")
 
 
 if __name__ == "__main__":
