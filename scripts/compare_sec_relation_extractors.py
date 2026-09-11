@@ -13,6 +13,7 @@ from src.nlp.triplet_extractor import GraphCandidate, TripletExtractor
 
 PROCESSED_SEC_ROOT = Path("data/processed/sec")
 TARGETS_PATH = Path("data/seed/sec_10k_targets.json")
+DISPUTES_OUTPUT = Path("sec_relation_disputes.txt")
 
 
 def _load_target_names() -> set[str]:
@@ -51,13 +52,51 @@ def _key(candidate) -> tuple[str, str, str, str, str]:
     )
 
 
-def _evidence_map(candidates) -> dict[tuple[str, str, str, str, str], list[str]]:
+def _resolved_evidence_map(
+    raw_candidates: list[GraphCandidate],
+    *,
+    filing_company: str,
+) -> dict[tuple[str, str, str, str, str], list[str]]:
+    """Map each resolved relation back to the raw SEC sentence(s) that produced it."""
     evidence: dict[tuple[str, str, str, str, str], list[str]] = defaultdict(list)
-    for candidate in candidates:
-        sentence = (getattr(candidate, "source_sentence", "") or "").strip()
-        if sentence and sentence not in evidence[_key(candidate)]:
-            evidence[_key(candidate)].append(sentence)
+
+    for raw_candidate in raw_candidates:
+        resolved = resolve_graph_candidates(
+            [raw_candidate],
+            filing_company=filing_company,
+        )
+        sentence = (raw_candidate.source_sentence or "").strip()
+
+        for candidate in resolved:
+            key = _key(candidate)
+            if sentence and sentence not in evidence[key]:
+                evidence[key].append(sentence)
+
     return evidence
+
+
+def _format_relation(
+    label: str,
+    *,
+    company_name: str,
+    key: tuple[str, str, str, str, str],
+    evidence_by_key: dict[tuple[str, str, str, str, str], list[str]],
+) -> list[str]:
+    subject, subject_type, relationship, object_name, object_type = key
+    lines = [
+        f"{label} | company={company_name} | "
+        f"({subject_type}) {subject} -[{relationship}]-> "
+        f"({object_type}) {object_name}"
+    ]
+
+    sentences = evidence_by_key.get(key, [])
+    if not sentences:
+        lines.append("EVIDENCE | <none found>")
+    else:
+        for sentence in sentences[:3]:
+            lines.append(f"EVIDENCE | {sentence}")
+
+    return lines
 
 
 def main() -> None:
@@ -70,6 +109,7 @@ def main() -> None:
 
     global_counts = Counter()
     audited = 0
+    dispute_lines: list[str] = []
 
     for processed_file in processed_files:
         filing = json.loads(processed_file.read_text(encoding="utf-8"))
@@ -80,8 +120,8 @@ def main() -> None:
         audited += 1
         texts = _extract_texts(filing)
 
-        legacy_raw = []
-        new_raw = []
+        legacy_raw: list[GraphCandidate] = []
+        new_raw: list[GraphCandidate] = []
 
         for text in texts:
             legacy_raw.extend(legacy_extractor.extract(text))
@@ -101,8 +141,14 @@ def main() -> None:
 
         legacy_keys = {_key(candidate) for candidate in legacy_resolved}
         new_keys = {_key(candidate) for candidate in new_resolved}
-        legacy_evidence = _evidence_map(legacy_resolved)
-        new_evidence = _evidence_map(new_resolved)
+        legacy_evidence = _resolved_evidence_map(
+            legacy_raw,
+            filing_company=company_name,
+        )
+        new_evidence = _resolved_evidence_map(
+            new_raw,
+            filing_company=company_name,
+        )
 
         overlap = legacy_keys & new_keys
         new_only = new_keys - legacy_keys
@@ -133,14 +179,22 @@ def main() -> None:
             ("LEGACY_ONLY", sorted(legacy_only), legacy_evidence),
         ):
             for key in values:
-                subject, subject_type, relationship, object_name, object_type = key
-                print(
-                    f"{label} | company={company_name} | "
-                    f"({subject_type}) {subject} -[{relationship}]-> "
-                    f"({object_type}) {object_name}"
+                lines = _format_relation(
+                    label,
+                    company_name=company_name,
+                    key=key,
+                    evidence_by_key=evidence_by_key,
                 )
-                for sentence in evidence_by_key.get(key, [])[:3]:
-                    print(f"EVIDENCE | {sentence}")
+                dispute_lines.extend(lines)
+                dispute_lines.append("")
+
+                for line in lines:
+                    print(line)
+
+    DISPUTES_OUTPUT.write_text(
+        "\n".join(dispute_lines).rstrip() + "\n",
+        encoding="utf-8",
+    )
 
     print()
     print("=" * 80)
@@ -168,6 +222,7 @@ def main() -> None:
         f"new_only={global_counts['new_only']} | "
         f"legacy_only={global_counts['legacy_only']}"
     )
+    print(f"DISPUTES_OUTPUT | {DISPUTES_OUTPUT}")
 
 
 if __name__ == "__main__":
