@@ -190,6 +190,40 @@ def test_produces_requires_product_object():
     assert RelationExtractor(nlp).extract("ignored") == []
 
 
+def test_production_accepts_vehicle_as_domain_product():
+    nlp = _nlp(
+        ["We", "produced", "vehicles"],
+        [1, 1, 1],
+        ["nsubj", "ROOT", "dobj"],
+        ["PRON", "VERB", "NOUN"],
+        ["we", "produce", "vehicle"],
+    )
+    candidates = RelationExtractor(nlp).extract("ignored")
+    assert len(candidates) == 1
+    assert candidates[0].relationship == "PRODUCES"
+    assert candidates[0].subject == "We"
+    assert candidates[0].object == "vehicles"
+    assert candidates[0].object_type == "Product"
+
+
+def test_utilize_coordinated_companies_preserves_company_objects():
+    nlp = _nlp(
+        ["We", "utilize", "TSMC", ",", "UMC", "and", "Samsung"],
+        [1, 1, 1, 2, 2, 6, 2],
+        ["nsubj", "ROOT", "dobj", "punct", "conj", "cc", "conj"],
+        ["PRON", "VERB", "PROPN", "PUNCT", "PROPN", "CCONJ", "PROPN"],
+        ["we", "utilize", "TSMC", ",", "UMC", "and", "Samsung"],
+        [(2, 3, "ORG"), (4, 5, "ORG"), (6, 7, "ORG")],
+    )
+    candidates = RelationExtractor(nlp).extract("ignored")
+    company_objects = {
+        candidate.object
+        for candidate in candidates
+        if candidate.relationship == "USES" and candidate.object_type == "Company"
+    }
+    assert company_objects == {"TSMC", "UMC", "Samsung"}
+
+
 def test_operates_requires_facility_object():
     nlp = _nlp(
         ["We", "operate", "Fab", "42"],
