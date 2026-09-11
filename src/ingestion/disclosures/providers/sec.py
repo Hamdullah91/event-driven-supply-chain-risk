@@ -4,7 +4,11 @@ import mimetypes
 from datetime import date
 
 from src.ingestion.sec.client import SECClient
-from src.ingestion.sec.crawler import build_archive_url, find_latest_form_with_history
+from src.ingestion.sec.crawler import (
+    FilingNotFoundError,
+    build_archive_url,
+    find_latest_form_with_history,
+)
 from src.ingestion.sec.models import CompanyTarget
 
 from ..models import (
@@ -89,7 +93,7 @@ class SECDisclosureProvider(DisclosureProvider):
                     submissions=submissions,
                     form=form,
                 )
-            except Exception:
+            except FilingNotFoundError:
                 continue
 
             filing_date = date.fromisoformat(filing["filing_date"])
@@ -120,7 +124,9 @@ class SECDisclosureProvider(DisclosureProvider):
                     filing_date=filing_date,
                     publication_date=filing_date,
                     reporting_period_end=report_date,
-                    reporting_year=report_date.year if report_date else filing_date.year,
+                    reporting_year=(
+                        report_date.year if report_date else filing_date.year
+                    ),
                     language="en",
                     metadata={
                         "cik": cik,
