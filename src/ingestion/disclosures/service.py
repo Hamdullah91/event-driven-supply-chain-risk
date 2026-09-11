@@ -4,7 +4,6 @@ import asyncio
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
 
 from .models import (
     DisclosureDocument,
@@ -32,6 +31,16 @@ class IngestionResult:
     error: Exception | None = None
     duplicate: bool = False
 
+    @property
+    def successful(self) -> bool:
+        return self.error is None and self.status in {
+            IngestionStatus.DOWNLOADED,
+            IngestionStatus.NORMALIZED,
+            IngestionStatus.NORMALIZED_UNSUPPORTED_LANGUAGE,
+            IngestionStatus.NLP_COMPLETE,
+            IngestionStatus.GRAPH_COMPLETE,
+        }
+
 
 class DisclosureIngestionService:
     def __init__(
@@ -43,6 +52,7 @@ class DisclosureIngestionService:
         document_registry: DocumentRegistry,
         normalizers: NormalizerRegistry | None = None,
         supported_languages: set[str] | None = None,
+        provider_concurrency: dict[str, int] | None = None,
     ) -> None:
         self.company_registry = company_registry
         self.router = router
@@ -50,6 +60,15 @@ class DisclosureIngestionService:
         self.document_registry = document_registry
         self.normalizers = normalizers or NormalizerRegistry()
         self.supported_languages = supported_languages or {"en"}
+        limits = provider_concurrency or {
+            "sec_edgar": 4,
+            "opendart": 3,
+            "investor_relations": 4,
+        }
+        self._provider_semaphores = {
+            provider_id: asyncio.Semaphore(max(1, limit))
+            for provider_id, limit in limits.items()
+        }
 
     @staticmethod
     def _provider_document_key(document: RemoteDocument) -> str:
@@ -61,6 +80,12 @@ class DisclosureIngestionService:
         period = document.reporting_period_end or document.reporting_year or "unknown"
         return f"{document.company_id}:{family}:{period}"
 
+    def _provider_semaphore(self, provider_id: str) -> asyncio.Semaphore:
+        return self._provider_semaphores.setdefault(
+            provider_id,
+            asyncio.Semaphore(2),
+        )
+
     async def ingest_document(
         self,
         *,
@@ -68,6 +93,38 @@ class DisclosureIngestionService:
         document: RemoteDocument,
     ) -> IngestionResult:
         provider_document_id = self._provider_document_key(document)
+
+        existing_occurrence = self.document_registry.representation_by_occurrence(
+            source_id=document.source_id,
+            provider_document_id=document.provider_document_id,
+            source_url=document.source_url,
+        )
+        if existing_occurrence is not None:
+            normalized = self.document_registry.load_normalized(
+                existing_occurrence["representation_id"]
+            )
+            status = (
+                IngestionStatus.NORMALIZED_UNSUPPORTED_LANGUAGE
+                if normalized
+                and (normalized.language or "").lower().split("-")[0]
+                not in self.supported_languages
+                else IngestionStatus.NORMALIZED
+            )
+            self.document_registry.set_status(
+                company_id=document.company_id,
+                source_id=document.source_id,
+                provider_document_id=provider_document_id,
+                status=status,
+            )
+            return IngestionResult(
+                company_id=document.company_id,
+                source_id=document.source_id,
+                provider_document_id=provider_document_id,
+                status=status,
+                normalized=normalized,
+                duplicate=True,
+            )
+
         self.document_registry.set_status(
             company_id=document.company_id,
             source_id=document.source_id,
@@ -76,7 +133,8 @@ class DisclosureIngestionService:
         )
 
         try:
-            artifact = await provider.fetch_document(document)
+            async with self._provider_semaphore(provider.provider_id):
+                artifact = await provider.fetch_document(document)
         except Exception as exc:
             self.document_registry.set_status(
                 company_id=document.company_id,
@@ -94,22 +152,12 @@ class DisclosureIngestionService:
             )
 
         content_hash, storage_path = self.artifact_store.save(artifact)
-        existing = self.document_registry.representation_by_hash(content_hash)
-        if existing is not None:
-            self.document_registry.set_status(
-                company_id=document.company_id,
-                source_id=document.source_id,
-                provider_document_id=provider_document_id,
-                status=IngestionStatus.DOWNLOADED,
-            )
-            return IngestionResult(
-                company_id=document.company_id,
-                source_id=document.source_id,
-                provider_document_id=provider_document_id,
-                status=IngestionStatus.DOWNLOADED,
-                duplicate=True,
-            )
-
+        self.document_registry.save_artifact(
+            content_sha256=content_hash,
+            mime_type=artifact.mime_type,
+            byte_size=len(artifact.content),
+            storage_uri=str(storage_path),
+        )
         self.document_registry.set_status(
             company_id=document.company_id,
             source_id=document.source_id,
@@ -200,12 +248,13 @@ class DisclosureIngestionService:
 
         for provider, binding in self.router.routes_for(company):
             try:
-                documents = await provider.discover_documents(
-                    company,
-                    binding,
-                    year_from=year_from,
-                    year_to=year_to,
-                )
+                async with self._provider_semaphore(provider.provider_id):
+                    documents = await provider.discover_documents(
+                        company,
+                        binding,
+                        year_from=year_from,
+                        year_to=year_to,
+                    )
             except Exception as exc:
                 self.document_registry.set_status(
                     company_id=company.company_id,
