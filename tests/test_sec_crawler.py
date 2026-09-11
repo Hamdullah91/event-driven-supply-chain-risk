@@ -185,3 +185,56 @@ def test_invalid_cik_raises_value_error() -> None:
         match="Invalid CIK",
     ):
         _ = company.normalized_cik
+
+def test_load_companies_from_registry(tmp_path) -> None:
+    import json
+    from scripts.crawl_sec import load_companies
+
+    registry = tmp_path / "targets.json"
+    registry.write_text(
+        json.dumps([
+            {
+                "company_id": "nvidia",
+                "name": "NVIDIA Corporation",
+                "cik": "1045810",
+            },
+            {
+                "company_id": "amd",
+                "name": "Advanced Micro Devices, Inc.",
+                "cik": "2488",
+            },
+        ]),
+        encoding="utf-8",
+    )
+
+    companies = load_companies(registry)
+
+    assert len(companies) == 2
+    assert companies[0].normalized_cik == "0001045810"
+    assert companies[1].normalized_cik == "0000002488"
+
+
+def test_load_companies_rejects_duplicate_cik(tmp_path) -> None:
+    import json
+    from scripts.crawl_sec import load_companies
+
+    registry = tmp_path / "targets.json"
+    registry.write_text(
+        json.dumps([
+            {
+                "name": "NVIDIA Corporation",
+                "cik": "1045810",
+            },
+            {
+                "name": "Duplicate NVIDIA",
+                "cik": "0001045810",
+            },
+        ]),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Duplicate SEC CIK",
+    ):
+        load_companies(registry)

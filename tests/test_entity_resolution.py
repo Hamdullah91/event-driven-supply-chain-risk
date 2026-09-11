@@ -156,3 +156,63 @@ def test_resolve_texas_instruments():
     result = resolve_company("Texas Instruments")
 
     assert result.canonical_id == "texas_instruments"
+
+
+def test_resolve_globalfoundries_aliases():
+    for name in ["GlobalFoundries", "GLOBALFOUNDRIES Inc.", "GF"]:
+        result = resolve_company(name)
+        assert result.canonical_id == "globalfoundries"
+        assert result.canonical_name == "GlobalFoundries"
+
+
+def test_resolve_umc_aliases():
+    for name in [
+        "United Microelectronics Corporation",
+        "UMC",
+    ]:
+        result = resolve_company(name)
+        assert result.canonical_id == "umc"
+        assert result.canonical_name == "United Microelectronics Corporation"
+
+
+def test_resolve_samsung_legal_name():
+    result = resolve_company("Samsung Electronics Co., Ltd.")
+    assert result.canonical_id == "samsung_electronics"
+
+
+def test_all_sec_10k_targets_resolve_to_expected_company_ids():
+    import json
+    from pathlib import Path
+
+    targets = json.loads(
+        Path("data/seed/sec_10k_targets.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    for target in targets:
+        result = resolve_company(target["name"])
+        assert result.canonical_id == target["company_id"], target
+        assert result.canonical_name is not None
+
+
+def test_all_baseline_companies_resolve_by_display_and_legal_name():
+    import json
+    from pathlib import Path
+
+    companies = json.loads(
+        Path("data/seed/companies.json").read_text(encoding="utf-8")
+    )
+
+    for company in companies:
+        for field in ("name", "legal_name"):
+            value = company[field]
+            result = resolve_company(value)
+            assert result.canonical_id == company["company_id"], (
+                company["company_id"],
+                field,
+                value,
+                result,
+            )
+            assert result.canonical_name is not None
+            assert result.resolution_method == "alias_exact"

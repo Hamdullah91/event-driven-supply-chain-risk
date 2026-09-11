@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from src.ingestion.sec.parser.filing_parser import SEC10KParser
+from src.ingestion.sec.parser.filing_parser_20f import SEC20FParser
 from src.ingestion.sec.parser.models import FilingMetadata
 from src.ingestion.sec.preprocessing import (
     FilingPreprocessor,
@@ -11,26 +13,55 @@ from src.ingestion.sec.preprocessing import (
 )
 
 
-def main() -> None:
-    filing_dir = Path(
-        "data/raw/sec/1045810/0001045810-26-000021"
-    )
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 
-    html_path = filing_dir / "10-k.htm"
-    metadata_path = filing_dir / "metadata.json"
+logger = logging.getLogger(__name__)
 
-    html = html_path.read_text(
-        encoding="utf-8",
-        errors="ignore",
-    )
+RAW_SEC_ROOT = Path("data/raw/sec")
+PROCESSED_SEC_ROOT = Path("data/processed/sec")
+SUPPORTED_FORMS = {"10-K", "20-F"}
 
-    with metadata_path.open(
-        "r",
-        encoding="utf-8",
-    ) as file:
+
+def _document_filename(form: str) -> str:
+    return f"{form.strip().lower()}.htm"
+
+
+def discover_filing_dirs(root: Path = RAW_SEC_ROOT) -> list[Path]:
+    """Return supported SEC filing directories with document + metadata."""
+    filing_dirs: list[Path] = []
+
+    if not root.exists():
+        return filing_dirs
+
+    for metadata_path in root.rglob("metadata.json"):
+        filing_dir = metadata_path.parent
+        try:
+            metadata_data = json.loads(
+                metadata_path.read_text(encoding="utf-8")
+            )
+        except (OSError, json.JSONDecodeError):
+            logger.exception("Skipping unreadable metadata: %s", metadata_path)
+            continue
+
+        form = str(metadata_data.get("form", "")).strip().upper()
+        if form not in SUPPORTED_FORMS:
+            continue
+
+        document_path = filing_dir / _document_filename(form)
+        if document_path.exists():
+            filing_dirs.append(filing_dir)
+
+    return sorted(filing_dirs)
+
+
+def load_metadata(path: Path) -> FilingMetadata:
+    with path.open("r", encoding="utf-8") as file:
         metadata_data = json.load(file)
 
-    metadata = FilingMetadata(
+    return FilingMetadata(
         cik=metadata_data["cik"],
         accession_number=metadata_data["accession_number"],
         company_name=metadata_data["company_name"],
@@ -39,26 +70,43 @@ def main() -> None:
         source_url=metadata_data["source_url"],
     )
 
-    parser = SEC10KParser()
+
+def _parser_for_form(form: str):
+    normalized = form.strip().upper()
+    if normalized == "10-K":
+        return SEC10KParser()
+    if normalized == "20-F":
+        return SEC20FParser()
+    raise ValueError(f"Unsupported SEC form for preprocessing: {form!r}")
+
+
+def process_filing(
+    filing_dir: Path,
+    *,
+    preprocessor: FilingPreprocessor,
+    exporter: ProcessedFilingExporter,
+) -> Path:
+    metadata_path = filing_dir / "metadata.json"
+    metadata = load_metadata(metadata_path)
+    parser = _parser_for_form(metadata.form)
+    html_path = filing_dir / _document_filename(metadata.form)
+
+    html = html_path.read_text(
+        encoding="utf-8",
+        errors="ignore",
+    )
 
     parsed_filing = parser.parse(
         html=html,
         metadata=metadata,
     )
+    processed_filing = preprocessor.process(parsed_filing)
 
-    preprocessor = FilingPreprocessor()
-
-    processed_filing = preprocessor.process(
-        parsed_filing
-    )
-
-    exporter = ProcessedFilingExporter()
-
-    output_path = Path(
-        "data/processed/sec/"
-        "1045810/"
-        "0001045810-26-000021/"
-        "processed.json"
+    output_path = (
+        PROCESSED_SEC_ROOT
+        / str(metadata.cik)
+        / metadata.accession_number
+        / "processed.json"
     )
 
     exporter.save_json(
@@ -66,22 +114,62 @@ def main() -> None:
         output_path,
     )
 
-    print(
-        f"Processed filing saved to: {output_path}"
-    )
-
-    print(
-        f"Sections: {len(processed_filing.sections)}"
-    )
-
     total_chunks = sum(
         len(section.chunks)
         for section in processed_filing.sections
     )
 
-    print(
-        f"Chunks: {total_chunks}"
+    logger.info(
+        "Processed SEC filing form=%s company=%s accession=%s sections=%d chunks=%d output=%s",
+        metadata.form,
+        metadata.company_name,
+        metadata.accession_number,
+        len(processed_filing.sections),
+        total_chunks,
+        output_path,
     )
+
+    return output_path
+
+
+def main() -> None:
+    filing_dirs = discover_filing_dirs()
+
+    if not filing_dirs:
+        raise FileNotFoundError(
+            f"No supported SEC filing directories found under {RAW_SEC_ROOT}"
+        )
+
+    preprocessor = FilingPreprocessor()
+    exporter = ProcessedFilingExporter()
+
+    succeeded = 0
+    failed = 0
+
+    for filing_dir in filing_dirs:
+        try:
+            process_filing(
+                filing_dir,
+                preprocessor=preprocessor,
+                exporter=exporter,
+            )
+            succeeded += 1
+        except Exception:
+            failed += 1
+            logger.exception(
+                "Failed to preprocess SEC filing: %s",
+                filing_dir,
+            )
+
+    print()
+    print("===== SEC BATCH PREPROCESSING =====")
+    print(f"Discovered: {len(filing_dirs)}")
+    print(f"Succeeded: {succeeded}")
+    print(f"Failed: {failed}")
+    print("===================================")
+
+    if failed:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

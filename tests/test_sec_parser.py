@@ -46,6 +46,33 @@ Supply constraints affected operations.
     assert "7" in sections
 
 
+def test_extract_sections_prefers_real_inline_section_over_cross_reference():
+    real_business = "We rely on external suppliers. " * 100
+    real_risk = "Our supply chain may experience disruption. " * 100
+    text = (
+        "FORM 10-K CROSS-REFERENCE INDEX "
+        "Item 1. Business 4-7 Item 1A. Risk Factors 24-31 "
+        "Item 2. Properties 32 Item 7. Management Discussion 40 "
+        "PART I Item 1. Business "
+        f"{real_business} "
+        "Item 1A. Risk Factors "
+        f"{real_risk} "
+        "Item 2. Properties "
+        + ("We operate manufacturing facilities. " * 20)
+        + " Item 3. Legal Proceedings none. "
+        "Item 7. Management Discussion "
+        + ("Supply constraints affected operations. " * 50)
+        + " Item 7A. Market Risk"
+    )
+
+    sections = SEC10KParser.extract_sections(text)
+
+    assert len(sections["1"]) >= 1000
+    assert "external suppliers" in sections["1"]
+    assert len(sections["1A"]) >= 1000
+    assert "supply chain" in sections["1A"]
+
+
 def test_filter_relevant_sections():
     sections = {
         "1": "Business",
