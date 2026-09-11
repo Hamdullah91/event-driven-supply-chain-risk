@@ -15,11 +15,14 @@ from .models import (
     ParsedFiling,
 )
 
+# SEC filings are inconsistent about whether Item headings start on their own
+# line.  Match headings inline, then reject table-of-contents/cross-reference
+# occurrences by requiring a plausible section body.
 ITEM_PATTERN = re.compile(
-    r"^\s*ITEM\s+"
+    r"\bITEM\s*"
     r"(1A|1B|1C|7A|9A|9B|9C|10|11|12|13|14|15|16|1|2|3|4|5|6|7|8|9)"
     r"\b\s*[.\-:]?",
-    re.IGNORECASE | re.MULTILINE,
+    re.IGNORECASE,
 )
 
 RELEVANT_ITEMS = {
@@ -69,6 +72,17 @@ SECTION_TITLES = {
     "7": "Management's Discussion and Analysis",
 }
 
+# A real 10-K Item 1/1A/7 body is normally far larger than a table-of-contents
+# entry.  Item 2 can legitimately be shorter, so use a smaller floor there.
+MIN_SECTION_CHARS = {
+    "1": 1000,
+    "1A": 1000,
+    "2": 250,
+    "7": 1000,
+}
+DEFAULT_MIN_SECTION_CHARS = 100
+
+
 class SEC10KParser:
     """
     Converts SEC 10-K HTML into clean normalized text.
@@ -81,7 +95,6 @@ class SEC10KParser:
 
         soup = BeautifulSoup(html, "lxml")
 
-        # Remove content we do not want in the filing text
         for element in soup(
             [
                 "script",
@@ -93,17 +106,9 @@ class SEC10KParser:
             element.decompose()
 
         text = soup.get_text(separator="\n")
-
-        # Replace non-breaking spaces
         text = text.replace("\xa0", " ")
-
-        # Remove extra spaces/tabs
         text = re.sub(r"[ \t]+", " ", text)
-
-        # Clean spaces around new lines
         text = re.sub(r" *\n *", "\n", text)
-
-        # Reduce too many blank lines
         text = re.sub(r"\n{3,}", "\n\n", text)
 
         return text.strip()
@@ -119,34 +124,44 @@ class SEC10KParser:
 
         for index, match in enumerate(matches):
             item = match.group(1).upper()
-
             start = match.end()
 
-            if index + 1 < len(matches):
-                end = matches[index + 1].start()
-            else:
-                end = len(text)
+            # A section ends at the next *different* Item heading. Repeated
+            # occurrences of the same heading are kept as separate candidates;
+            # the longest plausible body wins below.
+            end = len(text)
+            for next_match in matches[index + 1 :]:
+                if next_match.group(1).upper() != item:
+                    end = next_match.start()
+                    break
 
             section_text = text[start:end].strip()
 
             if not section_text:
                 continue
 
-            candidates.setdefault(
-                item,
-                [],
-            ).append(section_text)
+            candidates.setdefault(item, []).append(section_text)
 
         sections: dict[str, str] = {}
 
         for item, item_candidates in candidates.items():
-            sections[item] = max(
-                item_candidates,
-                key=len,
+            minimum = MIN_SECTION_CHARS.get(
+                item,
+                DEFAULT_MIN_SECTION_CHARS,
             )
+            plausible = [
+                candidate
+                for candidate in item_candidates
+                if len(candidate) >= minimum
+            ]
+
+            # Prefer a plausible real section. If none passes the floor, keep
+            # the longest candidate for backwards compatibility and diagnostics.
+            pool = plausible or item_candidates
+            sections[item] = max(pool, key=len)
 
         return sections
-        
+
     @staticmethod
     def filter_relevant_sections(
         sections: dict[str, str],
@@ -156,7 +171,7 @@ class SEC10KParser:
             for item, text in sections.items()
             if item in RELEVANT_ITEMS
         }
-    
+
     @staticmethod
     def split_paragraphs(section_text: str) -> list[str]:
         raw_paragraphs = re.split(
@@ -179,7 +194,7 @@ class SEC10KParser:
             paragraphs.append(cleaned)
 
         return paragraphs
-    
+
     @staticmethod
     def find_supply_chain_keywords(
         paragraph: str,
@@ -191,7 +206,7 @@ class SEC10KParser:
             for keyword in SUPPLY_CHAIN_KEYWORDS
             if keyword in paragraph_lower
         ]
-    
+
     @staticmethod
     def build_paragraph_objects(
         section: str,
@@ -205,9 +220,7 @@ class SEC10KParser:
                 paragraph
             )
 
-            paragraph_id = (
-                f"{section}-{index}"
-            )
+            paragraph_id = f"{section}-{index}"
 
             results.append(
                 FilingParagraph(
@@ -264,13 +277,10 @@ class SEC10KParser:
         metadata: FilingMetadata,
     ) -> ParsedFiling:
         text = self.html_to_text(html)
-
         sections = self.extract_sections(text)
-
         relevant_sections = self.filter_relevant_sections(
             sections
         )
-
         section_objects = self.build_section_objects(
             relevant_sections
         )
