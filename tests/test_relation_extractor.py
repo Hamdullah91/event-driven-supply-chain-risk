@@ -60,6 +60,39 @@ def test_extracts_supply_destination_not_supplied_product():
     assert candidate.object == "NVIDIA"
 
 
+def test_passive_supply_inverts_direction():
+    nlp = _nlp(
+        ["NVIDIA", "is", "supplied", "by", "TSMC"],
+        [2, 2, 2, 2, 3],
+        ["nsubjpass", "auxpass", "ROOT", "agent", "pobj"],
+        ["PROPN", "AUX", "VERB", "ADP", "PROPN"],
+        ["NVIDIA", "be", "supply", "by", "TSMC"],
+        [(0, 1, "ORG"), (4, 5, "ORG")],
+    )
+    candidate = RelationExtractor(nlp).extract("ignored")[0]
+    assert candidate.relationship == "SUPPLIES"
+    assert candidate.subject == "TSMC"
+    assert candidate.object == "NVIDIA"
+    assert candidate.voice == "passive"
+
+
+def test_passive_manufacture_assigns_company_as_producer():
+    nlp = _nlp(
+        ["Processors", "are", "manufactured", "by", "TSMC"],
+        [2, 2, 2, 2, 3],
+        ["nsubjpass", "auxpass", "ROOT", "agent", "pobj"],
+        ["NOUN", "AUX", "VERB", "ADP", "PROPN"],
+        ["processor", "be", "manufacture", "by", "TSMC"],
+        [(0, 1, "PRODUCT"), (4, 5, "ORG")],
+    )
+    candidate = RelationExtractor(nlp).extract("ignored")[0]
+    assert candidate.relationship == "PRODUCES"
+    assert candidate.subject == "TSMC"
+    assert candidate.object == "Processors"
+    assert candidate.object_type == "Product"
+    assert candidate.voice == "passive"
+
+
 def test_produces_requires_product_object():
     nlp = _nlp(
         ["We", "manufacture", "processors"],
