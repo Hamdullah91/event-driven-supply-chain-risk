@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from src.graph.connection import Neo4jConnection
 from src.graph.ingestion.models import GraphIngestionRelationship
+from src.nlp.entity_resolution.organizational_identity import (
+    resolve_organizational_identity,
+)
 from src.nlp.entity_resolution.resolver import resolve_company
 
 
@@ -33,15 +36,28 @@ class GraphIngestionRepository:
         self.connection = connection
 
     @staticmethod
-    def _resolve_company_id(name: str) -> str:
+    def _resolve_company_identity(name: str) -> tuple[str, str]:
         resolved = resolve_company(name)
 
-        if resolved.canonical_id is None:
-            raise ValueError(
-                f"Cannot persist unresolved Company entity: {name}"
-            )
+        if resolved.canonical_id is not None:
+            return resolved.canonical_id, "CANONICAL"
 
-        return resolved.canonical_id
+        identity = resolve_organizational_identity(name)
+        if (
+            identity is not None
+            and identity.identity_type == "VERIFIED_EXTERNAL"
+        ):
+            external_id = (
+                "external:"
+                + "_".join(
+                    identity.normalized_name.lower().split()
+                )
+            )
+            return external_id, "VERIFIED_EXTERNAL"
+
+        raise ValueError(
+            f"Cannot persist unresolved Company entity: {name}"
+        )
 
     def save_relationship(
         self,
@@ -68,19 +84,21 @@ class GraphIngestionRepository:
             )
 
         if subject_type == "Company" and object_type == "Company":
-            subject_id = self._resolve_company_id(
-                relationship.subject
+            subject_id, subject_identity_state = (
+                self._resolve_company_identity(relationship.subject)
             )
-            object_id = self._resolve_company_id(
-                relationship.object
+            object_id, object_identity_state = (
+                self._resolve_company_identity(relationship.object)
             )
 
             query = f"""
             MERGE (subject:Company {{company_id: $subject_id}})
             ON CREATE SET subject.name = $subject_name
+            SET subject.identity_state = $subject_identity_state
 
             MERGE (object:Company {{company_id: $object_id}})
             ON CREATE SET object.name = $object_name
+            SET object.identity_state = $object_identity_state
 
             MERGE (subject)-[r:{relationship_type}]->(object)
 
@@ -97,8 +115,10 @@ class GraphIngestionRepository:
             subject_params = {
                 "subject_id": subject_id,
                 "subject_name": relationship.subject,
+                "subject_identity_state": subject_identity_state,
                 "object_id": object_id,
                 "object_name": relationship.object,
+                "object_identity_state": object_identity_state,
             }
         else:
             query = f"""
