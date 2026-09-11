@@ -21,6 +21,7 @@ OPERATE_LEMMAS = {"operate"}
 OWN_LEMMAS = {"own"}
 
 FILING_REFERENCES = {"we", "us", "our", "ours", "ourselves", "company", "the company"}
+RELATIVE_PRONOUNS = {"who", "which", "that"}
 
 
 class RelationExtractor:
@@ -75,7 +76,25 @@ class RelationExtractor:
 
     @classmethod
     def _subject_mentions(cls, verb) -> list:
-        return cls._children(verb, {"nsubj", "nsubjpass"})
+        subjects = cls._children(verb, {"nsubj", "nsubjpass"})
+
+        # Safe local relative-clause attribution only. For
+        # "TSMC, which supplies chips to NVIDIA", spaCy commonly attaches
+        # `supplies` as relcl to `TSMC` and uses `which` as its subject.
+        if verb.dep_ == "relcl":
+            antecedent = verb.head
+            antecedent_ent = cls._entity_for_token(antecedent)
+            if antecedent_ent is not None and cls._graph_type(antecedent_ent) == "Company":
+                relative_subjects = [
+                    subject
+                    for subject in subjects
+                    if subject.lemma_.lower() in RELATIVE_PRONOUNS
+                    or subject.text.lower() in RELATIVE_PRONOUNS
+                ]
+                if relative_subjects or not subjects:
+                    return [antecedent]
+
+        return subjects
 
     @classmethod
     def _direct_objects(cls, verb) -> list:
