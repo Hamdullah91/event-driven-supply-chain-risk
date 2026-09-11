@@ -42,8 +42,22 @@ def normalize_organizational_mention(value: str) -> str:
     return " ".join(value.lower().replace("’", "'").split())
 
 
-def resolve_organizational_identity(value: str) -> OrganizationalIdentity | None:
-    normalized = normalize_organizational_mention(value)
+def resolve_organizational_identity(
+    value: str,
+    *,
+    allow_candidate: bool = False,
+) -> OrganizationalIdentity | None:
+    """Resolve a known organizational identity.
+
+    ``CANDIDATE`` is intentionally a review-only state. It preserves an
+    unresolved organizational mention for diagnostics/evaluation without
+    authorizing creation of a Company node in the production graph.
+    """
+    cleaned = " ".join(value.strip().split())
+    normalized = normalize_organizational_mention(cleaned)
+
+    if not normalized:
+        return None
 
     rollup = BUSINESS_UNIT_ROLLUPS.get(normalized)
     if rollup is not None:
@@ -59,10 +73,19 @@ def resolve_organizational_identity(value: str) -> OrganizationalIdentity | None
     if normalized in VERIFIED_EXTERNAL_ORGANIZATIONS:
         return OrganizationalIdentity(
             mention=value,
-            normalized_name=value,
+            normalized_name=cleaned,
             parent_company_id=None,
             identity_type="VERIFIED_EXTERNAL",
             confidence=0.95,
+        )
+
+    if allow_candidate:
+        return OrganizationalIdentity(
+            mention=value,
+            normalized_name=cleaned,
+            parent_company_id=None,
+            identity_type="CANDIDATE",
+            confidence=0.50,
         )
 
     return None
