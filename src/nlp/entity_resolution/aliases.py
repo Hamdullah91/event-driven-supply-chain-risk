@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from .normalizer import normalize_entity_name
+
+
 COMPANY_ALIASES: dict[str, str] = {
     "tsmc": "tsmc",
     "taiwan semiconductor manufacturing company": "tsmc",
@@ -124,3 +132,32 @@ COMPANY_ALIASES: dict[str, str] = {
     "united microelectronics corp": "umc",
     "umc": "umc",
 }
+
+
+def _baseline_company_path() -> Path:
+    return Path(__file__).resolve().parents[3] / "data" / "seed" / "companies.json"
+
+
+def _extend_aliases_from_baseline() -> None:
+    """Register every baseline display name and legal name as exact aliases."""
+    path = _baseline_company_path()
+    if not path.exists():
+        return
+
+    companies = json.loads(path.read_text(encoding="utf-8"))
+    for company in companies:
+        company_id = str(company["company_id"]).strip()
+        if not company_id:
+            continue
+
+        for field in ("name", "legal_name"):
+            value = str(company.get(field, "")).strip()
+            if not value:
+                continue
+            COMPANY_ALIASES.setdefault(
+                normalize_entity_name(value),
+                company_id,
+            )
+
+
+_extend_aliases_from_baseline()
