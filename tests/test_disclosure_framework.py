@@ -40,13 +40,20 @@ def test_all_50_baseline_companies_have_disclosure_routes() -> None:
     companies = registry.enabled()
 
     assert len(companies) == 50
-
     missing = [
         company.company_id
         for company in companies
         if not registry.bindings_for(company.company_id)
     ]
     assert missing == []
+
+
+def test_every_company_binding_references_registered_source() -> None:
+    registry = production_registry()
+    sources = SourceRegistry.from_json(ROOT / "data/seed/disclosure_sources.json")
+
+    for binding in registry.all_bindings():
+        assert sources.get(binding.source_id).enabled
 
 
 def test_nxp_is_now_configured_as_sec_10k() -> None:
@@ -71,7 +78,6 @@ def test_korean_baseline_companies_have_opendart_bindings() -> None:
         "samsung_sdi",
         "sk_on",
     }
-
     configured = {
         company_id
         for company_id in expected
@@ -83,7 +89,7 @@ def test_korean_baseline_companies_have_opendart_bindings() -> None:
     assert configured == expected
 
 
-def test_html_normalizer_produces_source_independent_sections() -> None:
+def test_html_normalizer_preserves_provenance_and_semantic_sections() -> None:
     document = RemoteDocument(
         source_id="test_provider",
         provider_document_id="doc-1",
@@ -108,6 +114,8 @@ def test_html_normalizer_produces_source_independent_sections() -> None:
     normalized = HTMLNormalizer().normalize(artifact)
 
     assert normalized.company_id == "example"
+    assert normalized.provider_document_id == "doc-1"
+    assert normalized.source_url == "https://example.com/report.html"
     assert normalized.document_family == DocumentFamily.ANNUAL_REPORT
     assert "suppliers" in normalized.full_text
     assert [section.semantic_role for section in normalized.sections] == [
@@ -117,34 +125,36 @@ def test_html_normalizer_produces_source_independent_sections() -> None:
 
 
 def test_ir_provider_rejects_cross_domain_links_and_scores_reports() -> None:
-    provider = InvestorRelationsDisclosureProvider()
-    try:
-        assert provider._same_domain(
-            "https://company.example/investors",
-            "https://company.example/reports/report.pdf",
-        )
-        assert not provider._same_domain(
-            "https://company.example/investors",
-            "https://untrusted.example/report.pdf",
-        )
-        assert provider._score_candidate(
-            "Annual Report 2025",
-            "/investors/annual-report-2025.pdf",
-            {2025},
-        ) >= 35
-        assert provider._score_candidate(
-            "Quarterly presentation",
-            "/q3-presentation.pdf",
-            {2025},
-        ) < 35
-    finally:
-        # No network calls were made. The client is closed in async integration
-        # paths; avoid an event-loop dependency in this synchronous unit test.
-        pass
+    assert InvestorRelationsDisclosureProvider._same_domain(
+        "https://company.example/investors",
+        "https://company.example/reports/report.pdf",
+    )
+    assert not InvestorRelationsDisclosureProvider._same_domain(
+        "https://company.example/investors",
+        "https://untrusted.example/report.pdf",
+    )
+    assert InvestorRelationsDisclosureProvider._score_candidate(
+        "Annual Report 2025",
+        "/investors/annual-report-2025.pdf",
+        {2025},
+    ) >= 35
+    assert InvestorRelationsDisclosureProvider._score_candidate(
+        "Quarterly presentation",
+        "/q3-presentation.pdf",
+        {2025},
+    ) < 35
 
 
 class FakeProvider(DisclosureProvider):
-    provider_id = "fake"
+    def __init__(
+        self,
+        provider_id: str = "fake",
+        provider_document_id: str = "fake-2025",
+        source_url: str = "https://example.com/report.html",
+    ) -> None:
+        self.provider_id = provider_id
+        self.provider_document_id = provider_document_id
+        self.source_url = source_url
 
     def supports(self, company, binding) -> bool:
         return bool(binding and binding.source_id == self.provider_id)
@@ -160,10 +170,10 @@ class FakeProvider(DisclosureProvider):
         return [
             RemoteDocument(
                 source_id=self.provider_id,
-                provider_document_id="fake-2025",
+                provider_document_id=self.provider_document_id,
                 company_id=company.company_id,
                 document_family=DocumentFamily.ANNUAL_REPORT,
-                source_url="https://example.com/report.html",
+                source_url=self.source_url,
                 filing_date=date(2026, 3, 1),
                 reporting_year=2025,
                 language="en",
@@ -178,34 +188,53 @@ class FakeProvider(DisclosureProvider):
         )
 
 
-@pytest.mark.asyncio
-async def test_ingestion_service_deduplicates_by_content_hash(tmp_path: Path) -> None:
+def build_fake_service(
+    tmp_path: Path,
+    *,
+    providers: list[FakeProvider],
+    bindings: list[CompanySourceBinding],
+) -> tuple[DisclosureIngestionService, DocumentRegistry]:
     company = Company(company_id="example", legal_name="Example Corp")
-    binding = CompanySourceBinding(company_id="example", source_id="fake")
-    company_registry = CompanyRegistry([company], [binding])
+    company_registry = CompanyRegistry([company], bindings)
     source_registry = SourceRegistry(
         [
             DisclosureSource(
-                source_id="fake",
-                display_name="Fake",
+                source_id=provider.provider_id,
+                display_name=provider.provider_id,
                 provider_type="fake",
                 authority=SourceAuthority.ISSUER,
-                default_priority=10,
+                default_priority=index + 1,
             )
+            for index, provider in enumerate(providers)
         ]
     )
-    provider = FakeProvider()
     router = SourceRouter(
         company_registry=company_registry,
         source_registry=source_registry,
-        providers=[provider],
+        providers=providers,
     )
-    service = DisclosureIngestionService(
-        company_registry=company_registry,
-        router=router,
-        artifact_store=RawArtifactStore(tmp_path / "raw"),
-        document_registry=DocumentRegistry(tmp_path / "registry.db"),
-        normalizers=NormalizerRegistry(),
+    registry = DocumentRegistry(tmp_path / "registry.db")
+    return (
+        DisclosureIngestionService(
+            company_registry=company_registry,
+            router=router,
+            artifact_store=RawArtifactStore(tmp_path / "raw"),
+            document_registry=registry,
+            normalizers=NormalizerRegistry(),
+        ),
+        registry,
+    )
+
+
+@pytest.mark.asyncio
+async def test_ingestion_service_deduplicates_same_source_occurrence(
+    tmp_path: Path,
+) -> None:
+    provider = FakeProvider()
+    service, _ = build_fake_service(
+        tmp_path,
+        providers=[provider],
+        bindings=[CompanySourceBinding(company_id="example", source_id="fake")],
     )
 
     first = await service.ingest_company("example")
@@ -214,3 +243,47 @@ async def test_ingestion_service_deduplicates_by_content_hash(tmp_path: Path) ->
     assert first[0].normalized is not None
     assert first[0].duplicate is False
     assert second[0].duplicate is True
+    assert second[0].normalized is not None
+
+
+@pytest.mark.asyncio
+async def test_identical_bytes_from_two_sources_keep_two_representations(
+    tmp_path: Path,
+) -> None:
+    first_provider = FakeProvider(
+        provider_id="regulator",
+        provider_document_id="reg-2025",
+        source_url="https://regulator.example/report",
+    )
+    second_provider = FakeProvider(
+        provider_id="issuer",
+        provider_document_id="issuer-2025",
+        source_url="https://issuer.example/report",
+    )
+    service, registry = build_fake_service(
+        tmp_path,
+        providers=[first_provider, second_provider],
+        bindings=[
+            CompanySourceBinding(company_id="example", source_id="regulator"),
+            CompanySourceBinding(company_id="example", source_id="issuer"),
+        ],
+    )
+
+    results = await service.ingest_company("example")
+
+    assert len(results) == 2
+    assert all(result.normalized is not None for result in results)
+    first_row = registry.representation_by_occurrence(
+        source_id="regulator",
+        provider_document_id="reg-2025",
+        source_url="https://regulator.example/report",
+    )
+    second_row = registry.representation_by_occurrence(
+        source_id="issuer",
+        provider_document_id="issuer-2025",
+        source_url="https://issuer.example/report",
+    )
+    assert first_row is not None
+    assert second_row is not None
+    assert first_row["content_sha256"] == second_row["content_sha256"]
+    assert first_row["representation_id"] != second_row["representation_id"]
