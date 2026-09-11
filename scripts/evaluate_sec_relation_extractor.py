@@ -58,10 +58,10 @@ def _gold_keys(row: dict) -> set[tuple[str, str, str, str, str]]:
         keys.add(
             _key(
                 subject=str(relation["subject"]),
-                subject_type=str(relation["subject_type"]),
+                subject_type=str(relation.get("subject_type", "Company")),
                 relationship=str(relation["relationship"]),
                 object_name=str(relation["object"]),
-                object_type=str(relation["object_type"]),
+                object_type=str(relation.get("object_type", "Company")),
             )
         )
     return keys
