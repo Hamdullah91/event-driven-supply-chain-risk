@@ -58,6 +58,13 @@ class RelationExtractor(BaseRelationExtractor):
             unique.append(candidate)
         return unique
 
+    @classmethod
+    def _sentence_filing_reference(cls, sentence):
+        for token in sentence:
+            if cls._is_filing_reference(token.text) or cls._is_filing_reference(token.lemma_):
+                return token
+        return None
+
     def _recover_dependency_conjuncts(self, sentence) -> list[RelationCandidate]:
         recovered: list[RelationCandidate] = []
         for verb in sentence:
@@ -116,19 +123,29 @@ class RelationExtractor(BaseRelationExtractor):
 
     def _recover_nominal_production(self, sentence) -> list[RelationCandidate]:
         recovered: list[RelationCandidate] = []
-        for noun in sentence:
-            if noun.pos_ != "NOUN" or noun.lemma_.lower() not in _NOMINAL_PRODUCTION_LEMMAS:
+        sentence_ref = self._sentence_filing_reference(sentence)
+
+        for token in sentence:
+            lemma = token.lemma_.lower()
+            if lemma not in _NOMINAL_PRODUCTION_LEMMAS:
                 continue
-            filing_ref = self._filing_reference_in_subtree(noun)
+            if token.pos_ not in {"NOUN", "VERB"}:
+                continue
+
+            filing_ref = self._filing_reference_in_subtree(token)
             if filing_ref is None:
-                for ancestor in noun.ancestors:
+                for ancestor in token.ancestors:
                     filing_ref = self._filing_reference_in_subtree(ancestor)
                     if filing_ref is not None:
                         break
             if filing_ref is None:
+                filing_ref = sentence_ref
+            if filing_ref is None:
                 continue
-            for pobj in self._prep_objects(noun, {"of"}):
-                object_text = self._span_text(pobj)
+
+            prep_objects = self._prep_objects(token, {"of"})
+            for prep_object in prep_objects:
+                object_text = self._span_text(prep_object)
                 if not object_text:
                     continue
                 recovered.append(
@@ -144,6 +161,28 @@ class RelationExtractor(BaseRelationExtractor):
                         voice="active",
                     )
                 )
+
+            # spaCy often parses "development and manufacture of our own cells"
+            # with the `of` phrase attached to a coordinated nominal sibling.
+            if not prep_objects:
+                for related in [token.head, *token.conjuncts]:
+                    for prep_object in self._prep_objects(related, {"of"}):
+                        object_text = self._span_text(prep_object)
+                        if not object_text:
+                            continue
+                        recovered.append(
+                            self._emit_explicit(
+                                sentence=sentence,
+                                subject_text=filing_ref.text,
+                                subject_type=None,
+                                object_text=object_text,
+                                object_type="Product",
+                                relationship="PRODUCES",
+                                pattern_id="production_nominal_coordinated_of",
+                                extraction_confidence=0.90,
+                                voice="active",
+                            )
+                        )
         return recovered
 
     def _recover_passive_products(self, sentence) -> list[RelationCandidate]:
@@ -185,10 +224,22 @@ class RelationExtractor(BaseRelationExtractor):
             subjects = self._subject_mentions(verb)
             if not subjects or any(subject.dep_ == "nsubjpass" for subject in subjects):
                 continue
-            direct_objects = self._direct_objects(verb)
-            if not any(obj.lemma_.lower() in {"interest", "stake"} for obj in direct_objects):
+
+            interest_objects = [
+                obj
+                for obj in self._direct_objects(verb)
+                if obj.lemma_.lower() in {"interest", "stake"}
+            ]
+            if not interest_objects:
                 continue
-            for prep_object in self._prep_objects(verb, {"in"}):
+
+            facility_objects = list(self._prep_objects(verb, {"in"}))
+            # In "own a 49% interest in the Greenbushes mine", the `in`
+            # prepositional phrase attaches to `interest`, not to `own`.
+            for interest_object in interest_objects:
+                facility_objects.extend(self._prep_objects(interest_object, {"in"}))
+
+            for prep_object in facility_objects:
                 head = prep_object.lemma_.lower()
                 text = self._span_text(prep_object)
                 if head not in _FACILITY_HEADS and not any(
