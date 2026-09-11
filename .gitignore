@@ -32,6 +32,13 @@ data/processed/*
 *.tmp
 *.temp
 
+# Local audit / diagnostic artifacts
+audit_sec*.txt
+extractor_evidence_only.txt
+sec_extractor_evidence.txt
+sec_relation_disputes.txt
+outputs/diagnostics/
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -51,7 +58,6 @@ models/**/pytorch_model.bin
 # Training checkpoints
 models/**/checkpoints/
 
-#for new ingestion pipeline
-.env
+# New ingestion pipeline runtime data
 data/news/*.db
 logs/*.log
