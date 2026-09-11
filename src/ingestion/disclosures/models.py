@@ -145,6 +145,8 @@ class NormalizedDisclosure(BaseModel):
     document_id: str
     company_id: str
     source_id: str
+    provider_document_id: str | None = None
+    source_url: str
     title: str | None = None
     document_family: DocumentFamily
     native_document_type: str | None = None
