@@ -7,6 +7,7 @@ from datetime import date
 
 import httpx
 
+from ..http import get_with_retries
 from ..models import (
     Company,
     CompanySourceBinding,
@@ -83,8 +84,11 @@ class OpenDARTDisclosureProvider(DisclosureProvider):
             "pblntf_ty": "A",
             "page_count": 100,
         }
-        response = await self.client.get(f"{self.base_url}/list.json", params=params)
-        response.raise_for_status()
+        response = await get_with_retries(
+            self.client,
+            f"{self.base_url}/list.json",
+            params=params,
+        )
         payload = response.json()
 
         status = payload.get("status")
@@ -114,9 +118,7 @@ class OpenDARTDisclosureProvider(DisclosureProvider):
                     document_family=DocumentFamily.BUSINESS_REPORT,
                     native_document_type=report_name,
                     title=report_name,
-                    source_url=(
-                        f"{self.base_url}/document.xml?rcept_no={receipt_number}"
-                    ),
+                    source_url=f"{self.base_url}/document.xml?rcept_no={receipt_number}",
                     filing_date=receipt_date,
                     publication_date=receipt_date,
                     reporting_year=receipt_date.year - 1,
@@ -136,20 +138,18 @@ class OpenDARTDisclosureProvider(DisclosureProvider):
             "crtfc_key": self._require_key(),
             "rcept_no": document.provider_document_id,
         }
-        response = await self.client.get(
+        response = await get_with_retries(
+            self.client,
             f"{self.base_url}/document.xml",
             params=params,
         )
-        response.raise_for_status()
         content = response.content
 
-        # OpenDART's original-document endpoint returns a ZIP archive of XML
-        # documents. Normalize that transport detail here while leaving XML
-        # parsing to the common format normalizer.
         if content[:2] == b"PK":
             with zipfile.ZipFile(io.BytesIO(content)) as archive:
                 xml_names = [
-                    name for name in archive.namelist()
+                    name
+                    for name in archive.namelist()
                     if name.lower().endswith((".xml", ".xhtml", ".html", ".htm"))
                 ]
                 if not xml_names:
@@ -162,7 +162,8 @@ class OpenDARTDisclosureProvider(DisclosureProvider):
             content=content,
             mime_type="application/xml",
             response_headers={
-                key: value for key, value in response.headers.items()
+                key: value
+                for key, value in response.headers.items()
                 if key.lower() in {"content-type", "etag", "last-modified"}
             },
         )
