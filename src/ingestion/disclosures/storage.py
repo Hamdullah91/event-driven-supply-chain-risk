@@ -134,13 +134,19 @@ class DocumentRegistry:
                 """
             )
 
-    def artifact_exists(self, content_sha256: str) -> bool:
+    def current_representation_id(self, document_id: str) -> str | None:
         with self._connect() as connection:
             row = connection.execute(
-                "SELECT 1 FROM artifacts WHERE content_sha256 = ?",
-                (content_sha256,),
+                """
+                SELECT current_representation_id
+                FROM documents
+                WHERE document_id = ?
+                """,
+                (document_id,),
             ).fetchone()
-            return row is not None
+        if row is None:
+            return None
+        return row["current_representation_id"]
 
     def representation_by_occurrence(
         self,
@@ -197,7 +203,10 @@ class DocumentRegistry:
                     created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(document_id) DO UPDATE SET
-                    current_representation_id = excluded.current_representation_id,
+                    current_representation_id = COALESCE(
+                        documents.current_representation_id,
+                        excluded.current_representation_id
+                    ),
                     updated_at = excluded.updated_at
                 """,
                 (
