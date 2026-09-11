@@ -38,3 +38,19 @@ def test_ford_otosan_is_preserved_as_external_org():
 
 def test_unknown_org_has_no_forced_identity():
     assert resolve_organizational_identity("Unknown Supplier LLC") is None
+
+
+def test_unknown_org_can_be_exposed_as_review_candidate():
+    identity = resolve_organizational_identity(
+        "Unknown Supplier LLC",
+        allow_candidate=True,
+    )
+    assert identity is not None
+    assert identity.identity_type == "CANDIDATE"
+    assert identity.normalized_name == "Unknown Supplier LLC"
+    assert identity.parent_company_id is None
+    assert identity.confidence == 0.50
+
+
+def test_blank_org_is_never_a_candidate():
+    assert resolve_organizational_identity("   ", allow_candidate=True) is None
