@@ -122,13 +122,8 @@ def _resolve_company_name(
     if organizational_identity is not None:
         if organizational_identity.identity_type == "BUSINESS_UNIT":
             return organizational_identity.normalized_name
-
         if organizational_identity.identity_type == "VERIFIED_EXTERNAL":
-            logger.info(
-                "Verified external company withheld until external-company persistence is enabled: %s",
-                cleaned_name,
-            )
-            return None
+            return organizational_identity.normalized_name
 
     resolution = resolve_company(cleaned_name)
 
