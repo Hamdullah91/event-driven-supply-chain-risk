@@ -22,19 +22,29 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 PROCESSED_SEC_ROOT = Path("data/processed/sec")
-SEC_TARGETS_PATH = Path("data/seed/sec_10k_targets.json")
+SEC_TARGET_PATHS = (
+    Path("data/seed/sec_10k_targets.json"),
+    Path("data/seed/sec_20f_targets.json"),
+)
 
 
 def load_target_company_names(
-    path: Path = SEC_TARGETS_PATH,
+    paths: tuple[Path, ...] = SEC_TARGET_PATHS,
 ) -> set[str]:
-    """Load normalized production SEC target company names."""
-    targets = json.loads(path.read_text(encoding="utf-8"))
-    return {
-        target["name"].strip().casefold()
-        for target in targets
-        if target.get("name")
-    }
+    """Load normalized production SEC target names across supported forms."""
+    names: set[str] = set()
+
+    for path in paths:
+        if not path.exists():
+            continue
+        targets = json.loads(path.read_text(encoding="utf-8"))
+        names.update(
+            str(target["name"]).strip().casefold()
+            for target in targets
+            if target.get("name")
+        )
+
+    return names
 
 
 def discover_processed_filings(
