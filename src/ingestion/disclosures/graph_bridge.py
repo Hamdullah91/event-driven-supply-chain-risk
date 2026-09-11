@@ -30,9 +30,10 @@ class NormalizedDisclosureGraphBridge:
 
         company = self.company_registry.get(disclosure.company_id)
         filing_date: date | None = disclosure.filing_date or disclosure.publication_date
-        source_document = disclosure.metadata.get("provider_document_id")
-        if not source_document:
-            source_document = disclosure.source_representation_id
+        source_document = (
+            disclosure.provider_document_id
+            or disclosure.source_representation_id
+        )
 
         totals = {"attempted": 0, "inserted": 0, "rejected": 0}
         sections = disclosure.sections or []
@@ -47,7 +48,7 @@ class NormalizedDisclosureGraphBridge:
                     filing_company=company.legal_name,
                     source_document=str(source_document),
                     source=disclosure.source_id.upper(),
-                    source_url=disclosure.metadata.get("source_url"),
+                    source_url=disclosure.source_url,
                     filing_date=filing_date,
                 )
                 for key in totals:
