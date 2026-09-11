@@ -59,11 +59,35 @@ class GraphIngestionRepository:
             f"Cannot persist unresolved Company entity: {name}"
         )
 
+    @classmethod
+    def _node_merge(
+        cls,
+        *,
+        role: str,
+        node_type: str,
+        name: str,
+    ) -> tuple[str, dict[str, str]]:
+        if node_type == "Company":
+            company_id, identity_state = cls._resolve_company_identity(name)
+            clause = f"""
+            MERGE ({role}:Company {{company_id: ${role}_id}})
+            ON CREATE SET {role}.name = ${role}_name
+            SET {role}.identity_state = ${role}_identity_state
+            """
+            params = {
+                f"{role}_id": company_id,
+                f"{role}_name": name,
+                f"{role}_identity_state": identity_state,
+            }
+            return clause, params
+
+        clause = f"MERGE ({role}:{node_type} {{name: ${role}_name}})"
+        return clause, {f"{role}_name": name}
+
     def save_relationship(
         self,
         relationship: GraphIngestionRelationship,
     ) -> None:
-
         subject_type = relationship.subject_type
         object_type = relationship.object_type
         relationship_type = relationship.relationship.upper()
@@ -83,71 +107,40 @@ class GraphIngestionRepository:
                 f"Unsupported relationship type: {relationship_type}"
             )
 
-        if subject_type == "Company" and object_type == "Company":
-            subject_id, subject_identity_state = (
-                self._resolve_company_identity(relationship.subject)
-            )
-            object_id, object_identity_state = (
-                self._resolve_company_identity(relationship.object)
-            )
+        subject_merge, subject_params = self._node_merge(
+            role="subject",
+            node_type=subject_type,
+            name=relationship.subject,
+        )
+        object_merge, object_params = self._node_merge(
+            role="object",
+            node_type=object_type,
+            name=relationship.object,
+        )
 
-            query = f"""
-            MERGE (subject:Company {{company_id: $subject_id}})
-            ON CREATE SET subject.name = $subject_name
-            SET subject.identity_state = $subject_identity_state
+        query = f"""
+        {subject_merge}
+        {object_merge}
 
-            MERGE (object:Company {{company_id: $object_id}})
-            ON CREATE SET object.name = $object_name
-            SET object.identity_state = $object_identity_state
+        MERGE (subject)-[r:{relationship_type}]->(object)
 
-            MERGE (subject)-[r:{relationship_type}]->(object)
-
-            SET
-                r.source = $source,
-                r.source_document = $source_document,
-                r.source_url = $source_url,
-                r.filing_date = $filing_date,
-                r.extraction_method = $extraction_method,
-                r.confidence = $confidence,
-                r.created_at = $created_at
-            """
-
-            subject_params = {
-                "subject_id": subject_id,
-                "subject_name": relationship.subject,
-                "subject_identity_state": subject_identity_state,
-                "object_id": object_id,
-                "object_name": relationship.object,
-                "object_identity_state": object_identity_state,
-            }
-        else:
-            query = f"""
-            MERGE (subject:{subject_type} {{name: $subject_name}})
-            MERGE (object:{object_type} {{name: $object_name}})
-
-            MERGE (subject)-[r:{relationship_type}]->(object)
-
-            SET
-                r.source = $source,
-                r.source_document = $source_document,
-                r.source_url = $source_url,
-                r.filing_date = $filing_date,
-                r.extraction_method = $extraction_method,
-                r.confidence = $confidence,
-                r.created_at = $created_at
-            """
-
-            subject_params = {
-                "subject_name": relationship.subject,
-                "object_name": relationship.object,
-            }
+        SET
+            r.source = $source,
+            r.source_document = $source_document,
+            r.source_url = $source_url,
+            r.filing_date = $filing_date,
+            r.extraction_method = $extraction_method,
+            r.confidence = $confidence,
+            r.created_at = $created_at
+        """
 
         provenance = relationship.provenance
+        params = {**subject_params, **object_params}
 
         with self.connection.driver.session() as session:
             session.run(
                 query,
-                **subject_params,
+                **params,
                 source=provenance.source,
                 source_document=provenance.source_document,
                 source_url=provenance.source_url,
