@@ -27,6 +27,7 @@ PRODUCTION_LEMMAS = {"produce", "manufacture", "fabricate", "assemble", "build"}
 USE_LEMMAS = {"use", "utilize"}
 OPERATE_LEMMAS = {"operate"}
 OWN_LEMMAS = {"own"}
+DOMAIN_PRODUCT_TERMS = {"vehicle", "vehicles"}
 
 FILING_REFERENCES = {
     "we",
@@ -142,6 +143,25 @@ class RelationExtractor:
                 values.extend(typed)
             else:
                 values.append(cls._mention(token))
+        return values
+
+    @classmethod
+    def _production_object_mentions(
+        cls,
+        tokens: Iterable,
+    ) -> list[tuple[str, str | None]]:
+        values: list[tuple[str, str | None]] = []
+        for token in tokens:
+            typed = cls._typed_entities_in_subtree(token)
+            if typed:
+                values.extend(
+                    value for value in typed if value[1] == "Product"
+                )
+                continue
+
+            normalized = token.lemma_.lower().strip() or token.text.lower().strip()
+            if normalized in DOMAIN_PRODUCT_TERMS:
+                values.append((token.text, "Product"))
         return values
 
     @staticmethod
@@ -380,11 +400,7 @@ class RelationExtractor:
                                     )
                     else:
                         direct_objects = self._direct_objects(verb)
-                        objects = [
-                            value
-                            for value in self._object_mentions(direct_objects)
-                            if value[1] == "Product"
-                        ]
+                        objects = self._production_object_mentions(direct_objects)
                         if objects:
                             candidates.extend(
                                 self._emit(
@@ -434,7 +450,7 @@ class RelationExtractor:
                     objects = [
                         value
                         for value in objects
-                        if value[1] in {"Product", None}
+                        if value[1] in {"Company", "Product", None}
                     ]
                     if objects:
                         candidates.extend(
