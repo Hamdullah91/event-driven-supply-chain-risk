@@ -93,6 +93,34 @@ def test_passive_manufacture_assigns_company_as_producer():
     assert candidate.voice == "passive"
 
 
+def test_relative_clause_uses_company_antecedent():
+    nlp = _nlp(
+        ["TSMC", ",", "which", "supplies", "chips", "to", "NVIDIA"],
+        [3, 0, 3, 0, 3, 3, 5],
+        ["nsubj", "punct", "nsubj", "relcl", "dobj", "prep", "pobj"],
+        ["PROPN", "PUNCT", "PRON", "VERB", "NOUN", "ADP", "PROPN"],
+        ["TSMC", ",", "which", "supply", "chip", "to", "NVIDIA"],
+        [(0, 1, "ORG"), (6, 7, "ORG")],
+    )
+    candidate = RelationExtractor(nlp).extract("ignored")[0]
+    assert candidate.relationship == "SUPPLIES"
+    assert candidate.subject == "TSMC"
+    assert candidate.object == "NVIDIA"
+
+
+def test_relative_clause_without_company_antecedent_is_rejected():
+    nlp = _nlp(
+        ["systems", ",", "which", "supply", "data", "to", "NVIDIA"],
+        [3, 0, 3, 0, 3, 3, 5],
+        ["nsubj", "punct", "nsubj", "relcl", "dobj", "prep", "pobj"],
+        ["NOUN", "PUNCT", "PRON", "VERB", "NOUN", "ADP", "PROPN"],
+        ["system", ",", "which", "supply", "data", "to", "NVIDIA"],
+        [(6, 7, "ORG")],
+    )
+    candidates = RelationExtractor(nlp).extract("ignored")
+    assert candidates == []
+
+
 def test_produces_requires_product_object():
     nlp = _nlp(
         ["We", "manufacture", "processors"],
