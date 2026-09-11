@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 
 from src.ingestion.sec.parser.filing_parser import SEC10KParser
+from src.ingestion.sec.parser.filing_parser_20f import SEC20FParser
 from src.ingestion.sec.parser.models import FilingMetadata
 from src.ingestion.sec.preprocessing import (
     FilingPreprocessor,
@@ -21,10 +22,15 @@ logger = logging.getLogger(__name__)
 
 RAW_SEC_ROOT = Path("data/raw/sec")
 PROCESSED_SEC_ROOT = Path("data/processed/sec")
+SUPPORTED_FORMS = {"10-K", "20-F"}
+
+
+def _document_filename(form: str) -> str:
+    return f"{form.strip().lower()}.htm"
 
 
 def discover_filing_dirs(root: Path = RAW_SEC_ROOT) -> list[Path]:
-    """Return SEC filing directories that contain both HTML and metadata."""
+    """Return supported SEC filing directories with document + metadata."""
     filing_dirs: list[Path] = []
 
     if not root.exists():
@@ -32,7 +38,20 @@ def discover_filing_dirs(root: Path = RAW_SEC_ROOT) -> list[Path]:
 
     for metadata_path in root.rglob("metadata.json"):
         filing_dir = metadata_path.parent
-        if (filing_dir / "10-k.htm").exists():
+        try:
+            metadata_data = json.loads(
+                metadata_path.read_text(encoding="utf-8")
+            )
+        except (OSError, json.JSONDecodeError):
+            logger.exception("Skipping unreadable metadata: %s", metadata_path)
+            continue
+
+        form = str(metadata_data.get("form", "")).strip().upper()
+        if form not in SUPPORTED_FORMS:
+            continue
+
+        document_path = filing_dir / _document_filename(form)
+        if document_path.exists():
             filing_dirs.append(filing_dir)
 
     return sorted(filing_dirs)
@@ -52,21 +71,30 @@ def load_metadata(path: Path) -> FilingMetadata:
     )
 
 
+def _parser_for_form(form: str):
+    normalized = form.strip().upper()
+    if normalized == "10-K":
+        return SEC10KParser()
+    if normalized == "20-F":
+        return SEC20FParser()
+    raise ValueError(f"Unsupported SEC form for preprocessing: {form!r}")
+
+
 def process_filing(
     filing_dir: Path,
     *,
-    parser: SEC10KParser,
     preprocessor: FilingPreprocessor,
     exporter: ProcessedFilingExporter,
 ) -> Path:
-    html_path = filing_dir / "10-k.htm"
     metadata_path = filing_dir / "metadata.json"
+    metadata = load_metadata(metadata_path)
+    parser = _parser_for_form(metadata.form)
+    html_path = filing_dir / _document_filename(metadata.form)
 
     html = html_path.read_text(
         encoding="utf-8",
         errors="ignore",
     )
-    metadata = load_metadata(metadata_path)
 
     parsed_filing = parser.parse(
         html=html,
@@ -92,7 +120,8 @@ def process_filing(
     )
 
     logger.info(
-        "Processed SEC filing company=%s accession=%s sections=%d chunks=%d output=%s",
+        "Processed SEC filing form=%s company=%s accession=%s sections=%d chunks=%d output=%s",
+        metadata.form,
         metadata.company_name,
         metadata.accession_number,
         len(processed_filing.sections),
@@ -108,10 +137,9 @@ def main() -> None:
 
     if not filing_dirs:
         raise FileNotFoundError(
-            f"No SEC filing directories found under {RAW_SEC_ROOT}"
+            f"No supported SEC filing directories found under {RAW_SEC_ROOT}"
         )
 
-    parser = SEC10KParser()
     preprocessor = FilingPreprocessor()
     exporter = ProcessedFilingExporter()
 
@@ -122,7 +150,6 @@ def main() -> None:
         try:
             process_filing(
                 filing_dir,
-                parser=parser,
                 preprocessor=preprocessor,
                 exporter=exporter,
             )
