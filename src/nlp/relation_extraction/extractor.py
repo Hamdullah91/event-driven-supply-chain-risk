@@ -13,24 +13,35 @@ OBJECT_TYPES = {
     "PRODUCT": "Product",
 }
 
-DEPENDENCY_LEMMAS = {"depend", "rely", "source", "purchase", "procure", "obtain", "outsource"}
+DEPENDENCY_LEMMAS = {
+    "depend",
+    "rely",
+    "source",
+    "purchase",
+    "procure",
+    "obtain",
+    "outsource",
+}
 SUPPLY_LEMMAS = {"supply", "provide", "deliver"}
 PRODUCTION_LEMMAS = {"produce", "manufacture", "fabricate", "assemble", "build"}
 USE_LEMMAS = {"use", "utilize"}
 OPERATE_LEMMAS = {"operate"}
 OWN_LEMMAS = {"own"}
 
-FILING_REFERENCES = {"we", "us", "our", "ours", "ourselves", "company", "the company"}
+FILING_REFERENCES = {
+    "we",
+    "us",
+    "our",
+    "ours",
+    "ourselves",
+    "company",
+    "the company",
+}
 RELATIVE_PRONOUNS = {"who", "which", "that"}
 
 
 class RelationExtractor:
-    """Conservative entity-first SEC relation extraction.
-
-    The extractor starts from typed entity mentions and only emits candidates
-    for relation-specific dependency structures. Entity resolution and graph
-    ontology validation remain downstream responsibilities.
-    """
+    """Conservative entity-first SEC relation extraction."""
 
     def __init__(self, nlp):
         self.nlp = nlp
@@ -65,7 +76,10 @@ class RelationExtractor:
         for child in token.children:
             if child.dep_ not in {"prep", "agent"}:
                 continue
-            if child.lemma_.lower() not in prepositions and child.text.lower() not in prepositions:
+            if (
+                child.lemma_.lower() not in prepositions
+                and child.text.lower() not in prepositions
+            ):
                 continue
             objects.extend(
                 grandchild
@@ -78,9 +92,6 @@ class RelationExtractor:
     def _subject_mentions(cls, verb) -> list:
         subjects = cls._children(verb, {"nsubj", "nsubjpass"})
 
-        # Relative clauses are only accepted when their local antecedent is a
-        # typed Company. This prevents generic noun phrases such as
-        # "systems, which supply data..." from leaking into the graph.
         if verb.dep_ == "relcl":
             antecedent = verb.head
             antecedent_ent = cls._entity_for_token(antecedent)
@@ -99,7 +110,6 @@ class RelationExtractor:
             ]
             if relative_subjects or not subjects:
                 return [antecedent]
-
             return []
 
         return subjects
@@ -121,7 +131,10 @@ class RelationExtractor:
         return values
 
     @classmethod
-    def _object_mentions(cls, tokens: Iterable) -> list[tuple[str, str | None]]:
+    def _object_mentions(
+        cls,
+        tokens: Iterable,
+    ) -> list[tuple[str, str | None]]:
         values: list[tuple[str, str | None]] = []
         for token in tokens:
             typed = cls._typed_entities_in_subtree(token)
@@ -134,6 +147,15 @@ class RelationExtractor:
     @staticmethod
     def _is_filing_reference(text: str) -> bool:
         return " ".join(text.lower().split()) in FILING_REFERENCES
+
+    @classmethod
+    def _filing_reference_in_subtree(cls, token):
+        for item in token.subtree:
+            if cls._is_filing_reference(item.text) or cls._is_filing_reference(
+                item.lemma_
+            ):
+                return item
+        return None
 
     @classmethod
     def _emit(
@@ -150,7 +172,13 @@ class RelationExtractor:
         candidates: list[RelationCandidate] = []
         for subject_token in subjects:
             subject, subject_type = cls._mention(subject_token)
-            attribution = 0.98 if cls._is_filing_reference(subject) else 0.92 if subject_type == "Company" else 0.70
+            attribution = (
+                0.98
+                if cls._is_filing_reference(subject)
+                else 0.92
+                if subject_type == "Company"
+                else 0.70
+            )
             for object_text, object_type in objects:
                 candidates.append(
                     RelationCandidate(
@@ -180,15 +208,22 @@ class RelationExtractor:
         relationship: str,
         pattern_id: str,
         extraction_confidence: float,
+        voice: str = "passive",
     ) -> RelationCandidate:
-        attribution = 0.92 if subject_type == "Company" else 0.85
+        attribution = (
+            0.98
+            if cls._is_filing_reference(subject_text)
+            else 0.92
+            if subject_type == "Company"
+            else 0.85
+        )
         return RelationCandidate(
             subject=subject_text,
             relationship=relationship,
             object=object_text,
             source_sentence=sentence.text.strip(),
             pattern_id=pattern_id,
-            voice="passive",
+            voice=voice,
             subject_type=subject_type,
             object_type=object_type,
             extraction_confidence=extraction_confidence,
@@ -209,24 +244,37 @@ class RelationExtractor:
                 if not subjects:
                     continue
 
-                passive = any(subject.dep_ == "nsubjpass" for subject in subjects)
+                passive = any(
+                    subject.dep_ == "nsubjpass" for subject in subjects
+                )
 
                 if lemma in DEPENDENCY_LEMMAS:
                     if passive:
                         continue
                     objects = self._object_mentions(
-                        self._prep_objects(verb, {"on", "upon", "from", "to"})
+                        self._prep_objects(
+                            verb,
+                            {"on", "upon", "from", "to"},
+                        )
                     )
                     if objects:
-                        candidates.extend(self._emit(
-                            sentence=sentence, subjects=subjects, objects=objects,
-                            relationship="DEPENDS_ON", pattern_id=f"dependency_{lemma}_prep",
-                            voice="active", extraction_confidence=0.94,
-                        ))
+                        candidates.extend(
+                            self._emit(
+                                sentence=sentence,
+                                subjects=subjects,
+                                objects=objects,
+                                relationship="DEPENDS_ON",
+                                pattern_id=f"dependency_{lemma}_prep",
+                                voice="active",
+                                extraction_confidence=0.94,
+                            )
+                        )
 
                 elif lemma in SUPPLY_LEMMAS:
                     if passive:
-                        agents = self._object_mentions(self._prep_objects(verb, {"by"}))
+                        agents = self._object_mentions(
+                            self._prep_objects(verb, {"by"})
+                        )
                         supplied = [self._mention(subject) for subject in subjects]
                         for agent_text, agent_type in agents:
                             if agent_type != "Company":
@@ -234,68 +282,172 @@ class RelationExtractor:
                             for supplied_text, supplied_type in supplied:
                                 if supplied_type != "Company":
                                     continue
-                                candidates.append(self._emit_explicit(
-                                    sentence=sentence,
-                                    subject_text=agent_text,
-                                    subject_type=agent_type,
-                                    object_text=supplied_text,
-                                    object_type=supplied_type,
-                                    relationship="SUPPLIES",
-                                    pattern_id=f"supply_{lemma}_passive_by",
-                                    extraction_confidence=0.97,
-                                ))
+                                candidates.append(
+                                    self._emit_explicit(
+                                        sentence=sentence,
+                                        subject_text=agent_text,
+                                        subject_type=agent_type,
+                                        object_text=supplied_text,
+                                        object_type=supplied_type,
+                                        relationship="SUPPLIES",
+                                        pattern_id=f"supply_{lemma}_passive_by",
+                                        extraction_confidence=0.97,
+                                    )
+                                )
                     else:
                         destinations = self._object_mentions(
                             self._prep_objects(verb, {"to", "for"})
                         )
                         if destinations:
-                            candidates.extend(self._emit(
-                                sentence=sentence, subjects=subjects, objects=destinations,
-                                relationship="SUPPLIES", pattern_id=f"supply_{lemma}_destination",
-                                voice="active", extraction_confidence=0.93,
-                            ))
+                            candidates.extend(
+                                self._emit(
+                                    sentence=sentence,
+                                    subjects=subjects,
+                                    objects=destinations,
+                                    relationship="SUPPLIES",
+                                    pattern_id=f"supply_{lemma}_destination",
+                                    voice="active",
+                                    extraction_confidence=0.93,
+                                )
+                            )
+                        else:
+                            direct_companies = [
+                                value
+                                for value in self._object_mentions(
+                                    self._direct_objects(verb)
+                                )
+                                if value[1] == "Company"
+                            ]
+                            if direct_companies:
+                                candidates.extend(
+                                    self._emit(
+                                        sentence=sentence,
+                                        subjects=subjects,
+                                        objects=direct_companies,
+                                        relationship="SUPPLIES",
+                                        pattern_id=f"supply_{lemma}_direct_company",
+                                        voice="active",
+                                        extraction_confidence=0.95,
+                                    )
+                                )
 
                 elif lemma in PRODUCTION_LEMMAS:
                     if passive:
-                        agents = self._object_mentions(self._prep_objects(verb, {"by"}))
-                        products = [self._mention(subject) for subject in subjects]
+                        agents = self._object_mentions(
+                            self._prep_objects(verb, {"by"})
+                        )
+                        product_subjects = [
+                            subject
+                            for subject in subjects
+                            if self._mention(subject)[1] == "Product"
+                        ]
                         for agent_text, agent_type in agents:
                             if agent_type != "Company":
                                 continue
-                            for product_text, product_type in products:
-                                if product_type != "Product":
-                                    continue
-                                candidates.append(self._emit_explicit(
-                                    sentence=sentence,
-                                    subject_text=agent_text,
-                                    subject_type=agent_type,
-                                    object_text=product_text,
-                                    object_type=product_type,
-                                    relationship="PRODUCES",
-                                    pattern_id=f"production_{lemma}_passive_by",
-                                    extraction_confidence=0.97,
-                                ))
+                            for product_subject in product_subjects:
+                                product_text, product_type = self._mention(
+                                    product_subject
+                                )
+                                candidates.append(
+                                    self._emit_explicit(
+                                        sentence=sentence,
+                                        subject_text=agent_text,
+                                        subject_type=agent_type,
+                                        object_text=product_text,
+                                        object_type=product_type,
+                                        relationship="PRODUCES",
+                                        pattern_id=f"production_{lemma}_passive_by",
+                                        extraction_confidence=0.97,
+                                    )
+                                )
+                                filing_ref = self._filing_reference_in_subtree(
+                                    product_subject
+                                )
+                                if filing_ref is not None:
+                                    candidates.append(
+                                        self._emit_explicit(
+                                            sentence=sentence,
+                                            subject_text=filing_ref.text,
+                                            subject_type=None,
+                                            object_text=agent_text,
+                                            object_type="Company",
+                                            relationship="DEPENDS_ON",
+                                            pattern_id=(
+                                                f"dependency_owned_product_{lemma}_passive_by"
+                                            ),
+                                            extraction_confidence=0.96,
+                                        )
+                                    )
                     else:
-                        objects = self._object_mentions(self._direct_objects(verb))
-                        objects = [value for value in objects if value[1] == "Product"]
+                        direct_objects = self._direct_objects(verb)
+                        objects = [
+                            value
+                            for value in self._object_mentions(direct_objects)
+                            if value[1] == "Product"
+                        ]
                         if objects:
-                            candidates.extend(self._emit(
-                                sentence=sentence, subjects=subjects, objects=objects,
-                                relationship="PRODUCES", pattern_id=f"production_{lemma}_product",
-                                voice="active", extraction_confidence=0.95,
-                            ))
+                            candidates.extend(
+                                self._emit(
+                                    sentence=sentence,
+                                    subjects=subjects,
+                                    objects=objects,
+                                    relationship="PRODUCES",
+                                    pattern_id=f"production_{lemma}_product",
+                                    voice="active",
+                                    extraction_confidence=0.95,
+                                )
+                            )
+
+                        company_subjects = [
+                            self._mention(subject)
+                            for subject in subjects
+                            if self._mention(subject)[1] == "Company"
+                        ]
+                        if company_subjects:
+                            for object_token in direct_objects:
+                                filing_ref = self._filing_reference_in_subtree(
+                                    object_token
+                                )
+                                if filing_ref is None:
+                                    continue
+                                for company_text, company_type in company_subjects:
+                                    candidates.append(
+                                        self._emit_explicit(
+                                            sentence=sentence,
+                                            subject_text=filing_ref.text,
+                                            subject_type=None,
+                                            object_text=company_text,
+                                            object_type=company_type,
+                                            relationship="DEPENDS_ON",
+                                            pattern_id=(
+                                                f"dependency_owned_product_{lemma}_active"
+                                            ),
+                                            extraction_confidence=0.95,
+                                            voice="active",
+                                        )
+                                    )
 
                 elif lemma in USE_LEMMAS:
                     if passive:
                         continue
                     objects = self._object_mentions(self._direct_objects(verb))
-                    objects = [value for value in objects if value[1] in {"Product", None}]
+                    objects = [
+                        value
+                        for value in objects
+                        if value[1] in {"Product", None}
+                    ]
                     if objects:
-                        candidates.extend(self._emit(
-                            sentence=sentence, subjects=subjects, objects=objects,
-                            relationship="USES", pattern_id=f"use_{lemma}_object",
-                            voice="active", extraction_confidence=0.88,
-                        ))
+                        candidates.extend(
+                            self._emit(
+                                sentence=sentence,
+                                subjects=subjects,
+                                objects=objects,
+                                relationship="USES",
+                                pattern_id=f"use_{lemma}_object",
+                                voice="active",
+                                extraction_confidence=0.88,
+                            )
+                        )
 
                 elif lemma in OPERATE_LEMMAS | OWN_LEMMAS:
                     if passive:
@@ -303,12 +455,22 @@ class RelationExtractor:
                     objects = self._object_mentions(self._direct_objects(verb))
                     objects = [value for value in objects if value[1] == "Facility"]
                     if objects:
-                        relationship = "OPERATES" if lemma in OPERATE_LEMMAS else "OWNS"
-                        candidates.extend(self._emit(
-                            sentence=sentence, subjects=subjects, objects=objects,
-                            relationship=relationship, pattern_id=f"facility_{lemma}",
-                            voice="active", extraction_confidence=0.96,
-                        ))
+                        relationship = (
+                            "OPERATES"
+                            if lemma in OPERATE_LEMMAS
+                            else "OWNS"
+                        )
+                        candidates.extend(
+                            self._emit(
+                                sentence=sentence,
+                                subjects=subjects,
+                                objects=objects,
+                                relationship=relationship,
+                                pattern_id=f"facility_{lemma}",
+                                voice="active",
+                                extraction_confidence=0.96,
+                            )
+                        )
 
         unique: list[RelationCandidate] = []
         seen: set[tuple] = set()
