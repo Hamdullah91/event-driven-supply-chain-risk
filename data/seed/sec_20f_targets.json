@@ -1,0 +1,32 @@
+[
+  {
+    "company_id": "tsmc",
+    "name": "TSMC",
+    "legal_name": "Taiwan Semiconductor Manufacturing Company Limited",
+    "cik": "0001046179"
+  },
+  {
+    "company_id": "asml",
+    "name": "ASML",
+    "legal_name": "ASML Holding N.V.",
+    "cik": "0000937966"
+  },
+  {
+    "company_id": "stmicroelectronics",
+    "name": "STMicroelectronics",
+    "legal_name": "STMicroelectronics N.V.",
+    "cik": "0000932787"
+  },
+  {
+    "company_id": "globalfoundries",
+    "name": "GlobalFoundries",
+    "legal_name": "GlobalFoundries Inc.",
+    "cik": "0001709048"
+  },
+  {
+    "company_id": "sqm",
+    "name": "SQM",
+    "legal_name": "Sociedad Quimica y Minera de Chile S.A.",
+    "cik": "0000909037"
+  }
+]
