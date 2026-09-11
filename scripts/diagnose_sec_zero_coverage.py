@@ -190,6 +190,7 @@ def main() -> None:
         ontology_rejections = 0
         object_type_counts: Counter[str] = Counter()
         predicate_counts: Counter[str] = Counter()
+        unresolved_subjects: Counter[str] = Counter()
         unresolved_objects: Counter[str] = Counter()
 
         for candidate in raw_candidates:
@@ -202,6 +203,7 @@ def main() -> None:
             )
             if subject is None:
                 subject_rejections += 1
+                unresolved_subjects[candidate.subject.strip()] += 1
                 continue
 
             object_value = _resolve_object(
@@ -224,6 +226,10 @@ def main() -> None:
 
         zero_coverage.append(company)
 
+        top_subjects = ", ".join(
+            f"{name}({count})"
+            for name, count in unresolved_subjects.most_common(5)
+        ) or "none"
         top_objects = ", ".join(
             f"{name}({count})"
             for name, count in unresolved_objects.most_common(5)
@@ -246,7 +252,8 @@ def main() -> None:
             f"ontology_reject={ontology_rejections} | "
             f"predicates={predicates} | "
             f"object_types={object_types} | "
-            f"top_unresolved={top_objects}"
+            f"top_unresolved_subjects={top_subjects} | "
+            f"top_unresolved_objects={top_objects}"
         )
 
     print()
