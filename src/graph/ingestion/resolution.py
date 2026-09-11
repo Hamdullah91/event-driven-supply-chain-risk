@@ -100,6 +100,15 @@ GENERIC_OBJECTS = {
     "business",
     "operations",
     "capacity",
+    "both",
+    "certain",
+    "that",
+    "range",
+    "sources",
+    "portfolio",
+    "variants",
+    "period",
+    "sale",
 }
 
 
@@ -203,6 +212,9 @@ def _resolve_object(
     cleaned = candidate.object.strip()
     normalized = " ".join(cleaned.lower().split())
 
+    if normalized in GENERIC_OBJECTS:
+        return None
+
     if candidate.object_type == "Company":
         resolved = _resolve_company_name(
             cleaned,
@@ -218,8 +230,6 @@ def _resolve_object(
 
     if candidate.predicate in {"OPERATES", "OWNS"}:
         if candidate.object_type == "Facility":
-            if normalized in GENERIC_OBJECTS:
-                return None
             return cleaned, "Facility"
         inferred_type = _infer_non_company_type(
             cleaned,
@@ -236,8 +246,6 @@ def _resolve_object(
         "Technology",
         "Location",
     }:
-        if normalized in GENERIC_OBJECTS:
-            return None
         return cleaned, candidate.object_type
 
     resolved_company = _resolve_company_name(
@@ -295,6 +303,19 @@ def resolve_graph_candidates(
 
         if relationship == "USES" and object_type == "Company":
             relationship = "DEPENDS_ON"
+
+        if (
+            subject_type == "Company"
+            and object_type == "Company"
+            and subject_name == object_name
+        ):
+            logger.warning(
+                "Self-referential company relationship skipped: %s -[%s]-> %s",
+                subject_name,
+                relationship,
+                object_name,
+            )
+            continue
 
         rule = (subject_type, relationship, object_type)
         if rule not in VALID_RELATIONSHIPS:
