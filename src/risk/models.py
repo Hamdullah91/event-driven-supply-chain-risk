@@ -26,6 +26,22 @@ class SupplyEdge:
 
 
 @dataclass(frozen=True, slots=True)
+class TwoHopSupplyPath:
+    """Exactly two downstream SUPPLIES edges from one source company."""
+
+    source_company_id: str
+    source_company_name: str
+    hop_1_company_id: str
+    hop_1_company_name: str
+    hop_2_company_id: str
+    hop_2_company_name: str
+    hop_1_weight: float
+    hop_1_weight_source: str
+    hop_2_weight: float
+    hop_2_weight_source: str
+
+
+@dataclass(frozen=True, slots=True)
 class OneHopExposure:
     """Explainable one-hop risk result for one downstream company."""
 
@@ -40,5 +56,28 @@ class OneHopExposure:
     weight_source: str
     hop_distance: int
     initial_risk: float
+    distance_decay: float
+    propagated_risk: float
+
+
+@dataclass(frozen=True, slots=True)
+class TwoHopExposure:
+    """Explainable two-hop risk result for one indirect downstream company."""
+
+    event_id: str
+    event_severity: str
+    source_company_id: str
+    source_company_name: str
+    hop_1_company_id: str
+    hop_1_company_name: str
+    hop_2_company_id: str
+    hop_2_company_name: str
+    hop_1_weight: float
+    hop_1_weight_source: str
+    hop_2_weight: float
+    hop_2_weight_source: str
+    hop_distance: int
+    initial_risk: float
+    path_dependency: float
     distance_decay: float
     propagated_risk: float
