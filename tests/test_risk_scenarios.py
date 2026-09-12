@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from src.risk.evaluation import (
@@ -7,6 +9,7 @@ from src.risk.evaluation import (
     evaluate_default_risk_scenarios,
     evaluate_risk_scenario,
 )
+from src.risk.mathematics import calculate_path_risk
 
 
 EXPECTED_THREE_HOP_RISK = {
@@ -71,6 +74,7 @@ def test_scenario_risk_is_bounded_and_dependency_aware(scenario) -> None:
         evaluation.two_hop,
         evaluation.three_hop,
     ):
+        assert math.isfinite(result.propagated_risk)
         assert 0.0 <= result.propagated_risk <= 1.0
         assert 0.0 <= result.path_dependency <= 1.0
 
@@ -93,3 +97,59 @@ def test_default_scenario_suite_is_deterministic() -> None:
     second = evaluate_default_risk_scenarios()
 
     assert first == second
+
+
+def test_risk_does_not_allow_four_hops() -> None:
+    with pytest.raises(ValueError, match="cannot contain more than"):
+        calculate_path_risk(
+            initial_risk=0.90,
+            dependency_weights=[0.90, 0.80, 0.70, 0.60],
+        )
+
+
+def test_stronger_dependency_produces_more_risk() -> None:
+    strong = calculate_path_risk(
+        initial_risk=0.80,
+        dependency_weights=[0.90],
+    )
+    weak = calculate_path_risk(
+        initial_risk=0.80,
+        dependency_weights=[0.30],
+    )
+
+    assert strong.propagated_risk == pytest.approx(0.72)
+    assert weak.propagated_risk == pytest.approx(0.24)
+    assert strong.propagated_risk > weak.propagated_risk
+
+
+def test_higher_event_severity_produces_more_risk() -> None:
+    severe = calculate_path_risk(
+        initial_risk=0.95,
+        dependency_weights=[0.80],
+    )
+    mild = calculate_path_risk(
+        initial_risk=0.40,
+        dependency_weights=[0.80],
+    )
+
+    assert severe.propagated_risk == pytest.approx(0.76)
+    assert mild.propagated_risk == pytest.approx(0.32)
+    assert severe.propagated_risk > mild.propagated_risk
+
+
+@pytest.mark.parametrize("invalid_initial_risk", [-0.01, 1.01, math.nan])
+def test_invalid_initial_risk_is_rejected(invalid_initial_risk: float) -> None:
+    with pytest.raises(ValueError, match="initial_risk"):
+        calculate_path_risk(
+            initial_risk=invalid_initial_risk,
+            dependency_weights=[0.80],
+        )
+
+
+@pytest.mark.parametrize("invalid_weight", [-0.01, 1.01, math.nan])
+def test_invalid_dependency_weight_is_rejected(invalid_weight: float) -> None:
+    with pytest.raises(ValueError, match="dependency_weights"):
+        calculate_path_risk(
+            initial_risk=0.80,
+            dependency_weights=[invalid_weight],
+        )
