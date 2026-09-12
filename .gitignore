@@ -60,4 +60,5 @@ models/**/checkpoints/
 
 # New ingestion pipeline runtime data
 data/news/*.db
+data/disclosures/
 logs/*.log
