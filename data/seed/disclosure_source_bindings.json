@@ -121,7 +121,7 @@
   {
     "company_id": "safran",
     "source_id": "investor_relations",
-    "discovery_url": "https://www.safran-group.com/finance/regulated-information",
+    "discovery_url": "https://www.safran-group.com/finance/publications-results?items_per_page=All&type%5B0%5D=publication",
     "priority_override": 20,
     "preferred_languages": ["en"]
   },
@@ -135,7 +135,7 @@
   {
     "company_id": "bae_systems",
     "source_id": "investor_relations",
-    "discovery_url": "https://www.baesystems.com/annualreport/",
+    "discovery_url": "https://www.baesystems.com/annualreport/2025",
     "priority_override": 20,
     "preferred_languages": ["en"]
   },
