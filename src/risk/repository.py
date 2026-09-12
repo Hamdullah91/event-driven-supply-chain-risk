@@ -4,6 +4,7 @@ from src.graph.connection import Neo4jConnection
 from src.risk.models import (
     DirectAffectedCompany,
     SupplyEdge,
+    ThreeHopSupplyPath,
     TwoHopSupplyPath,
 )
 
@@ -139,6 +140,78 @@ class RiskRepository:
                 hop_1_weight_source=str(record["hop_1_weight_source"]),
                 hop_2_weight=float(record["hop_2_weight"]),
                 hop_2_weight_source=str(record["hop_2_weight_source"]),
+            )
+            for record in records
+        ]
+
+    def get_three_hop_downstream(
+        self,
+        company_id: str,
+    ) -> list[ThreeHopSupplyPath]:
+        """Traverse exactly three canonical supplier -> customer edges."""
+
+        query = """
+        MATCH (source:Company {company_id: $company_id})-[r1:SUPPLIES]->(hop1:Company)
+              -[r2:SUPPLIES]->(hop2:Company)
+              -[r3:SUPPLIES]->(hop3:Company)
+        WHERE source <> hop1
+          AND source <> hop2
+          AND source <> hop3
+          AND hop1 <> hop2
+          AND hop1 <> hop3
+          AND hop2 <> hop3
+        RETURN DISTINCT
+            source.company_id AS source_company_id,
+            source.name AS source_company_name,
+            hop1.company_id AS hop_1_company_id,
+            hop1.name AS hop_1_company_name,
+            hop2.company_id AS hop_2_company_id,
+            hop2.name AS hop_2_company_name,
+            hop3.company_id AS hop_3_company_id,
+            hop3.name AS hop_3_company_name,
+            coalesce(r1.dependency_weight, $default_weight) AS hop_1_weight,
+            CASE
+                WHEN r1.dependency_weight IS NULL THEN 'default'
+                ELSE 'relationship'
+            END AS hop_1_weight_source,
+            coalesce(r2.dependency_weight, $default_weight) AS hop_2_weight,
+            CASE
+                WHEN r2.dependency_weight IS NULL THEN 'default'
+                ELSE 'relationship'
+            END AS hop_2_weight_source,
+            coalesce(r3.dependency_weight, $default_weight) AS hop_3_weight,
+            CASE
+                WHEN r3.dependency_weight IS NULL THEN 'default'
+                ELSE 'relationship'
+            END AS hop_3_weight_source
+        ORDER BY hop_1_company_id, hop_2_company_id, hop_3_company_id
+        """
+
+        with self.connection.driver.session() as session:
+            records = list(
+                session.run(
+                    query,
+                    company_id=company_id,
+                    default_weight=DEFAULT_DEPENDENCY_WEIGHT,
+                )
+            )
+
+        return [
+            ThreeHopSupplyPath(
+                source_company_id=str(record["source_company_id"]),
+                source_company_name=str(record["source_company_name"]),
+                hop_1_company_id=str(record["hop_1_company_id"]),
+                hop_1_company_name=str(record["hop_1_company_name"]),
+                hop_2_company_id=str(record["hop_2_company_id"]),
+                hop_2_company_name=str(record["hop_2_company_name"]),
+                hop_3_company_id=str(record["hop_3_company_id"]),
+                hop_3_company_name=str(record["hop_3_company_name"]),
+                hop_1_weight=float(record["hop_1_weight"]),
+                hop_1_weight_source=str(record["hop_1_weight_source"]),
+                hop_2_weight=float(record["hop_2_weight"]),
+                hop_2_weight_source=str(record["hop_2_weight_source"]),
+                hop_3_weight=float(record["hop_3_weight"]),
+                hop_3_weight_source=str(record["hop_3_weight_source"]),
             )
             for record in records
         ]
