@@ -1,0 +1,45 @@
+[
+  {
+    "source_id": "sec_edgar",
+    "display_name": "SEC EDGAR",
+    "provider_type": "sec",
+    "authority": "regulator",
+    "jurisdictions": ["US", "FOREIGN_PRIVATE_ISSUER"],
+    "supported_document_families": ["10-k", "20-f"],
+    "requires_api_key": false,
+    "supports_discovery_api": true,
+    "base_url": "https://www.sec.gov",
+    "default_priority": 10,
+    "enabled": true
+  },
+  {
+    "source_id": "opendart",
+    "display_name": "Korea OpenDART",
+    "provider_type": "opendart",
+    "authority": "regulator",
+    "jurisdictions": ["KR"],
+    "supported_document_families": ["business_report", "annual_report"],
+    "requires_api_key": true,
+    "supports_discovery_api": true,
+    "base_url": "https://opendart.fss.or.kr",
+    "default_priority": 10,
+    "enabled": true
+  },
+  {
+    "source_id": "investor_relations",
+    "display_name": "Official Investor Relations",
+    "provider_type": "investor_relations",
+    "authority": "issuer",
+    "jurisdictions": [],
+    "supported_document_families": [
+      "annual_report",
+      "integrated_report",
+      "universal_registration_document",
+      "other_annual_disclosure"
+    ],
+    "requires_api_key": false,
+    "supports_discovery_api": false,
+    "default_priority": 30,
+    "enabled": true
+  }
+]

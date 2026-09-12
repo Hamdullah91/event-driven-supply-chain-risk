@@ -1,0 +1,24 @@
+{
+  "benchmark": {
+    "path": "data\\evaluation\\sec_relation_balanced_annotation_sample.jsonl",
+    "reviewed_sentences": 100,
+    "positive_gold_sentences": 16,
+    "gold_relation_instances": 22
+  },
+  "true_positive": 12,
+  "false_positive": 0,
+  "false_negative": 10,
+  "precision": 1.0,
+  "recall": 0.5454545454545454,
+  "f1": 0.7058823529411764,
+  "exact_sentence_accuracy": 0.92,
+  "unique_gold_relations": 18,
+  "unique_predicted_relations": 9,
+  "mismatch_path": "data\\evaluation\\sec_relation_balanced_mismatches.jsonl",
+  "historical_baseline": {
+    "companies_with_sec_edges": 12,
+    "production_10k_companies": 27,
+    "unique_relationships": 35,
+    "note": "Pre-repair graph coverage baseline; not directly comparable to sentence-level Precision/Recall/F1."
+  }
+}

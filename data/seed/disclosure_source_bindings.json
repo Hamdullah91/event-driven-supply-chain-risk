@@ -1,0 +1,149 @@
+[
+  {
+    "company_id": "samsung_electronics",
+    "source_id": "opendart",
+    "external_company_id": "00126380",
+    "priority_override": 10,
+    "metadata": {"language": "ko", "stock_code": "005930"}
+  },
+  {
+    "company_id": "samsung_electronics",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.samsung.com/global/ir/reports-disclosures/business-report/",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "sk_hynix",
+    "source_id": "opendart",
+    "external_company_id": "00164779",
+    "priority_override": 10,
+    "metadata": {"language": "ko", "stock_code": "000660"}
+  },
+  {
+    "company_id": "sk_hynix",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.skhynix.com/ir/UI-FR-IR01/",
+    "priority_override": 25,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "lg_energy_solution",
+    "source_id": "opendart",
+    "external_company_id": "01515323",
+    "priority_override": 10,
+    "metadata": {"language": "ko", "stock_code": "373220"}
+  },
+  {
+    "company_id": "lg_energy_solution",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.lgensol.com/en/esg/report-performance",
+    "priority_override": 25,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "samsung_sdi",
+    "source_id": "opendart",
+    "external_company_id": "00126362",
+    "priority_override": 10,
+    "metadata": {"language": "ko", "stock_code": "006400"}
+  },
+  {
+    "company_id": "samsung_sdi",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.samsungsdi.com/esg/report/index.html",
+    "priority_override": 25,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "sk_on",
+    "source_id": "opendart",
+    "external_company_id": "01592447",
+    "priority_override": 10,
+    "metadata": {"language": "ko", "listing": "unlisted"}
+  },
+  {
+    "company_id": "infineon",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.infineon.com/about/investor",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "tokyo_electron",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.tel.com/ir/library/ar/",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "byd",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.bydglobal.com/en/InvestorAnnals.html",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "catl",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.catl.com/en/inverelations/",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "panasonic_energy",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.panasonic.com/global/energy/sustainability/report.html",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "volkswagen",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.volkswagen-group.com/en/financial-reports-18134",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "bmw",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.bmwgroup.com/en/investor-relations/company-reports.html",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "airbus",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.airbus.com/en/investors/annual-reports",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "safran",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.safran-group.com/finance/regulated-information",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "rolls_royce",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.rolls-royce.com/investors/results-reports-and-presentations/ar-annual-report-archive/ar-annual-reports.aspx",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "bae_systems",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.baesystems.com/annualreport/",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  },
+  {
+    "company_id": "thales",
+    "source_id": "investor_relations",
+    "discovery_url": "https://www.thalesgroup.com/en/investor-relations/regulated-information",
+    "priority_override": 20,
+    "preferred_languages": ["en"]
+  }
+]
