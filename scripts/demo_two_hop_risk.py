@@ -95,17 +95,17 @@ def main() -> None:
                 f" -> {exposure.hop_2_company_name}"
             )
             print(f"Hop: {exposure.hop_distance}")
-            print(f"Initial risk: {exposure.initial_risk}")
+            print(f"Initial risk: {exposure.initial_risk:.3f}")
             print(
                 "Dependency weights: "
-                f"{exposure.hop_1_weight} "
+                f"{exposure.hop_1_weight:.3f} "
                 f"({exposure.hop_1_weight_source}), "
-                f"{exposure.hop_2_weight} "
+                f"{exposure.hop_2_weight:.3f} "
                 f"({exposure.hop_2_weight_source})"
             )
-            print(f"Path dependency: {exposure.path_dependency}")
-            print(f"Distance decay: {exposure.distance_decay}")
-            print(f"Propagated risk: {exposure.propagated_risk}")
+            print(f"Path dependency: {exposure.path_dependency:.3f}")
+            print(f"Distance decay: {exposure.distance_decay:.3f}")
+            print(f"Propagated risk: {exposure.propagated_risk:.3f}")
             print()
 
     finally:
