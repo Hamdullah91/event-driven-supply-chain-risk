@@ -98,6 +98,44 @@ class InvestorRelationsDisclosureProvider(DisclosureProvider):
             return DocumentFamily.UNIVERSAL_REGISTRATION_DOCUMENT
         return DocumentFamily.ANNUAL_REPORT
 
+    @staticmethod
+    def _direct_document(
+        company: Company,
+        binding: CompanySourceBinding,
+    ) -> RemoteDocument | None:
+        metadata = binding.metadata or {}
+        if not metadata.get("direct_document") or not binding.discovery_url:
+            return None
+
+        family_value = str(metadata.get("document_family", "annual_report"))
+        try:
+            family = DocumentFamily(family_value)
+        except ValueError:
+            family = DocumentFamily.ANNUAL_REPORT
+
+        reporting_year = metadata.get("reporting_year")
+        if reporting_year is not None:
+            reporting_year = int(reporting_year)
+
+        return RemoteDocument(
+            source_id=InvestorRelationsDisclosureProvider.provider_id,
+            company_id=company.company_id,
+            document_family=family,
+            native_document_type=family.value,
+            title=str(metadata.get("title") or f"{company.legal_name} annual disclosure"),
+            source_url=binding.discovery_url,
+            reporting_year=reporting_year,
+            language=(
+                binding.preferred_languages
+                or company.preferred_languages
+                or ["en"]
+            )[0],
+            metadata={
+                "discovery_url": binding.discovery_url,
+                "direct_document": True,
+            },
+        )
+
     async def discover_documents(
         self,
         company: Company,
@@ -110,6 +148,14 @@ class InvestorRelationsDisclosureProvider(DisclosureProvider):
             raise ValueError(
                 f"No official IR discovery URL configured for {company.company_id}"
             )
+
+        direct = self._direct_document(company, binding)
+        if direct is not None:
+            if year_from is not None and direct.reporting_year is not None and direct.reporting_year < year_from:
+                return []
+            if year_to is not None and direct.reporting_year is not None and direct.reporting_year > year_to:
+                return []
+            return [direct]
 
         current_year = date.today().year
         years = set(range(year_from or current_year - 2, (year_to or current_year) + 1))
