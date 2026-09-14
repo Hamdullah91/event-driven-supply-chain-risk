@@ -215,3 +215,119 @@ class RiskRepository:
             )
             for record in records
         ]
+
+    def company_exists(self, company_id: str) -> bool:
+        query = """
+        MATCH (company:Company {company_id: $company_id})
+        RETURN count(company) > 0 AS exists
+        """
+
+        with self.connection.driver.session() as session:
+            record = session.run(query, company_id=company_id).single()
+
+        return bool(record["exists"]) if record else False
+
+    def get_company_blast_radius(
+        self,
+        company_id: str,
+        *,
+        max_hops: int = 3,
+    ) -> list[dict]:
+        if max_hops not in {1, 2, 3}:
+            raise ValueError("max_hops must be between 1 and 3.")
+
+        query = f"""
+        MATCH path =
+            (source:Company {{company_id: $company_id}})
+            -[:SUPPLIES*1..{max_hops}]->
+            (target:Company)
+        WHERE target <> source
+          AND all(node IN nodes(path) WHERE single(
+              other IN nodes(path) WHERE other = node
+          ))
+        WITH source, target, path, length(path) AS hop_distance
+        RETURN
+            source.company_id AS source_company_id,
+            source.name AS source_company_name,
+            target.company_id AS target_company_id,
+            target.name AS target_company_name,
+            hop_distance,
+            [node IN nodes(path) | {{
+                company_id: node.company_id,
+                name: node.name
+            }}] AS path_nodes,
+            [relationship IN relationships(path) | {{
+                dependency_weight: coalesce(
+                    relationship.dependency_weight,
+                    $default_weight
+                ),
+                weight_source: CASE
+                    WHEN relationship.dependency_weight IS NULL THEN 'default'
+                    ELSE 'relationship'
+                END
+            }}] AS path_relationships
+        ORDER BY hop_distance, target.company_id
+        """
+
+        with self.connection.driver.session() as session:
+            records = list(
+                session.run(
+                    query,
+                    company_id=company_id,
+                    default_weight=DEFAULT_DEPENDENCY_WEIGHT,
+                )
+            )
+
+        return [dict(record) for record in records]
+
+    def get_company_event_exposure(
+        self,
+        company_id: str,
+        *,
+        max_hops: int = 3,
+    ) -> list[dict]:
+        if max_hops not in {1, 2, 3}:
+            raise ValueError("max_hops must be between 1 and 3.")
+
+        query = f"""
+        MATCH (event:Event)-[:AFFECTS]->(source:Company)
+        MATCH path =
+            (source)-[:SUPPLIES*0..{max_hops}]->
+            (target:Company {{company_id: $company_id}})
+        WHERE all(node IN nodes(path) WHERE single(
+            other IN nodes(path) WHERE other = node
+        ))
+        WITH event, source, target, path, length(path) AS hop_distance
+        RETURN DISTINCT
+            event.event_id AS event_id,
+            event.event_type AS event_type,
+            event.severity AS severity,
+            event.timestamp AS timestamp,
+            event.source AS source,
+            event.confidence AS confidence,
+            event.description AS description,
+            source.company_id AS affected_company_id,
+            source.name AS affected_company_name,
+            target.company_id AS target_company_id,
+            target.name AS target_company_name,
+            hop_distance,
+            [relationship IN relationships(path) |
+                coalesce(relationship.dependency_weight, $default_weight)
+            ] AS dependency_weights,
+            [node IN nodes(path) | {{
+                company_id: node.company_id,
+                name: node.name
+            }}] AS path_nodes
+        ORDER BY timestamp DESC, event_id, hop_distance
+        """
+
+        with self.connection.driver.session() as session:
+            records = list(
+                session.run(
+                    query,
+                    company_id=company_id,
+                    default_weight=DEFAULT_DEPENDENCY_WEIGHT,
+                )
+            )
+
+        return [dict(record) for record in records]
