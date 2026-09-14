@@ -29,6 +29,7 @@ Generation rules:
 - Maximum traversal depth is 3 hops.
 - Never generate an unbounded variable-length traversal.
 - Include a bounded LIMIT for result-producing queries.
+- For dependency, exposure, supply-chain, blast-radius, or risk-path questions, bind the traversal to a path variable and RETURN that path (for example, RETURN p AS path) whenever a path exists. Downstream graph inspection requires the explicit path for explainability.
 - Return only structured JSON matching CypherProposal: cypher, parameters, expected_fields.
 - Do not invent risk mathematics. Risk calculations belong to the deterministic risk engine.
 
