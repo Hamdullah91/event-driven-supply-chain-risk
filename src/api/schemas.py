@@ -62,3 +62,51 @@ class CompanyNetwork(BaseModel):
     depth: int = Field(ge=1, le=3)
     nodes: list[GraphNode] = Field(default_factory=list)
     relationships: list[GraphRelationship] = Field(default_factory=list)
+
+
+class RiskSummary(BaseModel):
+    company_id: str
+    risk_score: float = Field(ge=0.0, le=1.0)
+    risk_level: str
+    contributing_event_count: int = Field(ge=0)
+    max_hops: int = Field(ge=1, le=3)
+
+
+class BlastRadiusCompany(BaseModel):
+    company_id: str
+    company_name: str
+    hop_distance: int = Field(ge=1, le=3)
+    transmission_factor: float = Field(ge=0.0, le=1.0)
+    path: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class BlastRadiusResponse(BaseModel):
+    company_id: str
+    max_hops: int = Field(ge=1, le=3)
+    affected_company_count: int = Field(ge=0)
+    hop_counts: dict[str, int] = Field(default_factory=dict)
+    companies: list[BlastRadiusCompany] = Field(default_factory=list)
+
+
+class EventExposure(BaseModel):
+    event_id: str
+    event_type: str | None = None
+    severity: str
+    timestamp: Any | None = None
+    source: str | None = None
+    confidence: float | None = None
+    description: str | None = None
+    affected_company_id: str
+    affected_company_name: str
+    hop_distance: int = Field(ge=0, le=3)
+    initial_risk: float = Field(ge=0.0, le=1.0)
+    path_dependency: float = Field(ge=0.0, le=1.0)
+    distance_decay: float = Field(ge=0.0, le=1.0)
+    propagated_risk: float = Field(ge=0.0, le=1.0)
+    path: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class CompanyExposureResponse(BaseModel):
+    company_id: str
+    event_count: int = Field(ge=0)
+    exposures: list[EventExposure] = Field(default_factory=list)
