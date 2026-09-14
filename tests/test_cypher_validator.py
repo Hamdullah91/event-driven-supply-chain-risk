@@ -38,6 +38,17 @@ def test_allows_parameterized_company_lookup(validator: CypherValidator) -> None
     assert result.errors == ()
 
 
+def test_parameter_names_do_not_trigger_blocked_keyword_false_positive(
+    validator: CypherValidator,
+) -> None:
+    result = validator.validate(
+        "MATCH (a:Company {name: $start})-[:SUPPLIES]->(b:Company {name: $set}) "
+        "RETURN a, b LIMIT 10"
+    )
+    assert result.valid
+    assert result.errors == ()
+
+
 def test_allows_three_hop_dependency_traversal(validator: CypherValidator) -> None:
     result = validator.validate(
         "MATCH p=(c:Company)-[:DEPENDS_ON*1..3]->(s:Company) "
