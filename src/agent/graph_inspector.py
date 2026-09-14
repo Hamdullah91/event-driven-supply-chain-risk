@@ -70,6 +70,8 @@ class GraphInspector:
         for record in records:
             for value in record.values():
                 for path in self._find_paths(value):
+                    if self._has_repeated_nodes(path):
+                        continue
                     key = self._path_key(path)
                     if key in seen:
                         continue
@@ -124,10 +126,7 @@ class GraphInspector:
         RETURN DISTINCT event,
                type(link) AS linkage_type,
                elementId(entity) AS linked_entity_ref,
-               coalesce(entity.company_id, entity.facility_id, entity.material_id,
-                        entity.product_id, entity.country_id, entity.id) AS linked_entity_id,
-               coalesce(entity.name, entity.company_name, entity.facility_name,
-                        entity.material_name, entity.product_name, entity.id) AS linked_entity_name
+               properties(entity) AS linked_entity_properties
         """
         session_kwargs = {"database": self.database} if self.database else {}
         with self.driver.session(**session_kwargs) as session:
@@ -141,6 +140,7 @@ class GraphInspector:
                     continue
                 seen.add(key)
                 props = dict(event)
+                entity_props = dict(record["linked_entity_properties"] or {})
                 events.append(
                     EventEvidence(
                         ref=event.element_id,
@@ -152,8 +152,24 @@ class GraphInspector:
                         description=self._optional_str(props.get("description")),
                         source=self._optional_str(props.get("source")),
                         linked_entity_ref=record["linked_entity_ref"],
-                        linked_entity_id=self._optional_str(record["linked_entity_id"]),
-                        linked_entity_name=self._optional_str(record["linked_entity_name"]),
+                        linked_entity_id=self._first_present(
+                            entity_props,
+                            "company_id",
+                            "facility_id",
+                            "material_id",
+                            "product_id",
+                            "country_id",
+                            "id",
+                        ),
+                        linked_entity_name=self._first_present(
+                            entity_props,
+                            "name",
+                            "company_name",
+                            "facility_name",
+                            "material_name",
+                            "product_name",
+                            "id",
+                        ),
                         linkage_type=record["linkage_type"],
                     )
                 )
@@ -189,6 +205,19 @@ class GraphInspector:
     @staticmethod
     def _optional_str(value: Any) -> str | None:
         return None if value is None else str(value)
+
+    @staticmethod
+    def _first_present(properties: dict[str, Any], *keys: str) -> str | None:
+        for key in keys:
+            value = properties.get(key)
+            if value not in (None, ""):
+                return str(value)
+        return None
+
+    @staticmethod
+    def _has_repeated_nodes(path: Path) -> bool:
+        node_ids = [node.element_id for node in path.nodes]
+        return len(node_ids) != len(set(node_ids))
 
     @staticmethod
     def _path_key(path: Path) -> str:
