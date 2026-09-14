@@ -111,6 +111,7 @@ def test_explainer_generates_grounded_one_hop_answer():
     assert explanation.path_ids == ["P1"]
     assert explanation.event_refs == ["event:1"]
     assert "NVIDIA depends on TSMC" in explanation.answer
+    assert "NVIDIA → TSMC" in explanation.answer
     assert "one dependency hop" in explanation.answer
     assert "facility outage" in explanation.answer.lower()
 
@@ -179,3 +180,17 @@ def test_explanation_does_not_invent_entities_or_relationships():
     assert "Intel" not in explanation.answer
     assert "Samsung" not in explanation.answer
     assert "supplies NVIDIA" not in explanation.answer
+
+
+def test_explainer_describes_same_event_only_once_across_multiple_paths():
+    bundle = _bundle()
+    second_path = bundle.paths[0].model_copy(update={"path_id": "P2"})
+    bundle = bundle.model_copy(update={"paths": [bundle.paths[0], second_path]})
+
+    explanation = GroundedExplainer().explain(
+        bundle=bundle,
+        assessment=assess_evidence(bundle),
+    )
+
+    assert explanation.answer.count("event evt-1") == 1
+    assert ". A linked" in explanation.answer
