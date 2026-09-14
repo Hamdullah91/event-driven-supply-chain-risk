@@ -74,6 +74,7 @@ class CypherValidator:
 
         without_comments = self._strip_comments(query)
         masked = self._mask_string_literals(without_comments)
+        masked = self._mask_parameters(masked)
 
         self._validate_single_statement(masked, errors)
         self._validate_read_only(masked, errors)
@@ -107,6 +108,13 @@ class CypherValidator:
         # parameter-like string values from being treated as Cypher syntax.
         query = re.sub(r"'(?:\\.|''|[^'])*'", "''", query)
         return re.sub(r'"(?:\\.|""|[^"])*"', '""', query)
+
+    @staticmethod
+    def _mask_parameters(query: str) -> str:
+        # Parameter names are data placeholders, not Cypher operations. Mask
+        # them before keyword checks so names such as $start or $set do not
+        # trigger blocked-keyword false positives.
+        return re.sub(r"\$[A-Za-z_][A-Za-z0-9_]*", "$PARAM", query)
 
     @staticmethod
     def _validate_single_statement(query: str, errors: list[str]) -> None:
