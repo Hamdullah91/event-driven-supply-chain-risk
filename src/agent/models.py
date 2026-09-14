@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class Intent(str, Enum):
@@ -35,6 +35,14 @@ class AgentPlan(BaseModel):
     entities: list[EntityReference] = Field(default_factory=list)
     requires_generated_cypher: bool = False
     max_hops: int = Field(default=3, ge=0, le=3)
+
+    @model_validator(mode="after")
+    def validate_cypher_routing(self) -> "AgentPlan":
+        if self.requires_generated_cypher and self.tool is not ToolName.GRAPH_QUERY:
+            raise ValueError(
+                "requires_generated_cypher can only be true for GRAPH_QUERY"
+            )
+        return self
 
 
 class CypherProposal(BaseModel):
