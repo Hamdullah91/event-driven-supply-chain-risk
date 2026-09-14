@@ -65,6 +65,7 @@ class GroundedExplainer:
         hop_counts: list[int] = []
         path_ids: list[str] = []
         affected_entities: list[str] = []
+        described_event_refs: set[str] = set()
 
         for finding in assessment.relevant_paths:
             path = path_by_id.get(finding.path_id)
@@ -87,12 +88,15 @@ class GroundedExplainer:
                 sentences.extend(relationship_sentences)
 
             for event_ref in finding.linked_events:
+                if event_ref in described_event_refs:
+                    continue
                 event = event_by_ref.get(event_ref)
                 if event is None:
                     continue
                 event_sentence = self._event_sentence(event)
                 if event_sentence:
                     sentences.append(event_sentence)
+                    described_event_refs.add(event_ref)
                 if event.linked_entity_name and event.linked_entity_name not in affected_entities:
                     affected_entities.append(event.linked_entity_name)
 
@@ -107,7 +111,7 @@ class GroundedExplainer:
             return self._insufficient_explanation(assessment)
 
         return GroundedExplanation(
-            answer=" ".join(sentences),
+            answer=self._join_sentences(sentences),
             evidence_status=assessment.status,
             affected_entities=affected_entities,
             dependency_paths=dependency_paths,
@@ -184,6 +188,10 @@ class GroundedExplainer:
         if details:
             sentence += " (" + ", ".join(details) + ")"
         return sentence + "."
+
+    @staticmethod
+    def _join_sentences(sentences: list[str]) -> str:
+        return " ".join(sentence.strip() for sentence in sentences if sentence.strip())
 
     @staticmethod
     def _hop_phrase(hop_count: int) -> str:
