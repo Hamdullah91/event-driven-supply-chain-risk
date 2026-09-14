@@ -5,6 +5,7 @@ from collections.abc import Mapping
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from src.agent.controller import AgentController
 from src.agent.cypher_generator import CypherGenerator
@@ -66,12 +67,22 @@ def test_planner_routes_risk_question_to_existing_risk_engine() -> None:
     assert plan.entities[0].name == "NVIDIA"
 
 
+def test_agent_plan_rejects_generated_cypher_for_non_graph_tool() -> None:
+    with pytest.raises(ValidationError, match="GRAPH_QUERY"):
+        AgentPlan(
+            intent=Intent.RISK_ANALYSIS,
+            tool=ToolName.RISK_ENGINE,
+            objective="Calculate risk",
+            requires_generated_cypher=True,
+        )
+
+
 def test_generator_returns_parameterized_cypher_proposal() -> None:
     llm = FakeStructuredLLM(
         [
             {
                 "cypher": (
-                    "MATCH (c:Company {company_id: $company_id})-"
+                    "MATCH p=(c:Company {company_id: $company_id})-"
                     "[:DEPENDS_ON*1..3]->(supplier:Company) "
                     "RETURN supplier.company_id AS company_id, length(p) AS hop_distance "
                     "LIMIT 50"
