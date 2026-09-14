@@ -12,6 +12,7 @@ from src.agent.evidence import (
     PathFinding,
     assess_evidence,
 )
+from src.agent.explainer import GroundedExplainer, GroundedExplanation
 from src.agent.graph_inspector import GraphInspector
 from src.agent.models import AgentPlan, CypherProposal, EntityReference, Intent, ToolName
 from src.agent.planner import AgentPlanner
@@ -32,6 +33,8 @@ __all__ = [
     "GraphNodeEvidence",
     "GraphPathEvidence",
     "GraphRelationshipEvidence",
+    "GroundedExplainer",
+    "GroundedExplanation",
     "Intent",
     "PathFinding",
     "ToolName",
