@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 from src.agent.cypher_validator import UnsafeCypherError
@@ -155,6 +157,36 @@ def test_inspector_preserves_query_results_and_warnings(monkeypatch):
 
     assert bundle.query_results == [{"company": "Dell", "risk_score": 0.468}]
     assert len(bundle.warnings) == 2
+
+
+def test_event_lookup_uses_property_map_without_optional_property_warnings():
+    driver = _FakeDriver([])
+    inspector = GraphInspector(driver)
+
+    assert inspector._fetch_events({"company:tsmc"}) == []
+
+    cypher, _, kwargs = driver.session_obj.calls[0]
+    assert "properties(entity) AS linked_entity_properties" in cypher
+    assert "entity.facility_name" not in cypher
+    assert "entity.product_name" not in cypher
+    assert kwargs["node_refs"] == ["company:tsmc"]
+
+
+def test_inspector_rejects_paths_with_repeated_nodes(monkeypatch):
+    inspector = GraphInspector(_FakeDriver([]))
+    repeated_path = SimpleNamespace(
+        nodes=[
+            SimpleNamespace(element_id="n1"),
+            SimpleNamespace(element_id="n2"),
+            SimpleNamespace(element_id="n1"),
+        ],
+        relationships=[SimpleNamespace(element_id="r1"), SimpleNamespace(element_id="r2")],
+    )
+    monkeypatch.setattr(inspector, "_find_paths", lambda value: [repeated_path])
+
+    paths = inspector._extract_paths([{"path": object()}])
+
+    assert paths == []
 
 
 def test_cypher_prompt_requires_explicit_path_for_explainability():
