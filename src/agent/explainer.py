@@ -179,7 +179,7 @@ class GroundedExplainer:
         if event.event_id:
             details.append(f"event {event.event_id}")
         if event.severity is not None:
-            details.append(f"severity {event.severity:.2f}")
+            details.append(f"severity {event.severity.value}")
         if event.confidence is not None:
             details.append(f"confidence {event.confidence:.2f}")
         if event.source:
