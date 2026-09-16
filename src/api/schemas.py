@@ -19,6 +19,24 @@ class EventRequest(BaseModel):
     severity: float = Field(ge=0.0, le=1.0, description="Normalized event severity between 0 and 1.")
 
 
+class EventDetail(BaseModel):
+    event_id: str
+    event_type: str
+    source: str
+    timestamp: Any
+    entity_id: str | None = None
+    severity: str
+    payload: dict[str, Any] = Field(default_factory=dict)
+    created_at: Any | None = None
+
+
+class EventListResponse(BaseModel):
+    events: list[EventDetail] = Field(default_factory=list)
+    count: int = Field(ge=0)
+    limit: int = Field(ge=1, le=500)
+    offset: int = Field(ge=0)
+
+
 class CompanySummary(BaseModel):
     company_id: str
     name: str
