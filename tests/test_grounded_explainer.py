@@ -10,6 +10,7 @@ from src.agent.evidence import (
     assess_evidence,
 )
 from src.agent.explainer import GroundedExplainer
+from src.events.types import EventSeverity
 
 
 def _bundle(*, hop_count: int = 1, with_event: bool = True) -> EvidenceBundle:
@@ -75,7 +76,7 @@ def _bundle(*, hop_count: int = 1, with_event: bool = True) -> EvidenceBundle:
                 ref="event:1",
                 event_id="evt-1",
                 event_type="FACILITY_OUTAGE",
-                severity=0.9,
+                severity=EventSeverity.HIGH,
                 confidence=0.95,
                 source="news-source",
                 linked_entity_ref=nodes[-1].ref,
@@ -114,6 +115,7 @@ def test_explainer_generates_grounded_one_hop_answer():
     assert "NVIDIA → TSMC" in explanation.answer
     assert "one dependency hop" in explanation.answer
     assert "facility outage" in explanation.answer.lower()
+    assert "severity high" in explanation.answer.lower()
 
 
 def test_explainer_describes_two_hop_exposure_as_indirect():
