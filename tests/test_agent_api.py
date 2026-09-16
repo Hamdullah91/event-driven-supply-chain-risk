@@ -85,4 +85,6 @@ def test_agent_query_is_unavailable_until_provider_is_configured() -> None:
         )
 
     assert response.status_code == 503
-    assert response.json()["detail"] == "Agentic RAG provider is not configured."
+    detail = response.json()["detail"]
+    assert "Agentic RAG provider is not configured" in detail
+    assert "LLM_PROVIDER=openai" in detail
