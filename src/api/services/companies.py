@@ -36,9 +36,4 @@ class CompanyGraphService:
         return self.repository.get_company(company_id)
 
     def get_company_network(self, company_id: str, *, depth: int) -> dict[str, Any] | None:
-        network = self.repository.get_company_network(company_id, depth=depth)
-        if network is None:
-            return None
-        for relationship in network["relationships"]:
-            relationship["relationship_type"] = relationship.pop("type")
-        return network
+        return self.repository.get_company_network(company_id, depth=depth)
