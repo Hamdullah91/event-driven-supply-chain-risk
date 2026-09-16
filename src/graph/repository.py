@@ -124,3 +124,98 @@ class GraphRepository:
         """
         with self.connection.driver.session() as session:
             session.run(query, industries=industries).consume()
+
+    def seed_company_products(self, company_products: list[dict]) -> None:
+        query = """
+        UNWIND $company_products AS item
+        MATCH (c:Company {company_id: item.company_id})
+        MATCH (p:Product {product_id: item.product_id})
+        MERGE (c)-[r:PRODUCES]->(p)
+        SET r.source_type = item.source_type,
+            r.source_url = item.source_url,
+            r.verification_status = item.verification_status,
+            r.confidence = item.confidence
+        """
+        with self.connection.driver.session() as session:
+            session.run(query, company_products=company_products).consume()
+
+    def seed_company_technologies(self, company_technologies: list[dict]) -> None:
+        query = """
+        UNWIND $company_technologies AS item
+        MATCH (c:Company {company_id: item.company_id})
+        MATCH (t:Technology {technology_id: item.technology_id})
+        MERGE (c)-[r:USES]->(t)
+        SET r.source_type = item.source_type,
+            r.source_url = item.source_url,
+            r.verification_status = item.verification_status,
+            r.confidence = item.confidence
+        """
+        with self.connection.driver.session() as session:
+            session.run(query, company_technologies=company_technologies).consume()
+
+    def seed_company_materials(self, company_materials: list[dict]) -> None:
+        query = """
+        UNWIND $company_materials AS item
+        MATCH (c:Company {company_id: item.company_id})
+        MATCH (m:Material {material_id: item.material_id})
+        MERGE (c)-[r:USES]->(m)
+        SET r.source_type = item.source_type,
+            r.verification_status = item.verification_status,
+            r.confidence = item.confidence
+        """
+        with self.connection.driver.session() as session:
+            session.run(query, company_materials=company_materials).consume()
+
+    def seed_company_dependencies(self, company_dependencies: list[dict]) -> None:
+        query = """
+        UNWIND $company_dependencies AS item
+        MATCH (supplier:Company {company_id: item.supplier_company_id})
+        MATCH (customer:Company {company_id: item.customer_company_id})
+        MERGE (supplier)-[s:SUPPLIES]->(customer)
+        SET s.source_type = item.source_type,
+            s.source_url = item.source_url,
+            s.verification_status = item.verification_status,
+            s.confidence = item.confidence
+        MERGE (customer)-[d:DEPENDS_ON]->(supplier)
+        SET d.source_type = "derived_from_verified_supplies",
+            d.source_url = item.source_url,
+            d.verification_status = item.verification_status,
+            d.confidence = item.confidence,
+            d.derivation = "inverse_of_SUPPLIES"
+        """
+        with self.connection.driver.session() as session:
+            session.run(query, company_dependencies=company_dependencies).consume()
+
+    def link_event_to_company(self, *, event_id: str, company_id: str, confidence: float, link_method: str = "entity_resolution") -> bool:
+        query = """
+        MATCH (event:Event {event_id: $event_id})
+        MATCH (company:Company {company_id: $company_id})
+        MERGE (event)-[relationship:AFFECTS]->(company)
+        ON CREATE SET relationship.confidence = $confidence,
+                      relationship.link_method = $link_method,
+                      relationship.linked_at = datetime()
+        ON MATCH SET relationship.confidence =
+            CASE WHEN relationship.confidence IS NULL OR $confidence > relationship.confidence
+                 THEN $confidence ELSE relationship.confidence END
+        RETURN count(relationship) > 0 AS linked
+        """
+        with self.connection.driver.session() as session:
+            record = session.run(query, event_id=event_id, company_id=company_id, confidence=confidence, link_method=link_method).single()
+        return bool(record and record["linked"])
+
+    def link_event_to_facility(self, *, event_id: str, facility_id: str, confidence: float, link_method: str = "entity_resolution") -> bool:
+        query = """
+        MATCH (event:Event {event_id: $event_id})
+        MATCH (facility:Facility {facility_id: $facility_id})
+        MERGE (event)-[relationship:OCCURS_AT]->(facility)
+        ON CREATE SET relationship.confidence = $confidence,
+                      relationship.link_method = $link_method,
+                      relationship.linked_at = datetime()
+        ON MATCH SET relationship.confidence =
+            CASE WHEN relationship.confidence IS NULL OR $confidence > relationship.confidence
+                 THEN $confidence ELSE relationship.confidence END
+        RETURN count(relationship) > 0 AS linked
+        """
+        with self.connection.driver.session() as session:
+            record = session.run(query, event_id=event_id, facility_id=facility_id, confidence=confidence, link_method=link_method).single()
+        return bool(record and record["linked"])
