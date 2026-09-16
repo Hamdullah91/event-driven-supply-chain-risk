@@ -106,6 +106,29 @@ class BlastRadiusResponse(BaseModel):
     companies: list[BlastRadiusCompany] = Field(default_factory=list)
 
 
+class EventBlastRadiusCompany(BaseModel):
+    company_id: str
+    company_name: str
+    origin_company_id: str
+    origin_company_name: str
+    hop_distance: int = Field(ge=0, le=3)
+    initial_risk: float = Field(ge=0.0, le=1.0)
+    path_dependency: float = Field(ge=0.0, le=1.0)
+    distance_decay: float = Field(ge=0.0, le=1.0)
+    propagated_risk: float = Field(ge=0.0, le=1.0)
+    path: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class EventBlastRadiusResponse(BaseModel):
+    event_id: str
+    event_type: str | None = None
+    severity: str | None = None
+    max_hops: int = Field(ge=1, le=3)
+    affected_company_count: int = Field(ge=0)
+    hop_counts: dict[str, int] = Field(default_factory=dict)
+    companies: list[EventBlastRadiusCompany] = Field(default_factory=list)
+
+
 class EventExposure(BaseModel):
     event_id: str
     event_type: str | None = None
