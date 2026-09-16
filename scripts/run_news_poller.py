@@ -7,165 +7,98 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.ingestion.news.client import NewsAPIClient
-from src.ingestion.news.poller import NewsPoller
-from src.ingestion.news.repository import NewsRepository
-from src.ingestion.news.classification import NewsClassificationService
-from src.ml.event_classifier import EventClassifier
-
+from src.api.services.risk import RiskAnalyticsService
+from src.api.services.risk_stream import RiskStreamService
 from src.events.pipeline import EventPipeline
 from src.graph.connection import Neo4jConnection
 from src.graph.repository import GraphRepository
+from src.ingestion.news.classification import NewsClassificationService
+from src.ingestion.news.client import NewsAPIClient
 from src.ingestion.news.nlp_processor import NewsNLPProcessor
+from src.ingestion.news.poller import NewsPoller
+from src.ingestion.news.repository import NewsRepository
+from src.ml.event_classifier import EventClassifier
+from src.risk.repository import RiskRepository
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
-
-    # News API settings
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
     news_api_key: str
     news_api_url: str = "https://newsapi.org/v2/everything"
-
     news_poll_interval_seconds: int = 900
     news_request_timeout_seconds: float = 20.0
     news_max_retries: int = 4
-
     news_database_path: str = "data/news/news.db"
     news_log_path: str = "logs/news_poller.log"
-
-    # DistilBERT event classifier settings
-    event_classifier_model_path: str = (
-        "models/event_classifier/distilbert_supply_chain"
-    )
+    event_classifier_model_path: str = "models/event_classifier/distilbert_supply_chain"
     event_classifier_max_length: int = 256
     event_classifier_confidence_threshold: float = 0.70
 
 
 def configure_logging(log_path: str) -> None:
     path = Path(log_path)
-
-    path.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    formatter = logging.Formatter(
-        "%(asctime)s | %(levelname)s | "
-        "%(name)s | %(message)s"
-    )
-
+    path.parent.mkdir(parents=True, exist_ok=True)
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
-
-    file_handler = logging.FileHandler(
-        path,
-        encoding="utf-8",
-    )
+    file_handler = logging.FileHandler(path, encoding="utf-8")
     file_handler.setFormatter(formatter)
+    logging.basicConfig(level=logging.INFO, handlers=[console_handler, file_handler])
 
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[
-            console_handler,
-            file_handler,
-        ],
-    )
 
 async def main() -> None:
     settings = Settings()
-
-    configure_logging(
-        settings.news_log_path
-    )
-
+    configure_logging(settings.news_log_path)
     logger = logging.getLogger(__name__)
 
-    repository = NewsRepository(
-        settings.news_database_path
-    )
-
+    repository = NewsRepository(settings.news_database_path)
     classifier = EventClassifier(
-        model_path=(
-            settings.event_classifier_model_path
-        ),
-        max_length=(
-            settings.event_classifier_max_length
-        ),
-        confidence_threshold=(
-            settings.event_classifier_confidence_threshold
-        ),
+        model_path=settings.event_classifier_model_path,
+        max_length=settings.event_classifier_max_length,
+        confidence_threshold=settings.event_classifier_confidence_threshold,
     )
-
-    classification_service = NewsClassificationService(
-        classifier=classifier
-    )
+    classification_service = NewsClassificationService(classifier=classifier)
     nlp_processor = NewsNLPProcessor()
 
     neo4j_connection = Neo4jConnection()
-    graph_repository = GraphRepository(
-        neo4j_connection
-    )
+    graph_repository = GraphRepository(neo4j_connection)
+    event_pipeline = EventPipeline(graph_repository=graph_repository)
+    risk_service = RiskAnalyticsService(RiskRepository(neo4j_connection))
+    risk_stream_service = RiskStreamService(risk_service)
 
-    event_pipeline = EventPipeline(
-        graph_repository=graph_repository
-    )
     query = (
-        '"semiconductor" OR '
-        '"chip shortage" OR '
-        '"EV battery" OR '
-        '"lithium" OR '
-        '"aerospace" OR '
-        '"supply chain" OR '
-        '"factory outage" OR '
-        '"export restriction"'
+        '"semiconductor" OR "chip shortage" OR "EV battery" OR "lithium" OR '
+        '"aerospace" OR "supply chain" OR "factory outage" OR "export restriction"'
     )
 
     async with NewsAPIClient(
         api_url=settings.news_api_url,
         api_key=settings.news_api_key,
-        timeout_seconds=(
-            settings.news_request_timeout_seconds
-        ),
+        timeout_seconds=settings.news_request_timeout_seconds,
         max_retries=settings.news_max_retries,
     ) as client:
-
         poller = NewsPoller(
             client=client,
             repository=repository,
             query=query,
-            poll_interval_seconds=(
-                settings.news_poll_interval_seconds
-            ),
+            poll_interval_seconds=settings.news_poll_interval_seconds,
             nlp_processor=nlp_processor,
             classification_service=classification_service,
             event_pipeline=event_pipeline,
+            risk_stream_service=risk_stream_service,
         )
-
         loop = asyncio.get_running_loop()
-
-        for sig in (
-            signal.SIGINT,
-            signal.SIGTERM,
-        ):
+        for sig in (signal.SIGINT, signal.SIGTERM):
             try:
-                loop.add_signal_handler(
-                    sig,
-                    poller.stop,
-                )
+                loop.add_signal_handler(sig, poller.stop)
             except NotImplementedError:
                 pass
-
-        logger.info(
-            "Starting Day 34 news classification service."
-        )
-
+        logger.info("Starting event-driven news risk streaming service.")
         try:
             await poller.run_forever()
         finally:
             neo4j_connection.close()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
