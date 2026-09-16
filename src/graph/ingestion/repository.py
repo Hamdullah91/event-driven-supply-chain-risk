@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import re
+
 from src.graph.connection import Neo4jConnection
+from src.graph.contracts import CANONICAL_ID_PROPERTIES
 from src.graph.ingestion.models import GraphIngestionRelationship
 from src.nlp.entity_resolution.organizational_identity import (
     resolve_organizational_identity,
@@ -59,6 +62,13 @@ class GraphIngestionRepository:
             f"Cannot persist unresolved Company entity: {name}"
         )
 
+    @staticmethod
+    def _stable_domain_id(name: str) -> str:
+        normalized = re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+        if not normalized:
+            raise ValueError("Cannot persist an unnamed graph entity")
+        return normalized
+
     @classmethod
     def _node_merge(
         cls,
@@ -80,6 +90,18 @@ class GraphIngestionRepository:
                 f"{role}_identity_state": identity_state,
             }
             return clause, params
+
+        identity_property = CANONICAL_ID_PROPERTIES.get(node_type)
+        if identity_property:
+            entity_id = cls._stable_domain_id(name)
+            clause = f"""
+            MERGE ({role}:{node_type} {{{identity_property}: ${role}_id}})
+            ON CREATE SET {role}.name = ${role}_name
+            """
+            return clause, {
+                f"{role}_id": entity_id,
+                f"{role}_name": name,
+            }
 
         clause = f"MERGE ({role}:{node_type} {{name: ${role}_name}})"
         return clause, {f"{role}_name": name}
