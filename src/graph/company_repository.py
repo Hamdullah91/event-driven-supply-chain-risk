@@ -137,7 +137,7 @@ class CompanyGraphRepository:
                     labels = list(node.labels)
                     label = labels[0] if labels else "Node"
                     props = self._json_safe(dict(node))
-                    node_id = canonical_graph_id(label, props, node.element_id)
+                    node_id = canonical_graph_id(label, props, element_id=node.element_id)
                     name = str(props.get("name") or props.get("legal_name") or props.get("company_id") or props.get("facility_id") or props.get("event_id") or node_id)
                     nodes[node_id] = {"id": node_id, "label": label, "name": name, "properties": props}
                 for rel in path.relationships:
@@ -145,13 +145,13 @@ class CompanyGraphRepository:
                     end = rel.end_node
                     start_labels = list(start.labels)
                     end_labels = list(end.labels)
-                    source = canonical_graph_id(start_labels[0] if start_labels else "Node", dict(start), start.element_id)
-                    target = canonical_graph_id(end_labels[0] if end_labels else "Node", dict(end), end.element_id)
+                    source = canonical_graph_id(start_labels[0] if start_labels else "Node", dict(start), element_id=start.element_id)
+                    target = canonical_graph_id(end_labels[0] if end_labels else "Node", dict(end), element_id=end.element_id)
                     rel_id = f"{source}|{rel.type}|{target}|{rel.element_id}"
                     relationships[rel_id] = {"id": rel_id, "source": source, "target": target, "relationship_type": rel.type, "properties": self._json_safe(dict(rel))}
             if not nodes:
                 company = self.get_company(company_id)
                 if company is not None:
-                    node_id = canonical_graph_id("Company", company, company_id)
+                    node_id = canonical_graph_id("Company", company, element_id=company_id)
                     nodes[node_id] = {"id": node_id, "label": "Company", "name": str(company.get("name") or company_id), "properties": company}
             return {"company_id": company_id, "depth": depth, "nodes": list(nodes.values()), "relationships": list(relationships.values())}
