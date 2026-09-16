@@ -1,5 +1,8 @@
 from functools import lru_cache
 
+from fastapi import HTTPException, status
+
+from src.api.services.agent import AgentQueryService
 from src.api.services.companies import CompanyGraphService
 from src.api.services.events import EventReadService
 from src.api.services.risk import RiskAnalyticsService
@@ -41,6 +44,14 @@ def get_risk_repository() -> RiskRepository:
 
 def get_risk_service() -> RiskAnalyticsService:
     return RiskAnalyticsService(get_risk_repository())
+
+
+def get_agent_service() -> AgentQueryService:
+    """Resolve the public agent service once a production StructuredLLM exists."""
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="Agentic RAG provider is not configured.",
+    )
 
 
 def close_neo4j_connection() -> None:
