@@ -13,10 +13,18 @@ class EventType(str, Enum):
     QUOTA_CHANGE = "QUOTA_CHANGE"
 
 
+class EventSeverity(str, Enum):
+    UNKNOWN = "unknown"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
 class EventRequest(BaseModel):
     event_type: EventType = Field(..., description="The classified supply-chain event type.")
     entity: str = Field(min_length=1, max_length=200, description="The entity associated with the event.")
-    severity: float = Field(ge=0.0, le=1.0, description="Normalized event severity between 0 and 1.")
+    severity: EventSeverity = Field(..., description="Canonical categorical event severity used by the risk engine.")
 
 
 class EventDetail(BaseModel):
@@ -25,7 +33,7 @@ class EventDetail(BaseModel):
     source: str
     timestamp: Any
     entity_id: str | None = None
-    severity: str
+    severity: EventSeverity
     payload: dict[str, Any] = Field(default_factory=dict)
     created_at: Any | None = None
 
@@ -122,7 +130,7 @@ class EventBlastRadiusCompany(BaseModel):
 class EventBlastRadiusResponse(BaseModel):
     event_id: str
     event_type: str | None = None
-    severity: str | None = None
+    severity: EventSeverity | None = None
     max_hops: int = Field(ge=1, le=3)
     affected_company_count: int = Field(ge=0)
     hop_counts: dict[str, int] = Field(default_factory=dict)
@@ -132,7 +140,7 @@ class EventBlastRadiusResponse(BaseModel):
 class EventExposure(BaseModel):
     event_id: str
     event_type: str | None = None
-    severity: str
+    severity: EventSeverity
     timestamp: Any | None = None
     source: str | None = None
     confidence: float | None = None
