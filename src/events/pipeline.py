@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 
 from src.events.builder import build_news_event
+from src.events.facility_resolution import resolve_facility_mentions
 from src.events.models import SupplyChainEvent
 from src.graph.repository import GraphRepository
 from src.ingestion.news.classification import ClassifiedNewsArticle
@@ -19,40 +20,29 @@ class EventPipelineResult:
     linked_companies: int
     failed_company_links: int
     linked_company_ids: tuple[str, ...] = ()
+    linked_facilities: int = 0
+    failed_facility_links: int = 0
+    linked_facility_ids: tuple[str, ...] = ()
 
 
 class EventPipeline:
-    """Persist classified news events and link them to resolved companies."""
+    """Persist classified news events and link them to resolved graph entities."""
 
     def __init__(self, *, graph_repository: GraphRepository) -> None:
         self.graph_repository = graph_repository
 
-    def process(
-        self,
-        *,
-        classified: ClassifiedNewsArticle,
-        nlp_result: NewsNLPResult,
-    ) -> EventPipelineResult:
+    def process(self, *, classified: ClassifiedNewsArticle, nlp_result: NewsNLPResult) -> EventPipelineResult:
         if classified.article_id != nlp_result.article_id:
             raise ValueError("Classification and NLP results belong to different articles.")
         if classified.requires_review:
             raise ValueError(
                 "Classification requires review; "
-                f"article_id={classified.article_id} "
-                f"event_type={classified.event_type} "
+                f"article_id={classified.article_id} event_type={classified.event_type} "
                 f"confidence={classified.confidence:.4f}"
             )
 
-        resolved_companies = [
-            entity
-            for entity in nlp_result.resolved_companies
-            if entity.canonical_id is not None
-        ]
-        primary_company = (
-            max(resolved_companies, key=lambda entity: entity.confidence)
-            if resolved_companies
-            else None
-        )
+        resolved_companies = [entity for entity in nlp_result.resolved_companies if entity.canonical_id is not None]
+        primary_company = max(resolved_companies, key=lambda entity: entity.confidence) if resolved_companies else None
         entity_id = primary_company.canonical_id if primary_company else None
 
         event = build_news_event(
@@ -72,36 +62,47 @@ class EventPipeline:
         for resolved in resolved_companies:
             assert resolved.canonical_id is not None
             linked = self.graph_repository.link_event_to_company(
-                event_id=str(event.event_id),
-                company_id=resolved.canonical_id,
-                confidence=resolved.confidence,
-                link_method=resolved.resolution_method,
+                event_id=str(event.event_id), company_id=resolved.canonical_id,
+                confidence=resolved.confidence, link_method=resolved.resolution_method,
             )
             if linked:
                 if resolved.canonical_id not in linked_company_ids:
                     linked_company_ids.append(resolved.canonical_id)
             else:
                 failed_company_links += 1
-                logger.warning(
-                    "Could not link event to company event_id=%s company_id=%s",
-                    event.event_id,
-                    resolved.canonical_id,
-                )
+                logger.warning("Could not link event to company event_id=%s company_id=%s", event.event_id, resolved.canonical_id)
+
+        facility_texts = [classified.title]
+        facility_texts.extend(entity.text for entity in nlp_result.entities)
+        facility_texts.extend(candidate.subject for candidate in nlp_result.triplets)
+        facility_texts.extend(candidate.object for candidate in nlp_result.triplets)
+        linked_facility_ids: list[str] = []
+        failed_facility_links = 0
+        for facility_id, match_method in resolve_facility_mentions(facility_texts):
+            linked = self.graph_repository.link_event_to_facility(
+                event_id=str(event.event_id), facility_id=facility_id,
+                confidence=classified.confidence, link_method=match_method,
+            )
+            if linked:
+                if facility_id not in linked_facility_ids:
+                    linked_facility_ids.append(facility_id)
+            else:
+                failed_facility_links += 1
+                logger.warning("Could not link event to facility event_id=%s facility_id=%s", event.event_id, facility_id)
 
         logger.info(
-            "Dynamic event pipeline completed article_id=%s event_id=%s "
-            "event_type=%s classification_confidence=%.4f "
-            "linked_companies=%d failed_company_links=%d",
-            classified.article_id,
-            event.event_id,
-            classified.event_type,
-            classified.confidence,
-            len(linked_company_ids),
-            failed_company_links,
+            "Dynamic event pipeline completed article_id=%s event_id=%s event_type=%s "
+            "classification_confidence=%.4f linked_companies=%d failed_company_links=%d "
+            "linked_facilities=%d failed_facility_links=%d",
+            classified.article_id, event.event_id, classified.event_type, classified.confidence,
+            len(linked_company_ids), failed_company_links, len(linked_facility_ids), failed_facility_links,
         )
         return EventPipelineResult(
             event=event,
             linked_companies=len(linked_company_ids),
             failed_company_links=failed_company_links,
             linked_company_ids=tuple(linked_company_ids),
+            linked_facilities=len(linked_facility_ids),
+            failed_facility_links=failed_facility_links,
+            linked_facility_ids=tuple(linked_facility_ids),
         )
