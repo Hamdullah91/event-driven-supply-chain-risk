@@ -7,19 +7,22 @@ from src.events.models import SupplyChainEvent
 from src.events.types import EventSeverity, EventType
 
 
+# Boundary aliases let older producers continue to work while every newly
+# built event is normalized to the six classifier categories.
 CLASSIFIER_EVENT_TYPE_MAP: dict[str, EventType] = {
-    "FACILITY_OUTAGE": EventType.FACILITY_SHUTDOWN,
-    "FACILITY_SHUTDOWN": EventType.FACILITY_SHUTDOWN,
     "SUPPLY_DISRUPTION": EventType.SUPPLY_DISRUPTION,
-    "REGULATION_CHANGE": EventType.REGULATORY_CHANGE,
-    "REGULATORY_CHANGE": EventType.REGULATORY_CHANGE,
-    "GEOPOLITICAL_EVENT": EventType.GEOPOLITICAL_EVENT,
+    "REGULATION_CHANGE": EventType.REGULATION_CHANGE,
+    "REGULATORY_CHANGE": EventType.REGULATION_CHANGE,
+    "FACILITY_OUTAGE": EventType.FACILITY_OUTAGE,
+    "FACILITY_SHUTDOWN": EventType.FACILITY_OUTAGE,
+    "TECHNOLOGY_EMBARGO": EventType.TECHNOLOGY_EMBARGO,
+    "TRADE_POLICY_CHANGE": EventType.TRADE_POLICY_CHANGE,
+    "QUOTA_CHANGE": EventType.QUOTA_CHANGE,
 }
 
 
 def normalize_classifier_event_type(label: str) -> EventType:
     normalized = label.strip().upper()
-
     try:
         return CLASSIFIER_EVENT_TYPE_MAP[normalized]
     except KeyError as exc:
@@ -34,24 +37,11 @@ def generate_event_id(
     event_type: EventType,
     entity_id: str | None = None,
 ) -> UUID:
-    normalized_entity = (
-        entity_id.strip().upper()
-        if entity_id
-        else "UNKNOWN"
-    )
-
+    normalized_entity = entity_id.strip().upper() if entity_id else "UNKNOWN"
     canonical = "|".join(
-        [
-            article_id.strip(),
-            event_type.value,
-            normalized_entity,
-        ]
+        [article_id.strip(), event_type.value, normalized_entity]
     )
-
-    return uuid5(
-        NAMESPACE_URL,
-        canonical,
-    )
+    return uuid5(NAMESPACE_URL, canonical)
 
 
 def build_news_event(
@@ -68,19 +58,12 @@ def build_news_event(
 ) -> SupplyChainEvent:
     if not article_id.strip():
         raise ValueError("article_id cannot be empty.")
-
     if not title.strip():
         raise ValueError("title cannot be empty.")
-
     if not 0.0 <= confidence <= 1.0:
-        raise ValueError(
-            "confidence must be between 0.0 and 1.0."
-        )
+        raise ValueError("confidence must be between 0.0 and 1.0.")
 
-    event_type = normalize_classifier_event_type(
-        classifier_label
-    )
-
+    event_type = normalize_classifier_event_type(classifier_label)
     event_id = generate_event_id(
         article_id=article_id,
         event_type=event_type,
