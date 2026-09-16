@@ -20,6 +20,7 @@ def main() -> None:
         report = {
             "canonical_ids": audit.canonical_id_completeness(),
             "geographic_coordinates": audit.geographic_coordinate_completeness(),
+            "provenance": audit.provenance_completeness(),
         }
         print(json.dumps(report, indent=2))
     finally:
