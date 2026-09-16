@@ -8,7 +8,15 @@ from src.api.dependencies import get_company_service
 
 
 class FakeCompanyService:
-    def list_companies(self, *, limit: int, offset: int) -> dict[str, Any]:
+    def list_companies(
+        self,
+        *,
+        limit: int,
+        offset: int,
+        search: str | None = None,
+        industry_id: str | None = None,
+        entity_type: str | None = None,
+    ) -> dict[str, Any]:
         return {
             "companies": [
                 {
@@ -47,27 +55,11 @@ class FakeCompanyService:
             "company_id": company_id,
             "depth": depth,
             "nodes": [
-                {
-                    "id": "company:tsmc",
-                    "label": "Company",
-                    "name": "TSMC",
-                    "properties": {"company_id": "tsmc", "name": "TSMC"},
-                },
-                {
-                    "id": "company:nvidia",
-                    "label": "Company",
-                    "name": "NVIDIA",
-                    "properties": {"company_id": "nvidia", "name": "NVIDIA"},
-                },
+                {"id": "company:tsmc", "label": "Company", "name": "TSMC", "properties": {"company_id": "tsmc", "name": "TSMC"}},
+                {"id": "company:nvidia", "label": "Company", "name": "NVIDIA", "properties": {"company_id": "nvidia", "name": "NVIDIA"}},
             ],
             "relationships": [
-                {
-                    "id": "rel-1",
-                    "source": "company:tsmc",
-                    "target": "company:nvidia",
-                    "relationship_type": "SUPPLIES",
-                    "properties": {"confidence": 1.0},
-                }
+                {"id": "rel-1", "source": "company:tsmc", "target": "company:nvidia", "relationship_type": "SUPPLIES", "properties": {"confidence": 1.0}}
             ],
         }
 
