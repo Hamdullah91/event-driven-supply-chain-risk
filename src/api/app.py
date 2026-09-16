@@ -4,6 +4,7 @@ from collections.abc import AsyncIterator
 from fastapi import FastAPI
 
 from src.api.dependencies import close_neo4j_connection
+from src.api.routes.agent import router as agent_router
 from src.api.routes.companies import router as companies_router
 from src.api.routes.events import router as events_router
 from src.api.routes.health import router as health_router
@@ -29,6 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(events_router)
     app.include_router(companies_router)
     app.include_router(risk_router)
+    app.include_router(agent_router)
     app.include_router(websocket_router)
     return app
 
