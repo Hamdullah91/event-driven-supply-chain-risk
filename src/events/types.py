@@ -1,40 +1,27 @@
 """
-Standard event types and severity levels used by the
-supply chain intelligence system.
+Core event taxonomy and severity levels used across the supply-chain system.
+
+The six classifier categories are the canonical event taxonomy.  Historical
+aliases remain accepted at ingestion boundaries, but persisted events use the
+canonical lowercase values defined here.
 """
 
 from enum import StrEnum
 
 
 class EventType(StrEnum):
-    """
-    Supported supply chain event categories.
-    """
+    """Canonical supply-chain event categories produced by the classifier."""
 
-    FACILITY_SHUTDOWN = "facility_shutdown"
     SUPPLY_DISRUPTION = "supply_disruption"
-    CAPACITY_CHANGE = "capacity_change"
-
-    EARNINGS_WARNING = "earnings_warning"
-    DEMAND_CHANGE = "demand_change"
-
-    GEOPOLITICAL_EVENT = "geopolitical_event"
-    NATURAL_DISASTER = "natural_disaster"
-    REGULATORY_CHANGE = "regulatory_change"
-
-    COMPANY_ACQUISITION = "company_acquisition"
-    COMPANY_PARTNERSHIP = "company_partnership"
-
-    PRODUCT_LAUNCH = "product_launch"
-    PRODUCTION_CHANGE = "production_change"
-
-    OTHER = "other"
+    REGULATION_CHANGE = "regulation_change"
+    FACILITY_OUTAGE = "facility_outage"
+    TECHNOLOGY_EMBARGO = "technology_embargo"
+    TRADE_POLICY_CHANGE = "trade_policy_change"
+    QUOTA_CHANGE = "quota_change"
 
 
 class EventSeverity(StrEnum):
-    """
-    Standard severity levels for supply chain events.
-    """
+    """Standard severity levels for supply chain events."""
 
     LOW = "low"
     MEDIUM = "medium"
