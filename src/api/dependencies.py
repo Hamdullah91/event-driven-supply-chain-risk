@@ -2,6 +2,11 @@ from functools import lru_cache
 
 from fastapi import HTTPException, status
 
+from src.agent.controller import AgentController
+from src.agent.cypher_generator import CypherGenerator
+from src.agent.graph_inspector import GraphInspector
+from src.agent.openai_llm import OpenAIStructuredLLM
+from src.agent.planner import AgentPlanner
 from src.api.services.agent import AgentQueryService
 from src.api.services.companies import CompanyGraphService
 from src.api.services.events import EventReadService
@@ -46,15 +51,35 @@ def get_risk_service() -> RiskAnalyticsService:
     return RiskAnalyticsService(get_risk_repository())
 
 
+@lru_cache(maxsize=1)
+def get_structured_llm() -> OpenAIStructuredLLM:
+    provider = settings.LLM_PROVIDER.strip().lower()
+    if provider != "openai":
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Agentic RAG provider is not configured. Set LLM_PROVIDER=openai.",
+        )
+    if not settings.LLM_API_KEY.strip() or not settings.LLM_MODEL.strip():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Agentic RAG requires LLM_API_KEY and LLM_MODEL.",
+        )
+    return OpenAIStructuredLLM(api_key=settings.LLM_API_KEY, model=settings.LLM_MODEL)
+
+
 def get_agent_service() -> AgentQueryService:
-    """Resolve the public agent service once a production StructuredLLM exists."""
-    raise HTTPException(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        detail="Agentic RAG provider is not configured.",
+    llm = get_structured_llm()
+    connection = get_neo4j_connection()
+    controller = AgentController(
+        planner=AgentPlanner(llm),
+        cypher_generator=CypherGenerator(llm),
+        graph_inspector=GraphInspector(connection.driver, database=settings.NEO4J_DATABASE),
     )
+    return AgentQueryService(controller)
 
 
 def close_neo4j_connection() -> None:
     if get_neo4j_connection.cache_info().currsize:
         get_neo4j_connection().close()
         get_neo4j_connection.cache_clear()
+    get_structured_llm.cache_clear()
