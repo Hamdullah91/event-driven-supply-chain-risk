@@ -11,13 +11,26 @@ class CompanyGraphService:
     def __init__(self, repository: CompanyGraphRepository) -> None:
         self.repository = repository
 
-    def list_companies(self, *, limit: int, offset: int) -> dict[str, Any]:
+    def list_companies(
+        self,
+        *,
+        limit: int,
+        offset: int,
+        search: str | None = None,
+        industry_id: str | None = None,
+        entity_type: str | None = None,
+    ) -> dict[str, Any]:
+        filters = {"search": search, "industry_id": industry_id, "entity_type": entity_type}
         return {
-            "companies": self.repository.list_companies(limit=limit, offset=offset),
-            "count": self.repository.count_companies(),
+            "companies": self.repository.list_companies(limit=limit, offset=offset, **filters),
+            "count": self.repository.count_companies(**filters),
             "limit": limit,
             "offset": offset,
         }
+
+    def search_entities(self, query: str, *, limit: int) -> dict[str, Any]:
+        results = self.repository.search_entities(query, limit=limit)
+        return {"query": query, "results": results, "count": len(results)}
 
     def get_company(self, company_id: str) -> dict[str, Any] | None:
         return self.repository.get_company(company_id)
@@ -26,7 +39,6 @@ class CompanyGraphService:
         network = self.repository.get_company_network(company_id, depth=depth)
         if network is None:
             return None
-
         for relationship in network["relationships"]:
             relationship["relationship_type"] = relationship.pop("type")
         return network
