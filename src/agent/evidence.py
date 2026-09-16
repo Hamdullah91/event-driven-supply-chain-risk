@@ -5,6 +5,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from src.events.types import EventSeverity
+
 
 class EvidenceStatus(str, Enum):
     SUFFICIENT = "SUFFICIENT"
@@ -38,7 +40,7 @@ class EventEvidence(BaseModel):
     event_id: str | None = None
     event_type: str | None = None
     timestamp: str | None = None
-    severity: float | None = None
+    severity: EventSeverity | None = None
     confidence: float | None = None
     description: str | None = None
     source: str | None = None
