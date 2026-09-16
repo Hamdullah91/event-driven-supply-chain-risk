@@ -15,6 +15,7 @@ from src.agent.evidence import (
     GraphRelationshipEvidence,
 )
 from src.agent.models import CypherProposal
+from src.events.types import EventSeverity
 
 
 class GraphInspector:
@@ -147,7 +148,7 @@ class GraphInspector:
                         event_id=self._optional_str(props.get("event_id")),
                         event_type=self._optional_str(props.get("event_type")),
                         timestamp=self._optional_str(props.get("timestamp")),
-                        severity=self._optional_float(props.get("severity")),
+                        severity=self._optional_severity(props.get("severity")),
                         confidence=self._optional_float(props.get("confidence")),
                         description=self._optional_str(props.get("description")),
                         source=self._optional_str(props.get("source")),
@@ -201,6 +202,15 @@ class GraphInspector:
             return float(value)
         except (TypeError, ValueError):
             return None
+
+    @staticmethod
+    def _optional_severity(value: Any) -> EventSeverity | None:
+        if value is None:
+            return None
+        try:
+            return EventSeverity(str(value).strip().lower())
+        except ValueError:
+            return EventSeverity.UNKNOWN
 
     @staticmethod
     def _optional_str(value: Any) -> str | None:
