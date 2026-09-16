@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.api.dependencies import get_agent_service
-from src.api.schemas import AgentQueryRequest, AgentQueryResponse
+from src.api.schemas import AgentQueryRequest, AgentQueryResponse, EvidenceProvenance
 from src.api.services.agent import AgentQueryService
 
 
@@ -17,9 +17,10 @@ async def query_agent(
     try:
         explanation = await service.answer(request.question)
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(exc),
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
 
-    return AgentQueryResponse(**explanation.model_dump())
+    payload = explanation.model_dump()
+    # Event refs are explicit graph evidence identifiers. Keep provenance typed at
+    # the public boundary without inventing source metadata not present in the explanation.
+    payload["provenance"] = [EvidenceProvenance(event_id=event_ref) for event_ref in explanation.event_refs]
+    return AgentQueryResponse(**payload)
