@@ -1,68 +1,13 @@
 [
-  {
-    "location_id": "tainan_tw",
-    "city": "Tainan",
-    "region": "Tainan",
-    "country_id": "taiwan"
-  },
-  {
-    "location_id": "phoenix_az_us",
-    "city": "Phoenix",
-    "region": "Arizona",
-    "country_id": "united_states"
-  },
-  {
-    "location_id": "chandler_az_us",
-    "city": "Chandler",
-    "region": "Arizona",
-    "country_id": "united_states"
-  },
-  {
-    "location_id": "hillsboro_or_us",
-    "city": "Hillsboro",
-    "region": "Oregon",
-    "country_id": "united_states"
-  },
-  {
-    "location_id": "leixlip_ie",
-    "city": "Leixlip",
-    "region": "County Kildare",
-    "country_id": "ireland"
-  },
-  {
-    "location_id": "boise_id_us",
-    "city": "Boise",
-    "region": "Idaho",
-    "country_id": "united_states"
-  },
-  {
-    "location_id": "manassas_va_us",
-    "city": "Manassas",
-    "region": "Virginia",
-    "country_id": "united_states"
-  },
-  {
-    "location_id": "singapore_sg",
-    "city": "Singapore",
-    "region": "Singapore",
-    "country_id": "singapore"
-  },
-  {
-    "location_id": "malta_ny_us",
-    "city": "Malta",
-    "region": "New York",
-    "country_id": "united_states"
-  },
-  {
-    "location_id": "dresden_de",
-    "city": "Dresden",
-    "region": "Saxony",
-    "country_id": "germany"
-  },
-  {
-    "location_id": "veldhoven_nl",
-    "city": "Veldhoven",
-    "region": "North Brabant",
-    "country_id": "netherlands"
-  }
+  {"location_id":"tainan_tw","city":"Tainan","region":"Tainan","country_id":"taiwan","latitude":22.990833,"longitude":120.213333,"coordinate_source":"GeoNames"},
+  {"location_id":"phoenix_az_us","city":"Phoenix","region":"Arizona","country_id":"united_states","latitude":33.4483771,"longitude":-112.0740373,"coordinate_source":"GeoNames"},
+  {"location_id":"chandler_az_us","city":"Chandler","region":"Arizona","country_id":"united_states","latitude":33.3061605,"longitude":-111.8412502,"coordinate_source":"GeoNames"},
+  {"location_id":"hillsboro_or_us","city":"Hillsboro","region":"Oregon","country_id":"united_states","latitude":45.5228939,"longitude":-122.989827,"coordinate_source":"GeoNames"},
+  {"location_id":"leixlip_ie","city":"Leixlip","region":"County Kildare","country_id":"ireland","latitude":53.3658333,"longitude":-6.4955556,"coordinate_source":"GeoNames"},
+  {"location_id":"boise_id_us","city":"Boise","region":"Idaho","country_id":"united_states","latitude":43.6135002,"longitude":-116.2034505,"coordinate_source":"GeoNames"},
+  {"location_id":"manassas_va_us","city":"Manassas","region":"Virginia","country_id":"united_states","latitude":38.7509488,"longitude":-77.4752667,"coordinate_source":"GeoNames"},
+  {"location_id":"singapore_sg","city":"Singapore","region":"Singapore","country_id":"singapore","latitude":1.28966883937733,"longitude":103.850069046021,"coordinate_source":"GeoNames"},
+  {"location_id":"malta_ny_us","city":"Malta","region":"New York","country_id":"united_states","latitude":42.9711869,"longitude":-73.7926207,"coordinate_source":"GeoNames"},
+  {"location_id":"dresden_de","city":"Dresden","region":"Saxony","country_id":"germany","latitude":51.05089108097961,"longitude":13.738317489624023,"coordinate_source":"GeoNames"},
+  {"location_id":"veldhoven_nl","city":"Veldhoven","region":"North Brabant","country_id":"netherlands","latitude":51.418333,"longitude":5.402778,"coordinate_source":"GeoNames"}
 ]
