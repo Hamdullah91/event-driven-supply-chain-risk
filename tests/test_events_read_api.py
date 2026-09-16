@@ -10,7 +10,7 @@ from src.api.dependencies import get_event_service
 class FakeEventService:
     event = {
         "event_id": "event-001",
-        "event_type": "facility_shutdown",
+        "event_type": "facility_outage",
         "source": "news_api",
         "timestamp": "2026-09-16T10:00:00+00:00",
         "entity_id": "tsmc",
@@ -25,17 +25,10 @@ class FakeEventService:
     }
 
     def list_events(self, *, limit: int, offset: int) -> dict[str, Any]:
-        return {
-            "events": [self.event],
-            "count": 1,
-            "limit": limit,
-            "offset": offset,
-        }
+        return {"events": [self.event], "count": 1, "limit": limit, "offset": offset}
 
     def get_event(self, event_id: str) -> dict[str, Any] | None:
-        if event_id != self.event["event_id"]:
-            return None
-        return self.event
+        return self.event if event_id == self.event["event_id"] else None
 
 
 @pytest.fixture
@@ -62,8 +55,9 @@ def test_get_event(client: TestClient) -> None:
     response = client.get("/api/v1/events/event-001")
     assert response.status_code == 200
     body = response.json()
-    assert body["event_type"] == "facility_shutdown"
+    assert body["event_type"] == "facility_outage"
     assert body["entity_id"] == "tsmc"
+    assert body["severity"] == "high"
     assert body["payload"]["article_id"] == "article-001"
 
 
@@ -79,7 +73,21 @@ def test_event_list_pagination_is_validated(client: TestClient) -> None:
     assert client.get("/api/v1/events?offset=-1").status_code == 422
 
 
-def test_existing_validate_route_is_preserved(client: TestClient) -> None:
+def test_existing_validate_route_uses_canonical_severity(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/events/validate",
+        json={
+            "event_type": "SUPPLY_DISRUPTION",
+            "entity": "TSMC",
+            "severity": "high",
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["entity"] == "TSMC"
+    assert response.json()["severity"] == "high"
+
+
+def test_numeric_event_severity_is_rejected(client: TestClient) -> None:
     response = client.post(
         "/api/v1/events/validate",
         json={
@@ -88,5 +96,17 @@ def test_existing_validate_route_is_preserved(client: TestClient) -> None:
             "severity": 0.8,
         },
     )
+    assert response.status_code == 422
+
+
+def test_unknown_categorical_severity_is_accepted(client: TestClient) -> None:
+    response = client.post(
+        "/api/v1/events/validate",
+        json={
+            "event_type": "SUPPLY_DISRUPTION",
+            "entity": "TSMC",
+            "severity": "unknown",
+        },
+    )
     assert response.status_code == 200
-    assert response.json()["entity"] == "TSMC"
+    assert response.json()["severity"] == "unknown"
