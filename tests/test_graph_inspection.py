@@ -17,6 +17,7 @@ from src.agent.evidence import (
 from src.agent.graph_inspector import GraphInspector
 from src.agent.models import CypherProposal
 from src.agent.prompts import build_cypher_system_prompt
+from src.events.types import EventSeverity
 
 
 class _FakeResult:
@@ -77,7 +78,7 @@ def test_assessment_is_sufficient_when_path_and_linked_event_exist():
                 ref="event:1",
                 event_id="evt-1",
                 event_type="FACILITY_OUTAGE",
-                severity=0.9,
+                severity=EventSeverity.HIGH,
                 confidence=0.94,
                 source="news-source",
                 linked_entity_ref="company:tsmc",
@@ -170,6 +171,15 @@ def test_event_lookup_uses_property_map_without_optional_property_warnings():
     assert "entity.facility_name" not in cypher
     assert "entity.product_name" not in cypher
     assert kwargs["node_refs"] == ["company:tsmc"]
+
+
+def test_agent_event_severity_uses_canonical_categories():
+    inspector = GraphInspector(_FakeDriver([]))
+
+    assert inspector._optional_severity("high") is EventSeverity.HIGH
+    assert inspector._optional_severity("CRITICAL") is EventSeverity.CRITICAL
+    assert inspector._optional_severity("unexpected") is EventSeverity.UNKNOWN
+    assert inspector._optional_severity(None) is None
 
 
 def test_inspector_rejects_paths_with_repeated_nodes(monkeypatch):
