@@ -31,10 +31,10 @@ def main() -> None:
             raise RuntimeError("Neo4j is not healthy; live integration cannot be verified.")
 
         companies = _check(client, "GET", "/companies", params={"limit": 10})
-        items = companies.get("items", [])
-        if not items:
-            raise RuntimeError("No live companies returned by /companies.")
-        company_id = items[0].get("company_id")
+        company_items = companies.get("companies", [])
+        if not company_items:
+            raise RuntimeError(f"No live companies returned by /companies. Response: {companies}")
+        company_id = company_items[0].get("company_id")
         if not company_id:
             raise RuntimeError("First company has no canonical company_id.")
         report["company_id"] = company_id
@@ -51,13 +51,15 @@ def main() -> None:
 
         events = _check(client, "GET", "/api/v1/events", params={"limit": 10, "offset": 0})
         report["events"] = events
-        event_items = events.get("items", [])
-        if event_items:
-            event_id = event_items[0].get("event_id")
-            if event_id:
-                report["event_id"] = event_id
-                report["event"] = _check(client, "GET", f"/api/v1/events/{event_id}")
-                report["event_blast_radius"] = _check(client, "GET", f"/api/v1/events/{event_id}/blast-radius", params={"max_hops": 3})
+        event_items = events.get("events", [])
+        if not event_items:
+            raise RuntimeError(f"No persisted live events returned by /api/v1/events. Response: {events}")
+        event_id = event_items[0].get("event_id")
+        if not event_id:
+            raise RuntimeError("First event has no canonical event_id.")
+        report["event_id"] = event_id
+        report["event"] = _check(client, "GET", f"/api/v1/events/{event_id}")
+        report["event_blast_radius"] = _check(client, "GET", f"/api/v1/events/{event_id}/blast-radius", params={"max_hops": 3})
 
         try:
             with client.websocket_connect("/risk-stream") as websocket:
