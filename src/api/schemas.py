@@ -159,3 +159,18 @@ class CompanyExposureResponse(BaseModel):
     company_id: str
     event_count: int = Field(ge=0)
     exposures: list[EventExposure] = Field(default_factory=list)
+
+
+class AgentQueryRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=2000)
+
+
+class AgentQueryResponse(BaseModel):
+    answer: str
+    evidence_status: str
+    affected_entities: list[str] = Field(default_factory=list)
+    dependency_paths: list[list[str]] = Field(default_factory=list)
+    hop_counts: list[int] = Field(default_factory=list)
+    event_refs: list[str] = Field(default_factory=list)
+    path_ids: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
