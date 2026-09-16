@@ -68,6 +68,19 @@ class CompanyDetail(CompanySummary):
     technologies: list[str] = Field(default_factory=list)
 
 
+class EntitySearchResult(BaseModel):
+    label: str
+    entity_id: str
+    name: str
+    properties: dict[str, Any] = Field(default_factory=dict)
+
+
+class EntitySearchResponse(BaseModel):
+    query: str
+    results: list[EntitySearchResult] = Field(default_factory=list)
+    count: int = Field(ge=0)
+
+
 class GraphNode(BaseModel):
     id: str
     label: str
@@ -161,6 +174,13 @@ class CompanyExposureResponse(BaseModel):
     exposures: list[EventExposure] = Field(default_factory=list)
 
 
+class EvidenceProvenance(BaseModel):
+    source: str | None = None
+    timestamp: str | None = None
+    confidence: float | None = None
+    event_id: str | None = None
+
+
 class AgentQueryRequest(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
 
@@ -174,3 +194,14 @@ class AgentQueryResponse(BaseModel):
     event_refs: list[str] = Field(default_factory=list)
     path_ids: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    provenance: list[EvidenceProvenance] = Field(default_factory=list)
+
+
+class ServiceHealth(BaseModel):
+    status: str
+    detail: str | None = None
+
+
+class DetailedHealthResponse(BaseModel):
+    status: str
+    services: dict[str, ServiceHealth]
