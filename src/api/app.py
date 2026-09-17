@@ -17,10 +17,16 @@ from src.ingestion.news.runtime import news_poller_runtime
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     try:
-        await news_poller_runtime.start(
-            settings=settings,
-            connection=get_neo4j_connection(),
-        )
+        if settings.NEWS_POLLER_ENABLED:
+            await news_poller_runtime.start(
+                settings=settings,
+                connection=get_neo4j_connection(),
+            )
+        else:
+            # Keep runtime state truthful without opening Neo4j merely because the
+            # optional poller is disabled.
+            news_poller_runtime.status = "disabled"
+            news_poller_runtime.last_error = None
         yield
     finally:
         await news_poller_runtime.stop()
