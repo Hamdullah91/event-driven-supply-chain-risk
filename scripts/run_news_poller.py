@@ -7,8 +7,6 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.api.services.risk import RiskAnalyticsService
-from src.api.services.risk_stream import RiskStreamService
 from src.events.pipeline import EventPipeline
 from src.graph.connection import Neo4jConnection
 from src.graph.repository import GraphRepository
@@ -18,11 +16,14 @@ from src.ingestion.news.nlp_processor import NewsNLPProcessor
 from src.ingestion.news.poller import NewsPoller
 from src.ingestion.news.repository import NewsRepository
 from src.ml.event_classifier import EventClassifier
-from src.risk.repository import RiskRepository
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
     news_api_key: str
     news_api_url: str = "https://newsapi.org/v2/everything"
     news_poll_interval_seconds: int = 900
@@ -38,12 +39,17 @@ class Settings(BaseSettings):
 def configure_logging(log_path: str) -> None:
     path = Path(log_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+    formatter = logging.Formatter(
+        "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    )
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
     file_handler = logging.FileHandler(path, encoding="utf-8")
     file_handler.setFormatter(formatter)
-    logging.basicConfig(level=logging.INFO, handlers=[console_handler, file_handler])
+    logging.basicConfig(
+        level=logging.INFO,
+        handlers=[console_handler, file_handler],
+    )
 
 
 async def main() -> None:
@@ -63,8 +69,6 @@ async def main() -> None:
     neo4j_connection = Neo4jConnection()
     graph_repository = GraphRepository(neo4j_connection)
     event_pipeline = EventPipeline(graph_repository=graph_repository)
-    risk_service = RiskAnalyticsService(RiskRepository(neo4j_connection))
-    risk_stream_service = RiskStreamService(risk_service)
 
     query = (
         '"semiconductor" OR "chip shortage" OR "EV battery" OR "lithium" OR '
@@ -85,7 +89,7 @@ async def main() -> None:
             nlp_processor=nlp_processor,
             classification_service=classification_service,
             event_pipeline=event_pipeline,
-            risk_stream_service=risk_stream_service,
+            risk_stream_service=None,
         )
         loop = asyncio.get_running_loop()
         for sig in (signal.SIGINT, signal.SIGTERM):
@@ -93,7 +97,11 @@ async def main() -> None:
                 loop.add_signal_handler(sig, poller.stop)
             except NotImplementedError:
                 pass
-        logger.info("Starting event-driven news risk streaming service.")
+        logger.warning(
+            "Standalone news poller persists dynamic events but does not publish "
+            "to FastAPI WebSocket clients. For live /risk-stream delivery, set "
+            "NEWS_POLLER_ENABLED=true and run the FastAPI application."
+        )
         try:
             await poller.run_forever()
         finally:
