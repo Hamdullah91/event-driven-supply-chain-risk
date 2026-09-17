@@ -4,6 +4,7 @@ import json
 from typing import Any
 
 from src.graph.connection import Neo4jConnection
+from src.provenance import event_evidence_availability
 
 
 class EventReadRepository:
@@ -23,6 +24,7 @@ class EventReadRepository:
                 event["payload"] = {"raw": payload}
         elif payload is None:
             event["payload"] = {}
+        event["evidence_status"] = event_evidence_availability(event)
         return event
 
     def list_events(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
