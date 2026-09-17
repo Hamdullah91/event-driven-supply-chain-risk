@@ -30,7 +30,7 @@ EVENT_LABELS = {
     "REGULATION_CHANGE": "regulatory change",
     "TECHNOLOGY_EMBARGO": "technology embargo",
     "TRADE_POLICY_CHANGE": "trade-policy disruption",
-    "RAW_MATERIAL_SHORTAGE": "raw-material shortage",
+    "QUOTA_CHANGE": "quota change",
 }
 
 
