@@ -6,6 +6,7 @@ from src.api.dependencies import get_neo4j_connection, get_settings
 from src.api.schemas import DetailedHealthResponse, ServiceHealth
 from src.api.websocket import risk_connection_manager
 from src.config.settings import Settings
+from src.graph.connection import Neo4jConnection
 from src.ingestion.news.runtime import news_poller_runtime
 
 
@@ -18,11 +19,13 @@ def health_check() -> dict[str, str]:
 
 
 @router.get("/api/v1/health/detailed", response_model=DetailedHealthResponse)
-def detailed_health(settings: Settings = Depends(get_settings)) -> DetailedHealthResponse:
+def detailed_health(
+    settings: Settings = Depends(get_settings),
+    connection: Neo4jConnection = Depends(get_neo4j_connection),
+) -> DetailedHealthResponse:
     services: dict[str, ServiceHealth] = {}
 
     try:
-        connection = get_neo4j_connection()
         with connection.driver.session() as session:
             session.run("RETURN 1 AS ok").single()
         services["neo4j"] = ServiceHealth(status="healthy")
