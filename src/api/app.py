@@ -1,9 +1,9 @@
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from src.api.dependencies import close_neo4j_connection
+from src.api.dependencies import close_neo4j_connection, get_neo4j_connection
 from src.api.routes.agent import router as agent_router
 from src.api.routes.companies import router as companies_router, search_router
 from src.api.routes.events import router as events_router
@@ -11,12 +11,20 @@ from src.api.routes.health import router as health_router
 from src.api.routes.risk import router as risk_router
 from src.api.routes.websocket import router as websocket_router
 from src.config.settings import settings
+from src.ingestion.news.runtime import news_poller_runtime
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    yield
-    close_neo4j_connection()
+    try:
+        await news_poller_runtime.start(
+            settings=settings,
+            connection=get_neo4j_connection(),
+        )
+        yield
+    finally:
+        await news_poller_runtime.stop()
+        close_neo4j_connection()
 
 
 def create_app() -> FastAPI:
