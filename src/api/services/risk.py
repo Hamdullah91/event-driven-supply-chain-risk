@@ -278,10 +278,12 @@ class RiskAnalyticsService:
         max_hops: int = 3,
         limit: int = 100,
     ) -> dict:
-        """Reconstruct cumulative risk after each chronological event exposure.
+        """Reconstruct one cumulative risk point per chronological event.
 
-        This endpoint is intentionally an event-derived historical series, not a
-        ledger of immutable risk snapshots captured at wall-clock intervals.
+        The series is derived from timestamped graph event exposure, not from
+        persisted wall-clock snapshots. When one event reaches the company via
+        multiple paths, only that event's strongest propagated path contributes,
+        matching current-risk aggregation semantics.
         """
 
         rows = list(
@@ -291,10 +293,8 @@ class RiskAnalyticsService:
                 limit=limit,
             )
         )
-        rows.sort(key=lambda row: str(row["timestamp"]))
 
-        strongest: dict[str, float] = {}
-        points: list[dict] = []
+        strongest_by_event: dict[str, dict] = {}
         for row in rows:
             event_id = str(row["event_id"])
             severity = str(row["severity"])
@@ -304,25 +304,39 @@ class RiskAnalyticsService:
                 for weight in (row["dependency_weights"] or [])
             ]
             _, _, _, risk = self._path_risk(severity, hop, weights)
-            strongest[event_id] = max(
-                risk,
-                strongest.get(event_id, 0.0),
-            )
+            candidate = {
+                "timestamp": row["timestamp"],
+                "risk": risk,
+            }
+            existing = strongest_by_event.get(event_id)
+            if existing is None or risk > float(existing["risk"]):
+                strongest_by_event[event_id] = candidate
+
+        ordered_events = sorted(
+            strongest_by_event.items(),
+            key=lambda item: (str(item[1]["timestamp"]), item[0]),
+        )
+
+        active: dict[str, float] = {}
+        points: list[dict] = []
+        for event_id, item in ordered_events:
+            active[event_id] = float(item["risk"])
             aggregate = aggregate_company_risk(
                 company_id=company_id,
                 contributions=[
                     RiskContribution(event_id=key, propagated_risk=value)
-                    for key, value in sorted(strongest.items())
+                    for key, value in sorted(active.items())
                 ],
             )
             points.append(
                 {
-                    "timestamp": row["timestamp"],
+                    "timestamp": item["timestamp"],
                     "risk_score": aggregate.aggregate_risk,
                     "risk_level": self._risk_level(aggregate.aggregate_risk),
                     "event_id": event_id,
                 }
             )
+
         return {
             "company_id": company_id,
             "max_hops": max_hops,
