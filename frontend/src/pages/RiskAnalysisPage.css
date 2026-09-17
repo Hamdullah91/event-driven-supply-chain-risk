@@ -1,0 +1,694 @@
+.risk-analysis-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.risk-analysis-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.risk-analysis-title-context {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  margin-bottom: var(--space-1);
+}
+
+.risk-analysis-subtitle {
+  max-width: 720px;
+  margin-top: var(--space-2);
+}
+
+.risk-analysis-history-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  padding-top: var(--space-2);
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   SCOPE
+   ========================================================= */
+
+.risk-scope-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  min-height: 52px;
+  padding: var(--space-2);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+
+  background: var(--color-panel);
+}
+
+.risk-scope-item {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: var(--space-2);
+
+  padding: 0 var(--space-3);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+
+  background: var(--color-app-bg);
+}
+
+.risk-scope-item span {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.risk-scope-item strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-scope-item.is-disabled {
+  opacity: 0.55;
+}
+
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+
+.risk-summary-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(0, 1fr)
+    minmax(0, 0.9fr);
+  gap: var(--standard-gap);
+}
+
+.risk-ranking-list,
+.domain-exposure-list,
+.hop-exposure-list,
+.event-contribution-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.risk-ranking-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+
+  min-height: 58px;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.risk-ranking-row:last-child {
+  border-bottom: 0;
+}
+
+.risk-rank-number {
+  color: var(--color-text-disabled);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-ranking-company {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.risk-ranking-company strong {
+  color: var(--color-text-primary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-ranking-company span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.risk-ranking-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1);
+}
+
+.risk-ranking-value > strong {
+  color: var(--color-text-primary);
+
+  font-size: 15px;
+}
+
+.domain-exposure-row,
+.hop-exposure-row {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  gap: var(--space-3);
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.domain-exposure-row:last-child,
+.hop-exposure-row:last-child {
+  border-bottom: 0;
+}
+
+.domain-exposure-row > div:first-child {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+
+  color: var(--color-text-muted);
+}
+
+.domain-exposure-row > div:first-child span {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+}
+
+.domain-exposure-row > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.domain-exposure-row > div:nth-child(2) strong {
+  color: var(--color-text-primary);
+
+  font-size: 13px;
+}
+
+.domain-exposure-row > div:nth-child(2) span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.hop-exposure-icon {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+
+  color: var(--color-primary);
+}
+
+.hop-exposure-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.hop-exposure-copy strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+}
+
+.hop-exposure-copy span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.hop-exposure-count {
+  color: var(--color-text-primary);
+
+  font-size: 18px;
+}
+
+/* =========================================================
+   VIEW TABS
+   ========================================================= */
+
+.risk-view-tabs {
+  display: flex;
+  gap: var(--space-1);
+
+  margin-bottom: var(--space-4);
+
+  padding-bottom: var(--space-3);
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.risk-view-tab {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: var(--space-2);
+
+  padding: 0 var(--space-3);
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+
+  background: transparent;
+  color: var(--color-text-muted);
+
+  cursor: pointer;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-view-tab:hover {
+  background: var(--color-elevated);
+  color: var(--color-text-primary);
+}
+
+.risk-view-tab.is-active {
+  border-color: var(--color-border-strong);
+
+  background: var(--color-elevated);
+  color: var(--color-primary);
+}
+
+.risk-view-content {
+  min-height: 310px;
+}
+
+/* =========================================================
+   NETWORK LENS
+   ========================================================= */
+
+.risk-network-view {
+  position: relative;
+
+  min-height: 310px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+
+  background: var(--color-app-bg);
+}
+
+.risk-network-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  display: flex;
+  width: 100px;
+  height: 100px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+
+  border: 2px solid var(--color-border-strong);
+  border-radius: 50%;
+
+  background: var(--color-panel);
+  color: var(--color-primary);
+
+  transform: translate(-50%, -50%);
+}
+
+.risk-network-center strong {
+  color: var(--color-text-primary);
+
+  font-size: 12px;
+}
+
+.risk-network-center span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.risk-network-company {
+  position: absolute;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  min-width: 125px;
+  padding: var(--space-3);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+
+  background: var(--color-panel);
+}
+
+.risk-network-company strong {
+  color: var(--color-text-primary);
+
+  font-size: 12px;
+}
+
+.risk-network-company > span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.risk-network-company--critical {
+  left: 12%;
+  top: 24%;
+}
+
+.risk-network-company--high {
+  right: 12%;
+  top: 24%;
+}
+
+.risk-network-company--medium {
+  left: 50%;
+  bottom: 10%;
+
+  transform: translateX(-50%);
+}
+
+.risk-network-demo-label {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-3);
+
+  color: var(--color-text-disabled);
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* =========================================================
+   GEOGRAPHY
+   ========================================================= */
+
+.geography-unavailable {
+  display: flex;
+  min-height: 310px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+
+  padding: var(--space-6);
+
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-card);
+
+  background: var(--color-app-bg);
+}
+
+.geography-icon {
+  display: flex;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+
+  color: var(--color-graph-cyan);
+}
+
+.geography-unavailable > div:last-child {
+  max-width: 580px;
+}
+
+.geography-unavailable h3 {
+  margin-top: var(--space-1);
+
+  color: var(--color-text-primary);
+
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.geography-unavailable p {
+  margin-top: var(--space-2);
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.geography-integrity-note {
+  width: fit-content;
+
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   HEATMAP
+   ========================================================= */
+
+.risk-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.risk-heatmap-grid {
+  display: grid;
+  min-height: 260px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.risk-heatmap-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+
+  border: 1px solid currentColor;
+  border-radius: var(--radius-card);
+}
+
+.risk-heatmap-cell span {
+  color: var(--color-text-primary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.risk-heatmap-cell strong {
+  font-size: 12px;
+}
+
+.risk-heatmap-cell--critical {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--risk-critical);
+}
+
+.risk-heatmap-cell--high {
+  background: rgba(249, 115, 22, 0.08);
+  color: var(--risk-high);
+}
+
+.risk-heatmap-cell--medium {
+  background: rgba(234, 179, 8, 0.08);
+  color: var(--risk-medium);
+}
+
+.risk-heatmap-cell--low {
+  background: rgba(34, 197, 94, 0.08);
+  color: var(--risk-low);
+}
+
+.risk-heatmap > p {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   CONTEXT
+   ========================================================= */
+
+.risk-context-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--standard-gap);
+}
+
+.event-contribution-row {
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.event-contribution-row:last-child {
+  border-bottom: 0;
+}
+
+.event-contribution-row > div:first-child {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+
+  color: var(--color-text-muted);
+}
+
+.event-contribution-row > div:first-child > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-contribution-row strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+}
+
+.event-contribution-row span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.event-contribution-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.event-contribution-value strong {
+  color: var(--color-text-primary);
+
+  font-size: 13px;
+}
+
+.risk-context-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+
+  min-height: 120px;
+
+  color: var(--color-text-muted);
+}
+
+.risk-context-body > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.risk-context-body strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+}
+
+.risk-context-body p {
+  max-width: 500px;
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+  line-height: 17px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1399px) {
+  .risk-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .risk-summary-grid > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1023px) {
+  .risk-context-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .risk-analysis-header {
+    flex-direction: column;
+  }
+
+  .risk-scope-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .risk-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-summary-grid > :last-child {
+    grid-column: auto;
+  }
+
+  .risk-view-tabs {
+    overflow-x: auto;
+  }
+
+  .geography-unavailable {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .risk-heatmap-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-network-company--critical {
+    left: 4%;
+  }
+
+  .risk-network-company--high {
+    right: 4%;
+  }
+}

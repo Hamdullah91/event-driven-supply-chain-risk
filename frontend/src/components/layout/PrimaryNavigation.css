@@ -1,0 +1,135 @@
+.primary-navigation {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-5) var(--space-3);
+}
+
+.navigation-section-label {
+  padding: 0 var(--space-3) var(--space-2);
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.navigation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.navigation-item {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.navigation-item:hover {
+  background: var(--color-panel);
+  color: var(--color-text-primary);
+}
+
+.navigation-item.is-active {
+  border-color: rgba(59, 130, 246, 0.14);
+
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--color-text-primary);
+}
+
+.navigation-accent {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -1px;
+
+  width: 2px;
+
+  border-radius: 0 2px 2px 0;
+
+  background: transparent;
+}
+
+.navigation-item.is-active .navigation-accent {
+  background: var(--color-primary);
+}
+
+.navigation-icon {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+}
+
+.navigation-item:hover .navigation-icon {
+  color: var(--color-text-secondary);
+}
+
+.navigation-item.is-active .navigation-icon {
+  color: var(--color-primary);
+}
+
+.navigation-label {
+  overflow: hidden;
+
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1023px) {
+  .primary-navigation {
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .navigation-section-label,
+  .navigation-label {
+    display: none;
+  }
+
+  .navigation-list {
+    align-items: center;
+  }
+
+  .navigation-item {
+    justify-content: center;
+
+    width: 40px;
+    padding: 0;
+  }
+
+  .navigation-accent {
+    top: 8px;
+    bottom: 8px;
+  }
+}

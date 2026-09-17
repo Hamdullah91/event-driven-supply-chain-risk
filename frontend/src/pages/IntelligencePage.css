@@ -1,0 +1,535 @@
+.intelligence-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.intelligence-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.intelligence-title-context {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  margin-bottom: var(--space-1);
+}
+
+.intelligence-subtitle {
+  max-width: 760px;
+  margin-top: var(--space-2);
+}
+
+.intelligence-api-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  padding: var(--space-3);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+
+  background: var(--color-panel);
+  color: var(--color-text-muted);
+}
+
+.intelligence-api-state > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intelligence-api-state strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.intelligence-api-state span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   QUERY COMPOSER
+   ========================================================= */
+
+.intelligence-query-composer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+
+  min-height: 68px;
+  padding: var(--space-3) var(--space-4);
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-card);
+
+  background: var(--color-panel);
+  color: var(--color-text-muted);
+}
+
+.intelligence-query-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.intelligence-query-copy > span:last-child {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.intelligence-api-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  margin-top: calc(var(--section-gap) * -0.6);
+
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   RESULT HEADING
+   ========================================================= */
+
+.intelligence-result-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+
+  padding-top: var(--space-2);
+}
+
+.intelligence-result-header > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.intelligence-result-header h2 {
+  max-width: 760px;
+
+  color: var(--color-text-primary);
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+}
+
+.intelligence-grounded-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 24px;
+  padding: 2px 8px;
+
+  border: 1px solid rgba(34, 184, 207, 0.45);
+  border-radius: var(--radius-badge);
+
+  background: rgba(34, 184, 207, 0.07);
+  color: var(--color-graph-cyan);
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+}
+
+/* =========================================================
+   PRIMARY RESULT
+   ========================================================= */
+
+.intelligence-result-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(340px, 0.8fr);
+  gap: var(--standard-gap);
+}
+
+.intelligence-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+
+  min-height: 150px;
+}
+
+.intelligence-answer-icon {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-card);
+
+  background: var(--color-app-bg);
+  color: var(--color-primary);
+}
+
+.intelligence-answer p {
+  max-width: 700px;
+
+  color: var(--color-text-secondary);
+
+  font-size: 13px;
+  line-height: 21px;
+}
+
+.intelligence-answer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+
+  padding-top: var(--space-4);
+
+  border-top: 1px solid var(--color-border);
+}
+
+/* =========================================================
+   SUPPORTING GRAPH
+   ========================================================= */
+
+.intelligence-graph-preview {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+
+  padding: var(--space-4);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+
+  background: var(--color-app-bg);
+}
+
+.intelligence-graph-node {
+  display: flex;
+  width: 82px;
+  height: 82px;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+
+  background: var(--color-panel);
+}
+
+.intelligence-graph-node.is-target {
+  border-color: var(--color-graph-cyan);
+}
+
+.intelligence-graph-node span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.intelligence-graph-node strong {
+  color: var(--color-text-primary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.intelligence-graph-edge {
+  display: flex;
+  min-width: 100px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+
+  color: var(--color-text-muted);
+}
+
+.intelligence-graph-edge span {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+}
+
+.intelligence-path-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+
+  color: var(--color-text-muted);
+}
+
+.intelligence-path-summary > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intelligence-path-summary span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+.intelligence-path-summary strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   SUPPORTING DETAILS
+   ========================================================= */
+
+.intelligence-support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--standard-gap);
+}
+
+.intelligence-entity-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.intelligence-entity {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  gap: var(--space-3);
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.intelligence-entity:last-child {
+  border-bottom: 0;
+}
+
+.intelligence-entity-icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+
+  color: var(--color-primary);
+}
+
+.intelligence-entity > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intelligence-entity strong {
+  color: var(--color-text-primary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.intelligence-entity span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+}
+
+/* =========================================================
+   RISK TRACE
+   ========================================================= */
+
+.intelligence-risk-trace {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.intelligence-trace-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  padding: var(--space-3);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+
+  background: var(--color-app-bg);
+}
+
+.intelligence-trace-item span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+  line-height: 13px;
+}
+
+.intelligence-trace-item strong {
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.intelligence-trace-item.is-emphasized {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.intelligence-trace-item.is-emphasized strong {
+  color: var(--color-primary);
+}
+
+/* =========================================================
+   EVIDENCE
+   ========================================================= */
+
+.intelligence-evidence-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.intelligence-evidence {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+
+  padding: var(--space-4);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+
+  background: var(--color-app-bg);
+}
+
+.intelligence-evidence-icon {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-button);
+
+  color: var(--color-graph-cyan);
+}
+
+.intelligence-evidence-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.intelligence-evidence-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.intelligence-evidence-field span {
+  color: var(--color-text-muted);
+
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.intelligence-evidence-field strong {
+  overflow-wrap: anywhere;
+
+  color: var(--color-text-secondary);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.intelligence-evidence-field strong.is-unavailable {
+  color: var(--color-text-muted);
+
+  font-weight: 500;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1199px) {
+  .intelligence-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intelligence-evidence-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .intelligence-header {
+    flex-direction: column;
+  }
+
+  .intelligence-query-composer {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .intelligence-result-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .intelligence-support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intelligence-graph-preview {
+    flex-direction: column;
+  }
+
+  .intelligence-graph-edge svg {
+    transform: rotate(90deg);
+  }
+
+  .intelligence-risk-trace,
+  .intelligence-evidence-fields {
+    grid-template-columns: 1fr;
+  }
+}

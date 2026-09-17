@@ -1,0 +1,268 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+:root {
+  /* ---------------------------------------------------------
+     Phase 1 — Frozen Layout Tokens
+     --------------------------------------------------------- */
+  --sidebar-expanded-width: 240px;
+  --sidebar-collapsed-width: 72px;
+  --topbar-height: 64px;
+  --page-padding: 24px;
+  --inspector-width: 380px;
+
+  --grid-columns: 12;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --standard-gap: 16px;
+  --section-gap: 24px;
+  --major-gap: 32px;
+
+  /* ---------------------------------------------------------
+     Phase 1 — Background / Surface System
+     --------------------------------------------------------- */
+  --color-app-bg: #0b0f14;
+  --color-chrome: #10151c;
+  --color-panel: #141b24;
+  --color-elevated: #1a2330;
+
+  --color-border: #253142;
+  --color-border-strong: #344258;
+
+  /* ---------------------------------------------------------
+     Typography
+     --------------------------------------------------------- */
+  --color-text-primary: #f2f5f8;
+  --color-text-secondary: #a9b4c2;
+  --color-text-muted: #718096;
+  --color-text-disabled: #4e5968;
+
+  /* ---------------------------------------------------------
+     Interaction
+     --------------------------------------------------------- */
+  --color-primary: #3b82f6;
+  --color-graph-cyan: #22b8cf;
+
+  /* ---------------------------------------------------------
+     Backend-aligned Risk Semantics
+
+     IMPORTANT:
+     These colors visualize backend-returned risk levels.
+     The frontend must not independently determine authoritative
+     company risk levels from risk scores.
+     --------------------------------------------------------- */
+  --risk-none: #64748b;
+  --risk-low: #22c55e;
+  --risk-medium: #eab308;
+  --risk-high: #f97316;
+  --risk-critical: #ef4444;
+
+  /* ---------------------------------------------------------
+     Radius
+     --------------------------------------------------------- */
+  --radius-card: 8px;
+  --radius-button: 6px;
+  --radius-input: 6px;
+  --radius-badge: 5px;
+  --radius-modal: 10px;
+
+  /* ---------------------------------------------------------
+     Typography Scale
+     --------------------------------------------------------- */
+  --font-family-ui: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
+  --font-size-page-title: 28px;
+  --font-size-major-heading: 20px;
+  --font-size-card-heading: 16px;
+  --font-size-body: 14px;
+  --font-size-table: 13px;
+  --font-size-metadata: 12px;
+
+  --line-height-page-title: 34px;
+  --line-height-body: 20px;
+  --line-height-metadata: 18px;
+
+  font-family: var(--font-family-ui);
+  color: var(--color-text-primary);
+  background: var(--color-app-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------------------------------------------------------
+   Baseline reset
+   --------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--color-app-bg);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  background: var(--color-app-bg);
+  color: var(--color-text-primary);
+
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: 400;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+/* ---------------------------------------------------------
+   Shared typography primitives
+   --------------------------------------------------------- */
+
+.page-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-page-title);
+  line-height: var(--line-height-page-title);
+  font-weight: 600;
+}
+
+.major-heading {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-major-heading);
+  font-weight: 600;
+}
+
+.card-heading {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-card-heading);
+  font-weight: 600;
+}
+
+.body-text {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+}
+
+.metadata-text {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-metadata);
+  line-height: var(--line-height-metadata);
+}
+
+/* ---------------------------------------------------------
+   Accessibility foundation
+   --------------------------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+/* =========================================================
+   ACCESSIBILITY BASELINE
+   ========================================================= */
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+button {
+  min-height: 40px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.28);
+  color: var(--color-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
