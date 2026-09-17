@@ -26,8 +26,19 @@ class GraphContractAudit:
                 record = session.run(query).single()
                 total = int(record["total"]) if record else 0
                 missing = int(record["missing"]) if record else 0
-                rows.append({"label": label, "identity_property": identity_property, "total": total, "missing": missing, "complete": missing == 0})
-        return {"complete": all(row["complete"] for row in rows), "labels": rows}
+                rows.append(
+                    {
+                        "label": label,
+                        "identity_property": identity_property,
+                        "total": total,
+                        "missing": missing,
+                        "complete": missing == 0,
+                    }
+                )
+        return {
+            "complete": all(row["complete"] for row in rows),
+            "labels": rows,
+        }
 
     def geographic_coordinate_completeness(self) -> dict[str, Any]:
         query = """
@@ -41,7 +52,13 @@ class GraphContractAudit:
         total = int(record["total"]) if record else 0
         geocoded = int(record["geocoded"]) if record else 0
         partial = int(record["partial"]) if record else 0
-        return {"total": total, "geocoded": geocoded, "missing": max(total - geocoded - partial, 0), "partial": partial, "contract_valid": partial == 0}
+        return {
+            "total": total,
+            "geocoded": geocoded,
+            "missing": max(total - geocoded - partial, 0),
+            "partial": partial,
+            "contract_valid": partial == 0,
+        }
 
     def provenance_completeness(self) -> dict[str, Any]:
         relationship_query = """
@@ -88,13 +105,23 @@ class GraphContractAudit:
             "with_confidence": int(event_record["with_confidence"]) if event_record else 0,
             "with_description": int(event_record["with_description"]) if event_record else 0,
         }
-        events["core_complete"] = event_total == 0 or all(
-            events[field] == event_total
-            for field in ("with_source", "with_timestamp", "with_confidence")
+        core_fields = ("with_source", "with_timestamp", "with_confidence")
+        events["core_evidence_fields"] = list(core_fields)
+        events["core_evidence_complete"] = event_total == 0 or all(
+            events[field] == event_total for field in core_fields
         )
+        events["description_complete"] = (
+            event_total == 0 or events["with_description"] == event_total
+        )
+
         return {
             "relationship_total": relationship_total,
             "relationships": relationships,
             "events": events,
-            "note": "Relationship provenance is reported by field/type because seeded, extracted, derived, and dynamic links have different evidence contracts.",
+            "note": (
+                "Relationship provenance is reported by field/type because seeded, "
+                "extracted, derived, and dynamic links have different evidence contracts. "
+                "Event core_evidence_complete explicitly means source + timestamp + "
+                "confidence; description completeness is reported separately."
+            ),
         }
