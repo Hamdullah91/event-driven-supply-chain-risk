@@ -18,9 +18,9 @@ def _normalize(text: str) -> str:
     return " ".join(text.casefold().replace("-", " ").split())
 
 
-# Ordered from strongest to weakest evidence. These are impact/severity cues,
-# not classifier-confidence thresholds. The event classifier answers "what kind
-# of event is this?"; this module answers "how severe does the text say it is?".
+# These are explicit impact/severity cues, not classifier-confidence thresholds.
+# The classifier answers "what event type is this?"; this module answers "how
+# severe does the available text say the impact is?".
 CRITICAL_CUES = (
     "catastrophic",
     "destroyed",
@@ -30,6 +30,23 @@ CRITICAL_CUES = (
     "indefinitely closed",
     "force majeure",
     "nationwide shutdown",
+)
+
+# Evaluate explicit low-impact phrases before generic high/medium terms such as
+# "shutdown" and "outage" so "brief shutdown" is not accidentally promoted.
+LOW_CUES = (
+    "minor outage",
+    "minor disruption",
+    "minor shutdown",
+    "brief outage",
+    "brief disruption",
+    "brief shutdown",
+    "temporary shutdown",
+    "localized disruption",
+    "limited disruption",
+    "small delay",
+    "short delay",
+    "temporary slowdown",
 )
 
 HIGH_CUES = (
@@ -44,22 +61,8 @@ HIGH_CUES = (
     "factory closure",
     "export ban",
     "import ban",
-    "technology embargo",
-    "trade embargo",
-)
-
-# LOW is evaluated before generic MEDIUM cues so phrases such as "minor outage"
-# do not get promoted merely because they contain the word "outage".
-LOW_CUES = (
-    "minor outage",
-    "minor disruption",
-    "brief outage",
-    "brief disruption",
-    "localized disruption",
-    "limited disruption",
-    "small delay",
-    "short delay",
-    "temporary slowdown",
+    "embargo",
+    "shutdown",
 )
 
 MEDIUM_CUES = (
@@ -69,11 +72,14 @@ MEDIUM_CUES = (
     "restriction",
     "quota cut",
     "quota reduction",
+    "quota reduced",
     "reduced production",
     "production cut",
     "suspended operations",
     "temporary closure",
-    "supply delay",
+    "delay",
+    "tariff",
+    "sanction",
 )
 
 
@@ -98,8 +104,8 @@ def assess_event_severity(*, event_type: str, texts: list[str]) -> SeverityAsses
 
     for severity, cues in (
         (EventSeverity.CRITICAL, CRITICAL_CUES),
-        (EventSeverity.HIGH, HIGH_CUES),
         (EventSeverity.LOW, LOW_CUES),
+        (EventSeverity.HIGH, HIGH_CUES),
         (EventSeverity.MEDIUM, MEDIUM_CUES),
     ):
         cue = _first_match(text, cues)
