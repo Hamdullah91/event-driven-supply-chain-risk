@@ -284,11 +284,15 @@ class RiskAnalyticsService:
         ledger of immutable risk snapshots captured at wall-clock intervals.
         """
 
-        rows = self.repository.get_company_risk_history(
-            company_id,
-            max_hops=max_hops,
-            limit=limit,
+        rows = list(
+            self.repository.get_company_risk_history(
+                company_id,
+                max_hops=max_hops,
+                limit=limit,
+            )
         )
+        rows.sort(key=lambda row: str(row["timestamp"]))
+
         strongest: dict[str, float] = {}
         points: list[dict] = []
         for row in rows:
