@@ -27,7 +27,8 @@ def test_facility_resolution_does_not_fuzzy_match_ambiguous_partial_name():
 class HistoryRepository:
     def get_company_risk_history(self, company_id, *, max_hops, limit):
         assert company_id == "nvidia"
-        # Intentionally out of order: service must reconstruct chronologically.
+        # Intentionally out of order, with two paths for e1. The service must
+        # reconstruct chronologically and emit only the strongest e1 path.
         return [
             {
                 "event_id": "e2",
@@ -35,6 +36,13 @@ class HistoryRepository:
                 "timestamp": "2026-01-02T00:00:00Z",
                 "hop_distance": 2,
                 "dependency_weights": [1.0, 1.0],
+            },
+            {
+                "event_id": "e1",
+                "severity": "high",
+                "timestamp": "2026-01-01T00:00:00Z",
+                "hop_distance": 2,
+                "dependency_weights": [0.5, 1.0],
             },
             {
                 "event_id": "e1",
