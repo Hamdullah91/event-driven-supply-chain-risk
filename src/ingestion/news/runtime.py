@@ -2,21 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from src.api.services.risk import RiskAnalyticsService
-from src.api.services.risk_stream import RiskStreamService
 from src.config.settings import Settings
-from src.events.pipeline import EventPipeline
 from src.graph.connection import Neo4jConnection
-from src.graph.repository import GraphRepository
-from src.ingestion.news.classification import NewsClassificationService
-from src.ingestion.news.client import NewsAPIClient
-from src.ingestion.news.nlp_processor import NewsNLPProcessor
-from src.ingestion.news.poller import NewsPoller
-from src.ingestion.news.repository import NewsRepository
-from src.ml.event_classifier import EventClassifier
-from src.risk.repository import RiskRepository
+
+if TYPE_CHECKING:
+    from src.ingestion.news.poller import NewsPoller
 
 
 logger = logging.getLogger(__name__)
@@ -67,11 +59,23 @@ class NewsPollerRuntime:
             self._run(settings=settings, connection=connection),
             name="supply-chain-news-poller",
         )
-        # Yield once so immediate construction/configuration failures are exposed
-        # to health checks instead of being hidden until the next event-loop turn.
         await asyncio.sleep(0)
 
     async def _run(self, *, settings: Settings, connection: Neo4jConnection) -> None:
+        # Import heavyweight ML/NLP/runtime dependencies only when the optional
+        # poller is actually enabled. Normal FastAPI imports stay lightweight.
+        from src.api.services.risk import RiskAnalyticsService
+        from src.api.services.risk_stream import RiskStreamService
+        from src.events.pipeline import EventPipeline
+        from src.graph.repository import GraphRepository
+        from src.ingestion.news.classification import NewsClassificationService
+        from src.ingestion.news.client import NewsAPIClient
+        from src.ingestion.news.nlp_processor import NewsNLPProcessor
+        from src.ingestion.news.poller import NewsPoller
+        from src.ingestion.news.repository import NewsRepository
+        from src.ml.event_classifier import EventClassifier
+        from src.risk.repository import RiskRepository
+
         try:
             repository = NewsRepository(settings.NEWS_DATABASE_PATH)
             classifier = EventClassifier(
@@ -84,8 +88,6 @@ class NewsPollerRuntime:
             graph_repository = GraphRepository(connection)
             event_pipeline = EventPipeline(graph_repository=graph_repository)
             risk_service = RiskAnalyticsService(RiskRepository(connection))
-            # Deliberately use the default global manager shared by FastAPI's
-            # /risk-stream route in this same process.
             risk_stream_service = RiskStreamService(risk_service)
 
             async with NewsAPIClient(
