@@ -11,69 +11,12 @@ import {
 
 import { Button } from "../components/ui/Button";
 import { Panel } from "../components/ui/Panel";
+import {
+  eventsDemo,
+  type EventSeverity,
+} from "../data/eventsDemo";
 
 import "./EventsPage.css";
-
-type EventSeverity = "MEDIUM" | "HIGH" | "CRITICAL";
-
-type DemoEvent = {
-  id: string;
-  type: string;
-  severity: EventSeverity;
-  confidence: number;
-  timestamp: string;
-  source: string;
-  title: string;
-  description: string;
-  affectedEntities: string[];
-  location?: string;
-  evidence: string;
-};
-
-const demoEvents: DemoEvent[] = [
-  {
-    id: "demo-event-001",
-    type: "FACILITY_OUTAGE",
-    severity: "HIGH",
-    confidence: 0.94,
-    timestamp: "Fixture timestamp · 08:42 UTC",
-    source: "Development source",
-    title: "Manufacturing facility disruption detected",
-    description:
-      "Development-only event used to validate the Phase 1 Events workspace and its master-detail information hierarchy.",
-    affectedEntities: ["TSMC", "Demo Facility"],
-    location: "Fixture location not supplied",
-    evidence: "Development evidence placeholder",
-  },
-  {
-    id: "demo-event-002",
-    type: "SUPPLY_DISRUPTION",
-    severity: "CRITICAL",
-    confidence: 0.89,
-    timestamp: "Fixture timestamp · 07:16 UTC",
-    source: "Development source",
-    title: "Supplier disruption affecting semiconductor context",
-    description:
-      "This example demonstrates a high-priority disruption without representing a live backend event.",
-    affectedEntities: ["Samsung Electronics"],
-    location: "Fixture location not supplied",
-    evidence: "Development evidence placeholder",
-  },
-  {
-    id: "demo-event-003",
-    type: "REGULATION_CHANGE",
-    severity: "MEDIUM",
-    confidence: 0.82,
-    timestamp: "Fixture timestamp · 06:04 UTC",
-    source: "Development source",
-    title: "Regulatory change detected in monitored context",
-    description:
-      "Development-only classifier-facing example for validating event metadata and evidence presentation.",
-    affectedEntities: ["Semiconductor domain"],
-    location: "Fixture location not supplied",
-    evidence: "Development evidence placeholder",
-  },
-];
 
 const severityClasses: Record<EventSeverity, string> = {
   MEDIUM: "events-severity events-severity--medium",
@@ -83,12 +26,12 @@ const severityClasses: Record<EventSeverity, string> = {
 
 export function EventsPage() {
   const [selectedEventId, setSelectedEventId] = useState(
-    demoEvents[0].id,
+    eventsDemo[0].id,
   );
 
   const selectedEvent =
-    demoEvents.find((event) => event.id === selectedEventId) ??
-    demoEvents[0];
+    eventsDemo.find((event) => event.id === selectedEventId) ??
+    eventsDemo[0];
 
   return (
     <div className="events-page">
@@ -154,7 +97,7 @@ export function EventsPage() {
           description="Development fixtures. GET /api/v1/events and event detail endpoints are available; live frontend adapter work is deferred."
         >
           <div className="events-list">
-            {demoEvents.map((event) => {
+            {eventsDemo.map((event) => {
               const isSelected = event.id === selectedEvent.id;
 
               return (

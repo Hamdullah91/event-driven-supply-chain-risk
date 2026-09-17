@@ -275,11 +275,20 @@ Only statuses actually returned by that endpoint may be displayed. Do not synthe
 
 ## Development Fixtures
 
-Development/demo data is isolated under `src/data/` where practical and otherwise explicitly marked by the page as `DEVELOPMENT DATA`, `DEVELOPMENT FIXTURE`, or equivalent.
+Phase 1 fixture datasets are isolated under `src/data/`:
 
-Synthetic events must not appear to be current real news. Fixture timestamps must be visibly identified as fixture/demo timing.
+- `overviewDemo.ts`
+- `eventsDemo.ts`
+- `companiesDemo.ts`
+- `networkStructureDemo.ts`
+- `networkImpactDemo.ts`
+- `riskAnalysisDemo.ts`
+- `intelligenceDemo.ts`
+- `inspectorDemo.ts`
 
-The unused `networkImpactDemo.ts` prototype fixture was removed during final cleanup; the current Impact preview remains an explicitly labeled Phase 1 visual fixture in `NetworkPage`.
+Pages render those datasets with visible `DEVELOPMENT DATA`, `DEVELOPMENT FIXTURE`, `DEMO`, or equivalent labels. Synthetic events must not appear to be current real news; fixture timestamps are visibly identified as fixture/demo timing.
+
+The Impact fixture contains only prototype company/path/context values. The controlled radial hop-ring structure itself remains a visual rule, not simulated live backend output.
 
 ## Accessibility Baseline
 
@@ -296,7 +305,7 @@ Phase 1 preserves:
 
 ## Responsive Baseline
 
-Primary desktop targets remain 1440×900 and larger, with 1280 supported and ~1024 using the collapsed shell behavior/Inspector adaptation defined by the Phase 1 CSS.
+Primary desktop targets remain 1440×900 and larger. At 1280-class widths the Inspector narrows while analytical content wraps. At ~1024 the sidebar collapses and the persistent desktop Inspector is removed from the inline layout so the primary workspace remains usable.
 
 Below desktop widths, cards and analytical sections may stack. Mobile requires basic compatibility only; Phase 1 is not a mobile redesign.
 

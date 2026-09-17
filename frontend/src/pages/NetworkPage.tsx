@@ -13,7 +13,7 @@ import {
 
 import { Button } from "../components/ui/Button";
 import { RiskBadge } from "../components/ui/RiskBadge";
-
+import { networkImpactDemo } from "../data/networkImpactDemo";
 import {
   networkStructureDemoNodes,
   type DemoGraphNodeType,
@@ -85,7 +85,7 @@ export function NetworkPage() {
         <div className="network-search-control">
           <Search size={15} aria-hidden="true" />
           <span>Search entity</span>
-          <small>Reserved</small>
+          <small>Adapter pending</small>
         </div>
 
         <div className="network-toolbar-divider" />
@@ -185,80 +185,24 @@ function StructureCanvas() {
             </marker>
           </defs>
 
-          <line
-            x1="170"
-            y1="144"
-            x2="450"
-            y2="235"
-            className="network-edge"
-            markerEnd="url(#structure-arrow)"
-          />
-
-          <line
-            x1="470"
-            y1="235"
-            x2="750"
-            y2="170"
-            className="network-edge"
-            markerEnd="url(#structure-arrow)"
-          />
-
-          <line
-            x1="450"
-            y1="250"
-            x2="360"
-            y2="420"
-            className="network-edge"
-            markerEnd="url(#structure-arrow)"
-          />
-
-          <line
-            x1="755"
-            y1="185"
-            x2="670"
-            y2="420"
-            className="network-edge"
-            markerEnd="url(#structure-arrow)"
-          />
-
-          <line
-            x1="775"
-            y1="185"
-            x2="850"
-            y2="340"
-            className="network-edge"
-            markerEnd="url(#structure-arrow)"
-          />
+          <line x1="170" y1="144" x2="450" y2="235" className="network-edge" markerEnd="url(#structure-arrow)" />
+          <line x1="470" y1="235" x2="750" y2="170" className="network-edge" markerEnd="url(#structure-arrow)" />
+          <line x1="450" y1="250" x2="360" y2="420" className="network-edge" markerEnd="url(#structure-arrow)" />
+          <line x1="755" y1="185" x2="670" y2="420" className="network-edge" markerEnd="url(#structure-arrow)" />
+          <line x1="775" y1="185" x2="850" y2="340" className="network-edge" markerEnd="url(#structure-arrow)" />
         </svg>
 
-        <div className="relationship-label relationship-label--one">
-          SUPPLIES
-        </div>
-
-        <div className="relationship-label relationship-label--two">
-          SUPPLIES
-        </div>
-
-        <div className="relationship-label relationship-label--three">
-          OPERATES
-        </div>
-
-        <div className="relationship-label relationship-label--four">
-          USES
-        </div>
-
-        <div className="relationship-label relationship-label--five">
-          PRODUCES
-        </div>
+        <div className="relationship-label relationship-label--one">SUPPLIES</div>
+        <div className="relationship-label relationship-label--two">SUPPLIES</div>
+        <div className="relationship-label relationship-label--three">OPERATES</div>
+        <div className="relationship-label relationship-label--four">USES</div>
+        <div className="relationship-label relationship-label--five">PRODUCES</div>
 
         {networkStructureDemoNodes.map((node) => (
           <div
             key={node.id}
             className="graph-node-wrapper"
-            style={{
-              left: `${node.x}%`,
-              top: `${node.y}%`,
-            }}
+            style={{ left: `${node.x}%`, top: `${node.y}%` }}
           >
             <div
               className={`graph-node graph-node--${node.type.toLowerCase()}${
@@ -279,7 +223,6 @@ function StructureCanvas() {
 
         <div className="network-canvas-notice">
           <span>DEMO STRUCTURE</span>
-
           <p>
             Static visual fixture for Phase 1. Relationship direction is
             preserved.
@@ -293,6 +236,8 @@ function StructureCanvas() {
 }
 
 function ImpactCanvas() {
+  const { origin, companies, paths, context } = networkImpactDemo;
+
   return (
     <section
       className="network-canvas impact-canvas"
@@ -310,7 +255,7 @@ function ImpactCanvas() {
       <div className="impact-surface">
         <div className="impact-origin-card">
           <span className="metadata-text">DEMO ORIGIN</span>
-          <strong>TSMC disruption</strong>
+          <strong>{origin.label}</strong>
           <span>Development-only propagation scenario</span>
         </div>
 
@@ -329,33 +274,20 @@ function ImpactCanvas() {
 
           <div className="blast-origin-node">
             <AlertTriangle size={19} aria-hidden="true" />
-            <strong>TSMC</strong>
+            <strong>{origin.company}</strong>
             <span>Origin</span>
           </div>
 
-          <ImpactCompany
-            className="impact-company--nvidia"
-            company="NVIDIA"
-            hop="Hop 1"
-            score="0.75"
-            level="CRITICAL"
-          />
-
-          <ImpactCompany
-            className="impact-company--demo-a"
-            company="Demo Company A"
-            hop="Hop 2"
-            score="0.525"
-            level="HIGH"
-          />
-
-          <ImpactCompany
-            className="impact-company--demo-b"
-            company="Demo Company B"
-            hop="Hop 3"
-            score="0.368"
-            level="MEDIUM"
-          />
+          {companies.map((company) => (
+            <ImpactCompany
+              key={company.id}
+              className={`impact-company--${company.position}`}
+              company={company.company}
+              hop={company.hop}
+              score={company.score}
+              level={company.level}
+            />
+          ))}
 
           <svg
             className="impact-paths"
@@ -379,32 +311,17 @@ function ImpactCanvas() {
               </marker>
             </defs>
 
-            <line
-              x1="500"
-              y1="300"
-              x2="660"
-              y2="300"
-              className="impact-path impact-path--critical"
-              markerEnd="url(#impact-arrow)"
-            />
-
-            <line
-              x1="690"
-              y1="300"
-              x2="750"
-              y2="180"
-              className="impact-path impact-path--high"
-              markerEnd="url(#impact-arrow)"
-            />
-
-            <line
-              x1="770"
-              y1="170"
-              x2="840"
-              y2="110"
-              className="impact-path impact-path--medium"
-              markerEnd="url(#impact-arrow)"
-            />
+            {paths.map((path) => (
+              <line
+                key={path.id}
+                x1={path.x1}
+                y1={path.y1}
+                x2={path.x2}
+                y2={path.y2}
+                className={`impact-path impact-path--${path.tone}`}
+                markerEnd="url(#impact-arrow)"
+              />
+            ))}
           </svg>
         </div>
 
@@ -417,22 +334,22 @@ function ImpactCanvas() {
           <div className="impact-context-grid">
             <div>
               <span>Initial Risk</span>
-              <strong>0.75</strong>
+              <strong>{context.initialRisk}</strong>
             </div>
 
             <div>
               <span>Max Hops</span>
-              <strong>3</strong>
+              <strong>{context.maxHops}</strong>
             </div>
 
             <div>
               <span>Distance Decay</span>
-              <strong>0.70</strong>
+              <strong>{context.distanceDecay}</strong>
             </div>
 
             <div>
               <span>Affected Companies</span>
-              <strong>3</strong>
+              <strong>{context.affectedCompanies}</strong>
             </div>
           </div>
 
