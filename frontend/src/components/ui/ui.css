@@ -123,7 +123,7 @@
   justify-content: center;
   gap: var(--space-2);
 
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 var(--space-3);
 
   border: 1px solid transparent;
@@ -228,72 +228,6 @@
   color: var(--risk-critical);
 }
 
-/* =========================================================
-   STEP 5 COMPONENT PREVIEW
-   Temporary preview layout only.
-   ========================================================= */
-
-.component-preview {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-gap);
-}
-
-.component-preview-header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.component-preview-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--standard-gap);
-}
-
-.component-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--standard-gap);
-}
-
-.component-preview-analytical {
-  grid-column: span 5;
-}
-
-.component-preview-workspace {
-  grid-column: span 7;
-}
-
-.component-preview-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.component-preview-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-@media (max-width: 1279px) {
-  .component-preview-metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .component-preview-analytical,
-  .component-preview-workspace {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (max-width: 767px) {
-  .component-preview-metrics {
-    grid-template-columns: 1fr;
-  }
-}
 /* =========================================================
    CROSS-PRODUCT STATES
    ========================================================= */
@@ -518,4 +452,3 @@
     animation: none;
   }
 }
-

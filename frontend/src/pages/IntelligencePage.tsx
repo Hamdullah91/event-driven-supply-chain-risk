@@ -47,8 +47,8 @@ export function IntelligencePage() {
           <BrainCircuit size={15} aria-hidden="true" />
 
           <div>
-            <strong>Public API unavailable</strong>
-            <span>Agentic RAG integration pending</span>
+            <strong>Agent API available</strong>
+            <span>Runtime provider configuration required</span>
           </div>
         </div>
       </header>
@@ -83,8 +83,9 @@ export function IntelligencePage() {
         <ShieldCheck size={14} aria-hidden="true" />
 
         <span>
-          Query submission remains disabled until a public Agentic RAG API
-          contract is exposed.
+          POST /api/v1/agent/query is available. Live query wiring remains
+          pending in the frontend, and production LLM responses require a
+          configured runtime provider.
         </span>
       </div>
 
@@ -300,31 +301,29 @@ export function IntelligencePage() {
           ))}
         </div>
       </Panel>
-
-     
     </div>
-);
+  );
 }
 
 type TraceItemProps = {
-label: string;
-value: string;
-emphasized?: boolean;
+  label: string;
+  value: string;
+  emphasized?: boolean;
 };
 
 function TraceItem({
-label,
-value,
-emphasized = false,
+  label,
+  value,
+  emphasized = false,
 }: TraceItemProps) {
-return (
+  return (
     <div
-    className={`intelligence-trace-item${
+      className={`intelligence-trace-item${
         emphasized ? " is-emphasized" : ""
-    }`}
+      }`}
     >
-    <span>{label}</span>
-    <strong>{value}</strong>
+      <span>{label}</span>
+      <strong>{value}</strong>
     </div>
   );
 }

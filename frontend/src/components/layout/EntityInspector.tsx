@@ -93,7 +93,7 @@ export function EntityInspector({
           </span>
 
           <span className="inspector-demo-label">
-            DEVELOPMENT
+            DEVELOPMENT FIXTURE
           </span>
         </div>
 

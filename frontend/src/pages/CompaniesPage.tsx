@@ -94,7 +94,7 @@ function CompaniesList({
 
           <span>Search companies</span>
 
-          <small>Reserved</small>
+          <small>Adapter pending</small>
         </div>
 
         <div className="companies-filter">
@@ -116,7 +116,7 @@ function CompaniesList({
       <Panel
         eyebrow="Company directory"
         title="Known Companies"
-        description="Initial table architecture follows the current company API contract."
+        description="Initial table architecture follows the current company API contract. Global search and company filtering APIs are available; interaction wiring is deferred."
       >
         <div className="companies-table-wrapper">
           <table className="companies-table">
@@ -175,8 +175,8 @@ function CompaniesList({
         <div className="companies-table-note">
           <span>
             Risk and active-event columns are intentionally not populated
-            in the directory because the current company-list response
-            does not directly return them.
+            in this fixture directory because the current company-list
+            response does not directly return those values.
           </span>
         </div>
       </Panel>
@@ -382,7 +382,8 @@ function CompanyProfile({
 
             <span>
               Final graph renderer will use Neo4j-backed nodes and
-              relationships through FastAPI.
+              relationships through FastAPI. The graph library is not frozen
+              in Phase 1.
             </span>
           </div>
         </div>
@@ -417,19 +418,20 @@ function CompanyProfile({
       <Panel
         eyebrow="Evidence & provenance"
         title="Available Evidence"
-        description="Evidence remains first-class but must only display fields actually returned by the backend."
+        description="Evidence remains first-class and must only display fields actually returned by the backend."
       >
         <div className="company-evidence-state">
           <FileText size={18} aria-hidden="true" />
 
           <div>
             <strong>
-              Partial evidence contract
+              Typed provenance supported
             </strong>
 
             <span>
-              Source, confidence, provenance, and relationship metadata
-              will appear here only when available.
+              Source, confidence, provenance, evidence status, and
+              relationship metadata render only when returned by the selected
+              backend contract.
             </span>
           </div>
 

@@ -40,7 +40,7 @@ export const defaultInspectorContext: InspectorContext = {
   id: "demo-tsmc",
   type: "Company",
   name: "TSMC",
-  subtitle: "Development selection",
+  subtitle: "Static Phase 1 development fixture — not a production selection",
 
   riskLevel: "HIGH",
   riskScore: "0.61",

@@ -36,13 +36,13 @@ const demoEvents: DemoEvent[] = [
     type: "FACILITY_OUTAGE",
     severity: "HIGH",
     confidence: 0.94,
-    timestamp: "2026-09-17 08:42 UTC",
+    timestamp: "Fixture timestamp · 08:42 UTC",
     source: "Development source",
     title: "Manufacturing facility disruption detected",
     description:
       "Development-only event used to validate the Phase 1 Events workspace and its master-detail information hierarchy.",
     affectedEntities: ["TSMC", "Demo Facility"],
-    location: "Not available",
+    location: "Fixture location not supplied",
     evidence: "Development evidence placeholder",
   },
   {
@@ -50,13 +50,13 @@ const demoEvents: DemoEvent[] = [
     type: "SUPPLY_DISRUPTION",
     severity: "CRITICAL",
     confidence: 0.89,
-    timestamp: "2026-09-17 07:16 UTC",
+    timestamp: "Fixture timestamp · 07:16 UTC",
     source: "Development source",
     title: "Supplier disruption affecting semiconductor context",
     description:
       "This example demonstrates a high-priority disruption without representing a live backend event.",
     affectedEntities: ["Samsung Electronics"],
-    location: "Not available",
+    location: "Fixture location not supplied",
     evidence: "Development evidence placeholder",
   },
   {
@@ -64,13 +64,13 @@ const demoEvents: DemoEvent[] = [
     type: "REGULATION_CHANGE",
     severity: "MEDIUM",
     confidence: 0.82,
-    timestamp: "2026-09-17 06:04 UTC",
+    timestamp: "Fixture timestamp · 06:04 UTC",
     source: "Development source",
     title: "Regulatory change detected in monitored context",
     description:
       "Development-only classifier-facing example for validating event metadata and evidence presentation.",
     affectedEntities: ["Semiconductor domain"],
-    location: "Not available",
+    location: "Fixture location not supplied",
     evidence: "Development evidence placeholder",
   },
 ];
@@ -96,7 +96,7 @@ export function EventsPage() {
         <div>
           <div className="events-heading-context">
             <span className="metadata-text">EVENT INTELLIGENCE</span>
-            <span className="demo-badge">DEVELOPMENT DATA</span>
+            <span className="demo-badge">DEVELOPMENT FIXTURE</span>
           </div>
 
           <h1 className="page-title">Events</h1>
@@ -109,7 +109,7 @@ export function EventsPage() {
 
         <div className="events-api-state">
           <Clock3 size={14} aria-hidden="true" />
-          <span>Event read API not yet available</span>
+          <span>Event APIs available · frontend adapter pending</span>
         </div>
       </header>
 
@@ -124,7 +124,7 @@ export function EventsPage() {
             disabled
           />
 
-          <span>Reserved</span>
+          <span>Adapter pending</span>
         </div>
 
         <div className="events-filter-group">
@@ -151,7 +151,7 @@ export function EventsPage() {
           className="events-list-panel"
           eyebrow="Detected context"
           title="Disruption Events"
-          description="Development examples only until event read APIs are implemented."
+          description="Development fixtures. GET /api/v1/events and event detail endpoints are available; live frontend adapter work is deferred."
         >
           <div className="events-list">
             {demoEvents.map((event) => {
@@ -212,7 +212,7 @@ export function EventsPage() {
           <div className="event-detail-header">
             <div>
               <span className="metadata-text">
-                SELECTED EVENT
+                SELECTED DEVELOPMENT EVENT
               </span>
 
               <h2>{selectedEvent.title}</h2>
@@ -292,8 +292,8 @@ export function EventsPage() {
             <div className="event-unavailable">
               <span>{selectedEvent.location}</span>
               <p>
-                No verified event-coordinate contract is currently
-                available.
+                Backend Location entities expose verified coordinates. This
+                development event fixture does not include a plotted location.
               </p>
             </div>
           </section>
@@ -318,8 +318,8 @@ export function EventsPage() {
                 <div>
                   <strong>{selectedEvent.evidence}</strong>
                   <span>
-                    Live typed event evidence is not exposed by the current
-                    public API.
+                    Production rendering must use only provenance and
+                    evidence fields returned by the selected event contract.
                   </span>
                 </div>
               </div>
@@ -340,7 +340,8 @@ export function EventsPage() {
             </Button>
 
             <span>
-              Event-originated impact API is not currently available.
+              Event Blast Radius API is available; action wiring remains
+              deferred to frontend interaction/integration work.
             </span>
           </div>
         </section>

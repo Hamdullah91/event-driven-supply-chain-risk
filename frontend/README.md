@@ -1,75 +1,66 @@
-# React + TypeScript + Vite
+# Supply Chain Risk Intelligence Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend for the Final Year Project:
 
-Currently, two official plugins are available:
+**Event-Driven Supply Chain Risk Intelligence Using Dynamic Knowledge Graphs**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Phase 1 Status
 
-## React Compiler
+This branch contains the frozen Phase 1 visual architecture candidate:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- exactly six top-level sections: Overview, Events, Network, Companies, Risk Analysis, Intelligence
+- professional dark analytical workstation visual system
+- permanent right-side Entity Inspector
+- Structure and Impact graph modes
+- controlled concentric/radial Blast Radius inside Network → Impact
+- canonical risk labels: NONE, LOW, MEDIUM, HIGH, CRITICAL
+- development fixtures clearly separated from live backend data
 
-## Expanding the ESLint configuration
+Phase 1 does **not** freeze the final graph-rendering library and does not implement the full live API adapter layer.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Backend Capabilities Already Available
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The current backend exposes event list/detail/blast-radius APIs, company/network APIs, global search, risk/history/exposure/blast-radius APIs, detailed health, geographic coordinates, the public Agent query API, and `/risk-stream` WebSocket connectivity.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Several Phase 1 screens remain intentionally fixture-backed. Their UI copy must say that frontend adapter/integration work is pending rather than claiming that the backend endpoint does not exist.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Production Agent responses require valid runtime LLM provider configuration. WebSocket connection and same-process event-to-risk publishing are distinct concerns; the current in-memory connection manager requires the poller and FastAPI application to share a runtime for live publication.
 
+## Development
+
+From `frontend/`:
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Final Phase 1 verification:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run build
+npm run lint
 ```
+
+## Fixture Policy
+
+Development/demo fixtures are isolated under `src/data/` or are explicitly marked in the relevant Phase 1 page component. Synthetic events, risk values, paths, and Inspector context must never be presented as current production data.
+
+## Graph Boundary
+
+The final graph engine is intentionally not selected in Phase 1. A later implementation decision must satisfy these capabilities:
+
+- directed edges
+- multigraph-style relationships
+- pan and zoom
+- drag where useful
+- node and edge selection
+- custom node and edge styles
+- Structure Mode styling
+- Impact Mode styling
+- path highlighting
+- bounded expansion
+- controlled concentric/radial Blast Radius by hop
+- Neo4j-backed data through the backend API
+
+See `frontend_phase1_handoff.md` for the complete frozen design and Phase 2 boundary.

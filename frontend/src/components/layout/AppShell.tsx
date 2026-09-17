@@ -70,10 +70,10 @@ export function AppShell({
           <div className="topbar-actions">
             <div
               className="search-reserved"
-              aria-label="Global search reserved"
+              aria-label="Global search API available; frontend adapter pending"
             >
               Global search
-              <span>Reserved</span>
+              <span>API available</span>
             </div>
 
             <div className="topbar-status">

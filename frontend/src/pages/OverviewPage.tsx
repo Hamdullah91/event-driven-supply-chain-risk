@@ -39,7 +39,7 @@ const demoEvents: DemoEvent[] = [
     type: "FACILITY_OUTAGE",
     severity: "HIGH",
     source: "Demo source",
-    timestamp: "12 min ago",
+    timestamp: "Demo T+12m",
     entity: "TSMC",
   },
   {
@@ -47,7 +47,7 @@ const demoEvents: DemoEvent[] = [
     type: "SUPPLY_DISRUPTION",
     severity: "MEDIUM",
     source: "Demo source",
-    timestamp: "38 min ago",
+    timestamp: "Demo T+38m",
     entity: "Samsung Electronics",
   },
   {
@@ -55,7 +55,7 @@ const demoEvents: DemoEvent[] = [
     type: "REGULATION_CHANGE",
     severity: "MEDIUM",
     source: "Demo source",
-    timestamp: "1 hr ago",
+    timestamp: "Demo T+1h",
     entity: "Semiconductor domain",
   },
 ];
@@ -109,7 +109,7 @@ export function OverviewPage() {
 
         <div className="overview-header-context">
           <Clock3 size={14} aria-hidden="true" />
-          <span>Live overview API not yet available</span>
+          <span>Aggregate overview adapter pending</span>
         </div>
       </header>
 
@@ -120,7 +120,7 @@ export function OverviewPage() {
         <MetricCard
           label="Detected Events"
           value="—"
-          detail="System-wide event read API required"
+          detail="Event list API available · overview adapter pending"
           status={<RadioTower size={16} aria-hidden="true" />}
         />
 
@@ -151,10 +151,10 @@ export function OverviewPage() {
           className="overview-events-panel"
           eyebrow="What happened?"
           title="Recent Disruption Context"
-          description="Development-only examples until system-wide event read APIs are available."
+          description="Development fixtures. GET /api/v1/events is available; live overview adapter work is pending."
           action={
-            <Button variant="ghost">
-              Events unavailable
+            <Button variant="ghost" disabled>
+              Live adapter pending
             </Button>
           }
         >
@@ -344,15 +344,16 @@ export function OverviewPage() {
         <Panel
           eyebrow="Recent context"
           title="Risk Activity"
-          description="Historical risk series is not currently available."
+          description="Historical risk endpoint is available; chart integration is pending."
         >
           <div className="unavailable-state">
             <Activity size={18} aria-hidden="true" />
 
             <div>
-              <strong>Not available</strong>
+              <strong>Frontend adapter pending</strong>
               <span>
-                Historical risk controls will remain hidden until supported.
+                GET /risk/&#123;company_id&#125;/history is available; this
+                Phase 1 overview does not yet render a live history chart.
               </span>
             </div>
           </div>

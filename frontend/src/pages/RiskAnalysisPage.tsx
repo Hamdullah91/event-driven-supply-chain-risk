@@ -53,7 +53,7 @@ export function RiskAnalysisPage() {
           <BarChart3 size={14} aria-hidden="true" />
 
           <span>
-            Historical risk series not available
+            Historical endpoint available · chart adapter pending
           </span>
         </div>
       </header>
@@ -74,7 +74,7 @@ export function RiskAnalysisPage() {
 
         <div className="risk-scope-item is-disabled">
           <span>Time</span>
-          <strong>Not available</strong>
+          <strong>Adapter pending</strong>
         </div>
       </section>
 
@@ -258,13 +258,14 @@ export function RiskAnalysisPage() {
 
             <div>
               <strong>
-                Current-state analysis
+                Development fixture presentation
               </strong>
 
               <p>
-                This workspace represents current exposure only.
-                Historical trend interpretation remains unavailable until
-                a backend risk-history contract exists.
+                Backend risk history is available through
+                /risk/&#123;company_id&#125;/history. This Phase 1 workspace
+                does not yet render live historical charts or infer persisted
+                snapshot semantics beyond the backend contract.
               </p>
             </div>
           </div>
@@ -320,16 +321,16 @@ function GeographyView() {
           GEOGRAPHY LENS
         </span>
 
-        <h3>Precise geographic plotting unavailable</h3>
+        <h3>Verified geographic coordinates available</h3>
 
         <p>
-          Facility, country, location, and event concepts exist in the
-          graph, but verified latitude and longitude coordinates are not
-          currently guaranteed by the frontend contract.
+          Backend Location nodes expose verified latitude and longitude
+          coordinates. Geography remains a secondary analytical lens, and
+          live map rendering is deferred to frontend integration work.
         </p>
 
         <div className="geography-integrity-note">
-          No coordinates have been invented for this view.
+          No synthetic coordinates are used in this fixture.
         </div>
       </div>
     </div>
