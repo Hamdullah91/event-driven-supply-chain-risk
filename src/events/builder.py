@@ -55,6 +55,8 @@ def build_news_event(
     entity_id: str | None = None,
     severity: EventSeverity = EventSeverity.UNKNOWN,
     source_url: str | None = None,
+    severity_reason: str | None = None,
+    severity_cue: str | None = None,
 ) -> SupplyChainEvent:
     if not article_id.strip():
         raise ValueError("article_id cannot be empty.")
@@ -70,6 +72,17 @@ def build_news_event(
         entity_id=entity_id,
     )
 
+    payload = {
+        "article_id": article_id,
+        "title": title,
+        "confidence": confidence,
+        "source_url": source_url,
+    }
+    if severity_reason:
+        payload["severity_reason"] = severity_reason
+    if severity_cue:
+        payload["severity_cue"] = severity_cue
+
     return SupplyChainEvent(
         event_id=event_id,
         event_type=event_type,
@@ -77,10 +90,5 @@ def build_news_event(
         timestamp=timestamp,
         entity_id=entity_id,
         severity=severity,
-        payload={
-            "article_id": article_id,
-            "title": title,
-            "confidence": confidence,
-            "source_url": source_url,
-        },
+        payload=payload,
     )

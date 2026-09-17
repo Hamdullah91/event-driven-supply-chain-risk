@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from src.events.builder import build_news_event
 from src.events.facility_resolution import resolve_facility_mentions
 from src.events.models import SupplyChainEvent
+from src.events.severity import assess_event_severity
 from src.graph.repository import GraphRepository
 from src.ingestion.news.classification import ClassifiedNewsArticle
 from src.ingestion.news.nlp_processor import NewsNLPResult
@@ -31,6 +32,15 @@ class EventPipeline:
     def __init__(self, *, graph_repository: GraphRepository) -> None:
         self.graph_repository = graph_repository
 
+    @staticmethod
+    def _severity_context(classified: ClassifiedNewsArticle, nlp_result: NewsNLPResult) -> list[str]:
+        """Build deterministic impact context without using classifier confidence."""
+        texts = [classified.title]
+        texts.extend(entity.text for entity in nlp_result.entities)
+        for candidate in nlp_result.triplets:
+            texts.extend((candidate.subject, candidate.predicate, candidate.object))
+        return texts
+
     def process(self, *, classified: ClassifiedNewsArticle, nlp_result: NewsNLPResult) -> EventPipelineResult:
         if classified.article_id != nlp_result.article_id:
             raise ValueError("Classification and NLP results belong to different articles.")
@@ -45,6 +55,11 @@ class EventPipeline:
         primary_company = max(resolved_companies, key=lambda entity: entity.confidence) if resolved_companies else None
         entity_id = primary_company.canonical_id if primary_company else None
 
+        severity = assess_event_severity(
+            event_type=classified.event_type,
+            texts=self._severity_context(classified, nlp_result),
+        )
+
         event = build_news_event(
             article_id=classified.article_id,
             classifier_label=classified.event_type,
@@ -53,7 +68,10 @@ class EventPipeline:
             confidence=classified.confidence,
             title=classified.title,
             entity_id=entity_id,
+            severity=severity.severity,
             source_url=classified.url,
+            severity_reason=severity.reason,
+            severity_cue=severity.matched_cue,
         )
         self.graph_repository.save_event(event)
 
@@ -92,9 +110,10 @@ class EventPipeline:
 
         logger.info(
             "Dynamic event pipeline completed article_id=%s event_id=%s event_type=%s "
-            "classification_confidence=%.4f linked_companies=%d failed_company_links=%d "
-            "linked_facilities=%d failed_facility_links=%d",
+            "classification_confidence=%.4f severity=%s severity_cue=%r "
+            "linked_companies=%d failed_company_links=%d linked_facilities=%d failed_facility_links=%d",
             classified.article_id, event.event_id, classified.event_type, classified.confidence,
+            event.severity.value, severity.matched_cue,
             len(linked_company_ids), failed_company_links, len(linked_facility_ids), failed_facility_links,
         )
         return EventPipelineResult(

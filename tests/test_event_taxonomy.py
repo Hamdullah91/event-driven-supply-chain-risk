@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
+from src.agent.explainer import EVENT_LABELS
 from src.events.builder import build_news_event, normalize_classifier_event_type
 from src.events.types import EventType
 
@@ -38,6 +39,18 @@ def test_event_type_values_match_classifier_taxonomy() -> None:
         "trade_policy_change",
         "quota_change",
     }
+
+
+def test_agent_display_labels_match_canonical_taxonomy() -> None:
+    assert set(EVENT_LABELS) == {
+        "SUPPLY_DISRUPTION",
+        "REGULATION_CHANGE",
+        "FACILITY_OUTAGE",
+        "TECHNOLOGY_EMBARGO",
+        "TRADE_POLICY_CHANGE",
+        "QUOTA_CHANGE",
+    }
+    assert "RAW_MATERIAL_SHORTAGE" not in EVENT_LABELS
 
 
 def test_built_event_persists_canonical_taxonomy_value() -> None:
