@@ -22,3 +22,12 @@
 .evidence-availability { display: inline-flex; margin-top: 8px; padding: 3px 6px; border: 1px solid var(--color-border); border-radius: var(--radius-badge); color: var(--color-text-secondary); font-size: 10px; font-weight: 700; }
 .evidence-availability--unavailable { color: var(--color-text-muted); }
 .inspector-evidence-toggle { margin-top: 8px; }
+.phase2-entity-button { border: 1px solid var(--color-border); color: inherit; cursor: pointer; font: inherit; text-align: left; }
+.phase2-entity-button:hover, .phase2-entity-button:focus-visible { border-color: var(--color-primary); outline: none; }
+.phase2-node-button { color: inherit; font: inherit; cursor: pointer; }
+.phase2-node-button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.phase2-evidence-detail { display: grid; gap: 6px; margin-top: 10px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-panel); color: var(--color-text-secondary); font-size: 12px; }
+.companies-search input.phase2-search-input { width: 100%; border: 0; background: transparent; padding: 0; }
+.companies-filter select.phase2-filter-select { min-height: 28px; padding: 0; border: 0; background: transparent; font-weight: 600; }
+.companies-table tr.phase2-selectable.is-selected td { background: color-mix(in srgb, var(--color-primary) 10%, transparent); }
+.propagation-node.phase2-node-button { border: inherit; }
