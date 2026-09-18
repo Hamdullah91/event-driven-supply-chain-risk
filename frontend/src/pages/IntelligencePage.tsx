@@ -19,6 +19,7 @@ export function IntelligencePage({ onInspect, onShowNetwork, onOpenImpact }: Int
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState(intelligenceDemo.question);
   const [preparing, setPreparing] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [selectedPath, setSelectedPath] = useState(false);
   const [showEvidence, setShowEvidence] = useState(false);
 
@@ -32,9 +33,15 @@ export function IntelligencePage({ onInspect, onShowNetwork, onOpenImpact }: Int
     const trimmed = question.trim();
     if (!trimmed) return;
     setSubmittedQuestion(trimmed);
+    setFailed(false);
     setPreparing(true);
     setSelectedPath(false);
     setShowEvidence(false);
+  };
+
+  const retry = () => {
+    setFailed(false);
+    setPreparing(true);
   };
 
   const inspectEntity = (entity: (typeof intelligenceDemo.entities)[number]) => {
@@ -61,12 +68,14 @@ export function IntelligencePage({ onInspect, onShowNetwork, onOpenImpact }: Int
         <Button type="submit" variant="primary" icon={<Sparkles size={15} />} disabled={!question.trim() || preparing}>{preparing ? "Preparing response..." : "Send"}</Button>
       </form>
 
-      <div className="intelligence-api-note"><ShieldCheck size={14} aria-hidden="true" /><span>This Phase 2 interaction uses a clearly labeled development response fixture. It does not display hidden reasoning or chain-of-thought.</span></div>
+      <div className="intelligence-api-note"><ShieldCheck size={14} aria-hidden="true" /><span>This Phase 2 interaction uses a clearly labeled development response fixture. It does not display hidden reasoning or chain-of-thought.</span><Button variant="ghost" onClick={() => { setPreparing(false); setFailed(true); setShowEvidence(false); }}>DEMO FAILURE</Button></div>
 
       <section className="intelligence-result-header"><div><span className="metadata-text">DEVELOPMENT RESPONSE</span><h2>{submittedQuestion}</h2></div><span className="intelligence-grounded-badge">GRAPH GROUNDED</span></section>
 
       {preparing ? (
         <div className="phase2-intelligence-loading" role="status"><BrainCircuit size={20} aria-hidden="true" /><strong>Preparing response...</strong><span>No internal reasoning steps are displayed.</span></div>
+      ) : failed ? (
+        <div className="phase2-intelligence-error" role="alert"><BrainCircuit size={20} aria-hidden="true" /><strong>Unable to prepare Intelligence response.</strong><span>This is a Phase 2 development failure state; no production Agent API request was made.</span><Button variant="secondary" onClick={retry}>Retry</Button></div>
       ) : (
         <>
           <section className="intelligence-result-grid">
