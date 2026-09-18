@@ -4,7 +4,13 @@ import { ArrowLeft, ArrowRight, Boxes, Building2, Cpu, Factory, FileText, Layers
 import { Button } from "../components/ui/Button";
 import { Panel } from "../components/ui/Panel";
 import { RiskBadge } from "../components/ui/RiskBadge";
-import { companiesDemo, getCompanyExposureFixture, type DemoCompany, type DemoCompanyExposure } from "../data/companiesDemo";
+import {
+  companiesDemo,
+  getCompanyExposureFixture,
+  getCompanyProfile,
+  type DemoCompany,
+  type DemoCompanyExposure,
+} from "../data/companiesDemo";
 import type { InspectorContext, InspectorEntityType } from "../data/inspectorDemo";
 
 import "./CompaniesPage.css";
@@ -37,9 +43,33 @@ function companyContext(company: DemoCompany): InspectorContext {
 }
 
 export function CompaniesPage(props: CompaniesPageProps) {
-  const selectedCompany = companiesDemo.find((company) => company.companyId === props.profileCompanyId);
-  if (selectedCompany) return <CompanyProfile company={selectedCompany} {...props} />;
+  if (props.profileCompanyId) {
+    const selectedCompany = getCompanyProfile(props.profileCompanyId);
+    if (selectedCompany) return <CompanyProfile company={selectedCompany} {...props} />;
+    return <CompanyProfileUnavailable requestedId={props.profileCompanyId} onBack={props.onBackFromProfile} />;
+  }
+
   return <CompaniesList {...props} />;
+}
+
+function CompanyProfileUnavailable({ requestedId, onBack }: { requestedId: string; onBack: () => void }) {
+  return (
+    <div className="company-profile">
+      <button type="button" className="company-profile-back" onClick={onBack}><ArrowLeft size={14} aria-hidden="true" /><span>Back</span></button>
+      <Panel
+        variant="workspace"
+        eyebrow="Company profile"
+        title="Profile unavailable for this development entity"
+        description="The requested company ID does not resolve to a Company Profile fixture. The Companies directory is not shown as though profile navigation succeeded."
+      >
+        <div className="company-network-placeholder" role="status">
+          <ShieldAlert size={22} aria-hidden="true" />
+          <div><strong>No profile fixture for {requestedId}</strong><span>Return to the previous investigation or choose a supported company from the Companies directory.</span></div>
+          <Button variant="secondary" onClick={onBack}>Return</Button>
+        </div>
+      </Panel>
+    </div>
+  );
 }
 
 function CompaniesList({ selectedInspectorId, onOpenProfile, onInspect }: CompaniesPageProps) {
@@ -130,10 +160,10 @@ function CompanyProfile({ company, onBackFromProfile, onInspect, onExploreNetwor
 
       <section className="company-profile-summary">
         <Panel eyebrow="Current risk" title="Risk Summary"><div className="company-risk-summary"><strong>{company.riskScore}</strong><RiskBadge level={company.riskLevel} /><span>{company.contributingEventCount} contributing events</span></div></Panel>
-        <Panel eyebrow="Event context" title="Contributing Events"><div className="company-event-summary"><strong>{company.contributingEventCount}</strong><span>Select a supported development exposure below to inspect its individual contribution. Missing fixtures remain unavailable rather than borrowing another company's path.</span></div></Panel>
+        <Panel eyebrow="Event context" title="Contributing Events"><div className="company-event-summary"><strong>{company.contributingEventCount}</strong><span>Aggregate event counts may be available even when detailed development exposure paths are not.</span></div></Panel>
       </section>
 
-      <Panel variant="workspace" eyebrow="Why is this company exposed?" title="Risk Paths & Contributing Events" description="Select a contribution to reveal its backend-shaped risk trace and path.">
+      <Panel variant="workspace" eyebrow="Why is this company exposed?" title="Risk Paths & Contributing Events" description="Select a supported contribution to reveal its backend-shaped risk trace and path.">
         {exposures.length > 0 ? (
           <div className="company-exposure-list">
             {exposures.map((exposure) => (
@@ -148,14 +178,14 @@ function CompanyProfile({ company, onBackFromProfile, onInspect, onExploreNetwor
         ) : (
           <div className="company-network-placeholder" role="status">
             <ShieldAlert size={22} aria-hidden="true" />
-            <div><strong>No development exposure fixture is available for this company.</strong><span>Aggregate company risk may still be shown, but no other company's event path is substituted.</span></div>
+            <div><strong>Detailed development exposure paths are unavailable for this company.</strong><span>Aggregate risk and event counts may still be available. No other company's path is substituted.</span></div>
           </div>
         )}
         {selectedExposure && <p className="phase2-interaction-note">Selected strongest/returned path: {selectedExposure.path.join(" → ")}. No alternate path is invented.</p>}
       </Panel>
 
       <Panel variant="workspace" eyebrow="Supply network" title="Focused Company Network" description="Contextual only; full exploration belongs in Network.">
-        <div className="company-network-placeholder"><Network size={22} aria-hidden="true" /><div><strong>Focused network context</strong><span>Use the explicit action to move into the main Structure workspace.</span></div><Button variant="secondary" onClick={() => onExploreNetwork(company)}>Explore Full Network</Button></div>
+        <div className="company-network-placeholder"><Network size={22} aria-hidden="true" /><div><strong>Focused network context</strong><span>Use the explicit action to move into the main Structure workspace. Unsupported fixture contexts remain unavailable there.</span></div><Button variant="secondary" onClick={() => onExploreNetwork(company)}>Explore Full Network</Button></div>
       </Panel>
 
       <section className="company-entity-grid">
