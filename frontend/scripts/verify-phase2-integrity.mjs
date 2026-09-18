@@ -40,6 +40,7 @@ const checks = [
   ["Structure fixture lookup has no unrelated default fallback", () => {
     assert.match(structureData, /return structureFixturesByFocusId\[focusId\]/);
     assert.doesNotMatch(structureData, /\?\?\s*tsmcFixture/);
+    assert.doesNotMatch(structureData, /networkStructureDemoNodes/);
     assert.doesNotMatch(networkPage, /find\(\(node\) => node\.label === "TSMC"\)!/);
   }],
   ["Structure to Impact mode switching preserves full focus identity", () => {
@@ -55,12 +56,13 @@ const checks = [
   }],
   ["returning from unavailable Impact keeps the original Structure focus", () => {
     assert.match(networkPage, /onReturnToStructure=\{\(\) => setMode\("structure"\)\}/);
-    assert.match(networkPage, /onReturnToStructure\}>Return to Structure/);
+    assert.match(networkPage, /onClick=\{onReturnToStructure\}>Return to Structure/);
     assert.doesNotMatch(networkPage, /normalize.*TSMC/i);
   }],
   ["supported TSMC Structure and Impact fixtures remain explicit", () => {
     assert.match(structureData, /"demo-tsmc": tsmcFixture/);
     assert.match(impactData, /"Company:demo-tsmc": companyTsmcFixture/);
+    assert.doesNotMatch(impactData, /networkImpactDemo/);
   }],
   ["Network Focus Search remains interactive and uses stable IDs", () => {
     assert.match(networkPage, /aria-label="Focus Network"/);
@@ -74,7 +76,7 @@ const checks = [
     assert.doesNotMatch(networkPage, /const reset[\s\S]*?focusId:\s*"demo-tsmc"/);
   }],
   ["Intelligence Show Network still replaces stale focus identity", () => {
-    assert.match(app, /const focusNode = networkStructureDemoNodes\.find/);
+    assert.match(app, /const focusNode = networkFocusEntities\.find/);
     assert.match(app, /focusId: focusNode\?\.id/);
     assert.match(app, /focusName: path\[0\]/);
   }],
