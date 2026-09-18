@@ -1,370 +1,104 @@
-import { useState } from "react";
-import {
-  AlertTriangle,
-  BarChart3,
-  Building2,
-  Globe2,
-  Layers3,
-  MapPin,
-  Network,
-  ShieldAlert,
-} from "lucide-react";
+import { useMemo, useState } from "react";
+import { AlertTriangle, BarChart3, Building2, Globe2, Layers3, MapPin, Network, ShieldAlert } from "lucide-react";
 
+import { Button } from "../components/ui/Button";
 import { Panel } from "../components/ui/Panel";
 import { RiskBadge } from "../components/ui/RiskBadge";
-
-import {
-  domainExposureDemo,
-  eventContributionDemo,
-  hopExposureDemo,
-  riskRankingDemo,
-} from "../data/riskAnalysisDemo";
+import { companiesDemo } from "../data/companiesDemo";
+import { eventsDemo } from "../data/eventsDemo";
+import type { InspectorContext } from "../data/inspectorDemo";
+import { domainExposureDemo, eventContributionDemo, hopExposureDemo, riskRankingDemo } from "../data/riskAnalysisDemo";
 
 import "./RiskAnalysisPage.css";
+import "./RiskAnalysisPhase2.css";
 
 type RiskView = "network" | "geography" | "heatmap";
 
-export function RiskAnalysisPage() {
+type RiskAnalysisPageProps = {
+  selectedInspectorId?: string;
+  onInspect: (context: InspectorContext) => void;
+  onOpenProfile: (companyId: string) => void;
+  onOpenImpact: (focus: { id: string; name: string; type: "Company" | "Event"; eventId?: string }) => void;
+};
+
+export function RiskAnalysisPage({ selectedInspectorId, onInspect, onOpenProfile, onOpenImpact }: RiskAnalysisPageProps) {
   const [view, setView] = useState<RiskView>("network");
+  const [hop, setHop] = useState<number | null>(null);
+  const [selectedContribution, setSelectedContribution] = useState<string | null>(null);
+  const [industry] = useState("All Domains");
+
+  const visibleContributions = useMemo(() => eventContributionDemo.filter((event) => !hop || event.hop === hop), [hop]);
+
+  const inspectRanking = (companyName: string) => {
+    const company = companiesDemo.find((candidate) => candidate.name === companyName);
+    const ranking = riskRankingDemo.find((candidate) => candidate.company === companyName)!;
+    onInspect({
+      id: company?.companyId ?? `demo-${companyName.toLowerCase().replaceAll(" ", "-")}`,
+      type: "Company",
+      name: companyName,
+      subtitle: "Selected from system-wide Risk Ranking",
+      riskLevel: ranking.level,
+      riskScore: ranking.score,
+      fields: [{ label: "Contributing events", value: String(ranking.contributingEvents) }, { label: "Scope", value: industry }],
+      evidence: { availability: "UNAVAILABLE" },
+    });
+  };
 
   return (
     <div className="risk-analysis-page">
       <header className="risk-analysis-header">
-        <div>
-          <div className="risk-analysis-title-context">
-            <span className="metadata-text">SYSTEM RISK</span>
-
-            <span className="demo-badge">
-              DEVELOPMENT DATA
-            </span>
-          </div>
-
-          <h1 className="page-title">
-            Risk Analysis
-          </h1>
-
-          <p className="body-text risk-analysis-subtitle">
-            Examine where risk is concentrated, how far exposure
-            propagates, and which events contribute to company risk.
-          </p>
-        </div>
-
-        <div className="risk-analysis-history-state">
-          <BarChart3 size={14} aria-hidden="true" />
-
-          <span>
-            Historical endpoint available · chart adapter pending
-          </span>
-        </div>
+        <div><div className="risk-analysis-title-context"><span className="metadata-text">SYSTEM RISK</span><span className="demo-badge">DEVELOPMENT DATA</span></div><h1 className="page-title">Risk Analysis</h1><p className="body-text risk-analysis-subtitle">System-wide concentration and comparison. Specific origin propagation remains in Impact.</p></div>
+        <div className="risk-analysis-history-state"><BarChart3 size={14} aria-hidden="true" /><span>History endpoint exists · fixture semantics remain explicit</span></div>
       </header>
 
-      <section
-        className="risk-scope-bar"
-        aria-label="Risk analysis scope"
-      >
-        <div className="risk-scope-item">
-          <span>Scope</span>
-          <strong>Current System</strong>
-        </div>
-
-        <div className="risk-scope-item">
-          <span>Industry</span>
-          <strong>All Domains</strong>
-        </div>
-
-        <div className="risk-scope-item is-disabled">
-          <span>Time</span>
-          <strong>Adapter pending</strong>
-        </div>
-      </section>
+      <section className="risk-scope-bar" aria-label="Risk analysis scope"><div className="risk-scope-item"><span>Scope</span><strong>Current System</strong></div><div className="risk-scope-item"><span>Industry</span><strong>{industry}</strong></div><div className="risk-scope-item is-disabled"><span>Time</span><strong>Adapter pending</strong></div></section>
 
       <section className="risk-summary-grid">
-        <Panel
-          eyebrow="Concentration"
-          title="Risk Ranking"
-        >
-          <div className="risk-ranking-list">
-            {riskRankingDemo.map((company, index) => (
-              <article
-                className="risk-ranking-row"
-                key={company.company}
-              >
-                <span className="risk-rank-number">
-                  {index + 1}
-                </span>
-
-                <div className="risk-ranking-company">
-                  <strong>{company.company}</strong>
-
-                  <span>
-                    {company.contributingEvents} contributing event
-                    {company.contributingEvents === 1 ? "" : "s"}
-                  </span>
-                </div>
-
-                <div className="risk-ranking-value">
-                  <strong>{company.score}</strong>
-                  <RiskBadge level={company.level} />
-                </div>
-              </article>
-            ))}
-          </div>
+        <Panel eyebrow="Concentration" title="Risk Ranking">
+          <div className="risk-ranking-list">{riskRankingDemo.map((company, index) => {
+            const id = companiesDemo.find((candidate) => candidate.name === company.company)?.companyId ?? `demo-${company.company.toLowerCase().replaceAll(" ", "-")}`;
+            return <article key={company.company} className={`risk-ranking-row phase2-selectable${selectedInspectorId === id ? " is-selected" : ""}`} tabIndex={0} role="button" onClick={() => inspectRanking(company.company)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") inspectRanking(company.company); }}><span className="risk-rank-number">{index + 1}</span><div className="risk-ranking-company"><strong>{company.company}</strong><span>{company.contributingEvents} contributing event{company.contributingEvents === 1 ? "" : "s"}</span><div className="phase2-inline-actions">{companiesDemo.some((candidate) => candidate.companyId === id) && <Button variant="ghost" onClick={(event) => { event.stopPropagation(); onOpenProfile(id); }}>Open Profile</Button>}<Button variant="secondary" onClick={(event) => { event.stopPropagation(); onOpenImpact({ id, name: company.company, type: "Company" }); }}>Open Impact</Button></div></div><div className="risk-ranking-value"><strong>{company.score}</strong><RiskBadge level={company.level} /></div></article>;
+          })}</div>
         </Panel>
 
-        <Panel
-          eyebrow="Domain concentration"
-          title="Domain Exposure"
-        >
-          <div className="domain-exposure-list">
-            {domainExposureDemo.map((domain) => (
-              <article
-                className="domain-exposure-row"
-                key={domain.domain}
-              >
-                <div>
-                  <Building2 size={15} aria-hidden="true" />
+        <Panel eyebrow="Domain concentration" title="Domain Exposure"><div className="domain-exposure-list">{domainExposureDemo.map((domain) => <article className="domain-exposure-row" key={domain.domain}><div><Building2 size={15} aria-hidden="true" /><span>{domain.domain}</span></div><div><strong>{domain.exposedCompanies}</strong><span>companies</span></div><RiskBadge level={domain.highestRisk} /></article>)}</div></Panel>
 
-                  <span>{domain.domain}</span>
-                </div>
-
-                <div>
-                  <strong>
-                    {domain.exposedCompanies}
-                  </strong>
-
-                  <span>companies</span>
-                </div>
-
-                <RiskBadge level={domain.highestRisk} />
-              </article>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel
-          eyebrow="Propagation depth"
-          title="Hop Exposure"
-        >
-          <div className="hop-exposure-list">
-            {hopExposureDemo.map((hop) => (
-              <article
-                className="hop-exposure-row"
-                key={hop.hop}
-              >
-                <div className="hop-exposure-icon">
-                  <Layers3 size={15} aria-hidden="true" />
-                </div>
-
-                <div className="hop-exposure-copy">
-                  <strong>{hop.hop}</strong>
-                  <span>{hop.description}</span>
-                </div>
-
-                <strong className="hop-exposure-count">
-                  {hop.companies}
-                </strong>
-              </article>
-            ))}
-          </div>
+        <Panel eyebrow="Propagation depth" title="Hop Exposure">
+          <div className="hop-exposure-list">{hopExposureDemo.map((item) => { const hopNumber = Number(item.hop.replace("Hop ", "")); return <button type="button" className={`hop-exposure-row phase2-hop-button${hop === hopNumber ? " is-selected" : ""}`} key={item.hop} aria-pressed={hop === hopNumber} onClick={() => setHop((current) => current === hopNumber ? null : hopNumber)}><div className="hop-exposure-icon"><Layers3 size={15} aria-hidden="true" /></div><div className="hop-exposure-copy"><strong>{item.hop}</strong><span>{item.description}</span></div><strong className="hop-exposure-count">{item.companies}</strong></button>; })}</div>
+          <p className="phase2-interaction-note">Hop selection filters the view only; it does not recompute backend risk.</p>
         </Panel>
       </section>
 
-      <Panel
-        variant="workspace"
-        eyebrow="Analytical view"
-        title="Risk Concentration"
-        description="Switch between system-level analytical lenses."
-      >
-        <div className="risk-view-tabs">
-          <button
-            type="button"
-            className={`risk-view-tab${
-              view === "network" ? " is-active" : ""
-            }`}
-            onClick={() => setView("network")}
-          >
-            <Network size={14} aria-hidden="true" />
-            <span>Network</span>
-          </button>
-
-          <button
-            type="button"
-            className={`risk-view-tab${
-              view === "geography" ? " is-active" : ""
-            }`}
-            onClick={() => setView("geography")}
-          >
-            <Globe2 size={14} aria-hidden="true" />
-            <span>Geography</span>
-          </button>
-
-          <button
-            type="button"
-            className={`risk-view-tab${
-              view === "heatmap" ? " is-active" : ""
-            }`}
-            onClick={() => setView("heatmap")}
-          >
-            <BarChart3 size={14} aria-hidden="true" />
-            <span>Heatmap</span>
-          </button>
-        </div>
-
-        <div className="risk-view-content">
-          {view === "network" && <RiskNetworkView />}
-          {view === "geography" && <GeographyView />}
-          {view === "heatmap" && <HeatmapView />}
-        </div>
+      <Panel variant="workspace" eyebrow="Analytical view" title="Risk Concentration" description="Lens switching preserves the same fixture scope and hop selection.">
+        <div className="risk-view-tabs">{(["network", "geography", "heatmap"] as RiskView[]).map((lens) => <button key={lens} type="button" className={`risk-view-tab${view === lens ? " is-active" : ""}`} aria-pressed={view === lens} onClick={() => setView(lens)}>{lens === "network" ? <Network size={14} aria-hidden="true" /> : lens === "geography" ? <Globe2 size={14} aria-hidden="true" /> : <BarChart3 size={14} aria-hidden="true" />}<span>{lens[0].toUpperCase() + lens.slice(1)}</span></button>)}</div>
+        <div className="risk-view-content">{view === "network" && <RiskNetworkView hop={hop} />}{view === "geography" && <GeographyView />}{view === "heatmap" && <HeatmapView />}</div>
       </Panel>
 
       <section className="risk-context-grid">
-        <Panel
-          eyebrow="Why?"
-          title="Event Contributions"
-        >
-          <div className="event-contribution-list">
-            {eventContributionDemo.map((event) => (
-              <article
-                className="event-contribution-row"
-                key={`${event.eventType}-${event.company}`}
-              >
-                <div>
-                  <AlertTriangle
-                    size={14}
-                    aria-hidden="true"
-                  />
-
-                  <div>
-                    <strong>{event.eventType}</strong>
-                    <span>{event.company}</span>
-                  </div>
-                </div>
-
-                <div className="event-contribution-value">
-                  <span>Hop {event.hop}</span>
-                  <strong>{event.propagatedRisk}</strong>
-                </div>
-              </article>
-            ))}
-          </div>
+        <Panel eyebrow="Why?" title="Event Contributions">
+          <div className="event-contribution-list">{visibleContributions.length > 0 ? visibleContributions.map((event) => {
+            const key = `${event.eventType}-${event.company}`;
+            const sourceEvent = eventsDemo.find((candidate) => candidate.type === event.eventType);
+            return <button type="button" className={`event-contribution-row phase2-contribution-button${selectedContribution === key ? " is-selected" : ""}`} key={key} onClick={() => { setSelectedContribution(key); onInspect({ id: sourceEvent?.id ?? key, type: "Event", name: event.eventType, subtitle: `Contribution to ${event.company}`, riskScore: event.propagatedRisk, fields: [{ label: "Affected company", value: event.company }, { label: "Hop", value: String(event.hop) }, { label: "Propagated Risk", value: event.propagatedRisk }], evidence: { availability: sourceEvent ? "PARTIAL" : "UNAVAILABLE", source: sourceEvent?.source, provenance: sourceEvent ? "Development fixture" : undefined } }); }}><div><AlertTriangle size={14} aria-hidden="true" /><div><strong>{event.eventType}</strong><span>{event.company}</span></div></div><div className="event-contribution-value"><span>Hop {event.hop}</span><strong>{event.propagatedRisk}</strong></div></button>;
+          }) : <div className="phase2-interaction-note">No event contributions match Hop {hop}. Clear the Hop selection to restore all fixture contributions.</div>}</div>
+          {selectedContribution && (() => { const event = eventContributionDemo.find((item) => `${item.eventType}-${item.company}` === selectedContribution); const source = eventsDemo.find((candidate) => candidate.type === event?.eventType); return event ? <div className="phase2-inline-actions"><Button variant="primary" onClick={() => onOpenImpact({ id: source?.id ?? selectedContribution, name: event.eventType, type: "Event", eventId: source?.id })}>Open Impact</Button></div> : null; })()}
         </Panel>
 
-        <Panel
-          eyebrow="Interpretation"
-          title="Risk Context"
-        >
-          <div className="risk-context-body">
-            <ShieldAlert size={20} aria-hidden="true" />
-
-            <div>
-              <strong>
-                Development fixture presentation
-              </strong>
-
-              <p>
-                Backend risk history is available through
-                /risk/&#123;company_id&#125;/history. This Phase 1 workspace
-                does not yet render live historical charts or infer persisted
-                snapshot semantics beyond the backend contract.
-              </p>
-            </div>
-          </div>
-        </Panel>
+        <Panel eyebrow="Interpretation" title="Risk Context"><div className="risk-context-body"><ShieldAlert size={20} aria-hidden="true" /><div><strong>History semantics remain backend-defined</strong><p>Historical interaction may select a point/event when live data is adapted, but this fixture does not claim persisted market-grade snapshots.</p></div></div></Panel>
       </section>
     </div>
   );
 }
 
-function RiskNetworkView() {
-  return (
-    <div className="risk-network-view">
-      <div className="risk-network-center">
-        <ShieldAlert size={21} aria-hidden="true" />
-        <strong>System Risk</strong>
-        <span>Current exposure</span>
-      </div>
-
-      <div className="risk-network-company risk-network-company--critical">
-        <strong>NVIDIA</strong>
-        <span>0.75</span>
-        <RiskBadge level="CRITICAL" />
-      </div>
-
-      <div className="risk-network-company risk-network-company--high">
-        <strong>TSMC</strong>
-        <span>0.61</span>
-        <RiskBadge level="HIGH" />
-      </div>
-
-      <div className="risk-network-company risk-network-company--medium">
-        <strong>Samsung</strong>
-        <span>0.42</span>
-        <RiskBadge level="MEDIUM" />
-      </div>
-
-      <div className="risk-network-demo-label">
-        DEMO NETWORK CONCENTRATION
-      </div>
-    </div>
-  );
+function RiskNetworkView({ hop }: { hop: number | null }) {
+  return <div className="risk-network-view"><div className="risk-network-center"><ShieldAlert size={21} aria-hidden="true" /><strong>System Risk</strong><span>{hop ? `Hop ${hop} filter` : "Current exposure"}</span></div><div className="risk-network-company risk-network-company--critical"><strong>NVIDIA</strong><span>0.75</span><RiskBadge level="CRITICAL" /></div><div className="risk-network-company risk-network-company--high"><strong>TSMC</strong><span>0.61</span><RiskBadge level="HIGH" /></div><div className="risk-network-company risk-network-company--medium"><strong>Samsung</strong><span>0.42</span><RiskBadge level="MEDIUM" /></div><div className="risk-network-demo-label">DEMO NETWORK CONCENTRATION</div></div>;
 }
 
 function GeographyView() {
-  return (
-    <div className="geography-unavailable">
-      <div className="geography-icon">
-        <MapPin size={24} aria-hidden="true" />
-      </div>
-
-      <div>
-        <span className="metadata-text">
-          GEOGRAPHY LENS
-        </span>
-
-        <h3>Verified geographic coordinates available</h3>
-
-        <p>
-          Backend Location nodes expose verified latitude and longitude
-          coordinates. Geography remains a secondary analytical lens, and
-          live map rendering is deferred to frontend integration work.
-        </p>
-
-        <div className="geography-integrity-note">
-          No synthetic coordinates are used in this fixture.
-        </div>
-      </div>
-    </div>
-  );
+  return <div className="geography-unavailable"><div className="geography-icon"><MapPin size={24} aria-hidden="true" /></div><div><span className="metadata-text">GEOGRAPHY LENS</span><h3>Verified geographic coordinates are backend-supported</h3><p>Click behavior is defined for Country / Location / Facility selection when live geographic entities are adapted. This fixture does not invent coordinates or shipment telemetry.</p><div className="geography-integrity-note">No synthetic coordinates are used.</div></div></div>;
 }
 
 function HeatmapView() {
-  const cells = [
-    { label: "Semiconductors", level: "critical" },
-    { label: "Electronics", level: "high" },
-    { label: "EV / Battery", level: "medium" },
-    { label: "Aerospace", level: "low" },
-  ];
-
-  return (
-    <div className="risk-heatmap">
-      <div className="risk-heatmap-grid">
-        {cells.map((cell) => (
-          <div
-            key={cell.label}
-            className={`risk-heatmap-cell risk-heatmap-cell--${cell.level}`}
-          >
-            <span>{cell.label}</span>
-            <strong>
-              {cell.level.toUpperCase()}
-            </strong>
-          </div>
-        ))}
-      </div>
-
-      <p>
-        Development-only categorical heatmap. Production values must
-        originate from backend risk results.
-      </p>
-    </div>
-  );
+  const cells = [{ label: "Semiconductors", level: "critical" }, { label: "Electronics", level: "high" }, { label: "EV / Battery", level: "medium" }, { label: "Aerospace", level: "low" }];
+  return <div className="risk-heatmap"><div className="risk-heatmap-grid">{cells.map((cell) => <div key={cell.label} className={`risk-heatmap-cell risk-heatmap-cell--${cell.level}`}><span>{cell.label}</span><strong>{cell.level.toUpperCase()}</strong></div>)}</div><p>Development-only categorical heatmap. Production values must originate from backend risk results.</p></div>;
 }
