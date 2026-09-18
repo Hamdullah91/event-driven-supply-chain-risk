@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Boxes, Building2, Cpu, Factory, FileText, Layers
 import { Button } from "../components/ui/Button";
 import { Panel } from "../components/ui/Panel";
 import { RiskBadge } from "../components/ui/RiskBadge";
-import { companiesDemo, demoNvidiaExposures, type DemoCompany, type DemoCompanyExposure } from "../data/companiesDemo";
+import { companiesDemo, getCompanyExposureFixture, type DemoCompany, type DemoCompanyExposure } from "../data/companiesDemo";
 import type { InspectorContext, InspectorEntityType } from "../data/inspectorDemo";
 
 import "./CompaniesPage.css";
@@ -95,8 +95,7 @@ function CompaniesList({ selectedInspectorId, onOpenProfile, onInspect }: Compan
 
 function CompanyProfile({ company, onBackFromProfile, onInspect, onExploreNetwork, onOpenImpact }: CompaniesPageProps & { company: DemoCompany }) {
   const [selectedExposureId, setSelectedExposureId] = useState<string | null>(null);
-  const isNvidia = company.companyId === "demo-nvidia";
-  const exposures = isNvidia ? demoNvidiaExposures : demoNvidiaExposures.slice(0, 1);
+  const exposures = getCompanyExposureFixture(company.companyId);
   const selectedExposure = exposures.find((exposure) => exposure.id === selectedExposureId);
 
   const inspectExposure = (exposure: DemoCompanyExposure) => {
@@ -131,20 +130,27 @@ function CompanyProfile({ company, onBackFromProfile, onInspect, onExploreNetwor
 
       <section className="company-profile-summary">
         <Panel eyebrow="Current risk" title="Risk Summary"><div className="company-risk-summary"><strong>{company.riskScore}</strong><RiskBadge level={company.riskLevel} /><span>{company.contributingEventCount} contributing events</span></div></Panel>
-        <Panel eyebrow="Event context" title="Contributing Events"><div className="company-event-summary"><strong>{company.contributingEventCount}</strong><span>Select an event below to inspect its individual contribution rather than mixing it with aggregate risk.</span></div></Panel>
+        <Panel eyebrow="Event context" title="Contributing Events"><div className="company-event-summary"><strong>{company.contributingEventCount}</strong><span>Select a supported development exposure below to inspect its individual contribution. Missing fixtures remain unavailable rather than borrowing another company's path.</span></div></Panel>
       </section>
 
       <Panel variant="workspace" eyebrow="Why is this company exposed?" title="Risk Paths & Contributing Events" description="Select a contribution to reveal its backend-shaped risk trace and path.">
-        <div className="company-exposure-list">
-          {exposures.map((exposure) => (
-            <article key={exposure.id} className={`company-exposure phase2-selectable${selectedExposureId === exposure.id ? " is-selected" : ""}`} tabIndex={0} role="button" onClick={() => inspectExposure(exposure)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") inspectExposure(exposure); }}>
-              <div className="company-exposure-header"><div><span className="company-exposure-type">{exposure.eventType}</span><strong>{exposure.path.join(" → ")}</strong></div><span className="company-exposure-hop">HOP {exposure.hopDistance}</span></div>
-              <div className="company-exposure-meta"><span>Severity {exposure.severity}</span><span aria-hidden="true">•</span><span>Confidence {exposure.confidence}</span><span aria-hidden="true">•</span><span>{exposure.source}</span></div>
-              <div className="company-risk-trace"><TraceValue label="Initial Risk" value={exposure.initialRisk} /><span>×</span><TraceValue label="Combined Path Dependency" value={exposure.pathDependency} /><span>×</span><TraceValue label="Distance Decay" value={exposure.distanceDecay} /><span>=</span><TraceValue label="Propagated Risk" value={exposure.propagatedRisk} emphasized /></div>
-              <div className="phase2-inline-actions"><Button variant="ghost" onClick={(event) => { event.stopPropagation(); inspectExposure(exposure); }}>Highlight Path</Button><Button variant="secondary" onClick={(event) => { event.stopPropagation(); onOpenImpact(company); }}>Open Impact</Button></div>
-            </article>
-          ))}
-        </div>
+        {exposures.length > 0 ? (
+          <div className="company-exposure-list">
+            {exposures.map((exposure) => (
+              <article key={exposure.id} className={`company-exposure phase2-selectable${selectedExposureId === exposure.id ? " is-selected" : ""}`} tabIndex={0} role="button" onClick={() => inspectExposure(exposure)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") inspectExposure(exposure); }}>
+                <div className="company-exposure-header"><div><span className="company-exposure-type">{exposure.eventType}</span><strong>{exposure.path.join(" → ")}</strong></div><span className="company-exposure-hop">HOP {exposure.hopDistance}</span></div>
+                <div className="company-exposure-meta"><span>Severity {exposure.severity}</span><span aria-hidden="true">•</span><span>Confidence {exposure.confidence}</span><span aria-hidden="true">•</span><span>{exposure.source}</span></div>
+                <div className="company-risk-trace"><TraceValue label="Initial Risk" value={exposure.initialRisk} /><span>×</span><TraceValue label="Combined Path Dependency" value={exposure.pathDependency} /><span>×</span><TraceValue label="Distance Decay" value={exposure.distanceDecay} /><span>=</span><TraceValue label="Propagated Risk" value={exposure.propagatedRisk} emphasized /></div>
+                <div className="phase2-inline-actions"><Button variant="ghost" onClick={(event) => { event.stopPropagation(); inspectExposure(exposure); }}>Highlight Path</Button><Button variant="secondary" onClick={(event) => { event.stopPropagation(); onOpenImpact(company); }}>Open Impact</Button></div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="company-network-placeholder" role="status">
+            <ShieldAlert size={22} aria-hidden="true" />
+            <div><strong>No development exposure fixture is available for this company.</strong><span>Aggregate company risk may still be shown, but no other company's event path is substituted.</span></div>
+          </div>
+        )}
         {selectedExposure && <p className="phase2-interaction-note">Selected strongest/returned path: {selectedExposure.path.join(" → ")}. No alternate path is invented.</p>}
       </Panel>
 
