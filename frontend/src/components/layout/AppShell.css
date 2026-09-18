@@ -105,7 +105,29 @@
   .brand-copy, .sidebar-placeholder, .sidebar-system > div { display: none; }
   .sidebar-brand, .sidebar-system { justify-content: center; padding-inline: 0; }
   .app-main { grid-column: 2; }
+  .app-topbar { gap: 12px; padding-inline: 16px; }
+  .topbar-actions { gap: 10px; }
+  .global-search { display: flex; width: min(260px, 42vw); min-width: 190px; }
+  .global-search-results { right: auto; width: min(320px, 72vw); }
+  .topbar-status { padding-inline: 10px; }
   .app-workspace { display: block; }
-  .entity-inspector { display: none; }
-  .global-search { display: none; }
+  .entity-inspector {
+    position: fixed;
+    top: var(--topbar-height);
+    right: 0;
+    bottom: 0;
+    z-index: 55;
+    display: block;
+    width: min(380px, calc(100vw - var(--sidebar-collapsed-width)));
+    max-width: 88vw;
+    overflow-y: auto;
+    border-left: 1px solid var(--color-border-strong);
+    box-shadow: -18px 0 42px rgb(0 0 0 / 38%);
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar-eyebrow, .topbar-status { display: none; }
+  .global-search { width: min(300px, 58vw); min-width: 170px; }
+  .workspace-content { padding: 16px; }
 }
