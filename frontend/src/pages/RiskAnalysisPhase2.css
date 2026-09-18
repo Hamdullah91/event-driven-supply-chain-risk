@@ -1,3 +1,7 @@
 .phase2-hop-button, .phase2-contribution-button { width: 100%; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .phase2-hop-button.is-selected, .phase2-contribution-button.is-selected { outline: 1px solid var(--color-primary); background: color-mix(in srgb, var(--color-primary) 9%, var(--color-panel)); }
 .phase2-hop-button:focus-visible, .phase2-contribution-button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.phase2-geography-list { display: grid; gap: 8px; margin: 14px 0; }
+.phase2-geography-list button { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-panel); color: var(--color-text-primary); cursor: pointer; text-align: left; }
+.phase2-geography-list button span { color: var(--color-text-muted); font-size: 11px; text-transform: uppercase; }
+.phase2-geography-list button:hover, .phase2-geography-list button:focus-visible { border-color: var(--color-primary); outline: none; }
