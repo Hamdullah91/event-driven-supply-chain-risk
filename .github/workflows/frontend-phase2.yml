@@ -32,3 +32,6 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Phase 2 integrity tests
+        run: npm test
