@@ -35,3 +35,8 @@ jobs:
 
       - name: Phase 2 integrity tests
         run: npm test
+
+      - name: Verify clean working tree
+        run: |
+          git status --short
+          test -z "$(git status --porcelain)"
