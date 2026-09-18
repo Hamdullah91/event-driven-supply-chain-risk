@@ -114,7 +114,7 @@ export function AppShell({
               )}
 
               {searchOpen && (
-                <div className="global-search-results" role="listbox" aria-label="Global search results">
+                <div className="global-search-results" aria-label="Global search results">
                   <div className="global-search-fixture-label">DEVELOPMENT SEARCH FIXTURE</div>
                   {filteredResults.length > 0 ? (
                     filteredResults.map((result) => (
