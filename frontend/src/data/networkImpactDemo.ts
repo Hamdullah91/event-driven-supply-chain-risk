@@ -41,39 +41,13 @@ export type DemoImpactFixture = {
 };
 
 const sharedPaths: DemoImpactPath[] = [
-  {
-    id: "origin-hop1",
-    x1: 500,
-    y1: 300,
-    x2: 660,
-    y2: 300,
-    tone: "critical",
-  },
-  {
-    id: "hop1-hop2",
-    x1: 690,
-    y1: 300,
-    x2: 750,
-    y2: 180,
-    tone: "high",
-  },
-  {
-    id: "hop2-hop3",
-    x1: 770,
-    y1: 170,
-    x2: 840,
-    y2: 110,
-    tone: "medium",
-  },
+  { id: "origin-hop1", x1: 500, y1: 300, x2: 660, y2: 300, tone: "critical" },
+  { id: "hop1-hop2", x1: 690, y1: 300, x2: 750, y2: 180, tone: "high" },
+  { id: "hop2-hop3", x1: 770, y1: 170, x2: 840, y2: 110, tone: "medium" },
 ];
 
 const companyTsmcFixture: DemoImpactFixture = {
-  origin: {
-    id: "demo-tsmc",
-    type: "Company",
-    name: "TSMC",
-    label: "TSMC transmission fixture",
-  },
+  origin: { id: "demo-tsmc", type: "Company", name: "TSMC", label: "TSMC transmission fixture" },
   companies: [
     {
       id: "demo-impact-nvidia",
@@ -104,19 +78,11 @@ const companyTsmcFixture: DemoImpactFixture = {
     },
   ],
   paths: sharedPaths,
-  context: {
-    maxHops: "3",
-    affectedCompanies: "3",
-  },
+  context: { maxHops: "3", affectedCompanies: "3" },
 };
 
 const eventFacilityOutageFixture: DemoImpactFixture = {
-  origin: {
-    id: "demo-event-001",
-    type: "Event",
-    name: "FACILITY_OUTAGE",
-    label: "Facility outage development fixture",
-  },
+  origin: { id: "demo-event-001", type: "Event", name: "FACILITY_OUTAGE", label: "Facility outage development fixture" },
   companies: [
     {
       id: "demo-impact-nvidia",
@@ -153,17 +119,11 @@ const eventFacilityOutageFixture: DemoImpactFixture = {
     },
   ],
   paths: sharedPaths,
-  context: {
-    initialRisk: "0.75",
-    maxHops: "3",
-    distanceDecay: "0.70",
-    affectedCompanies: "3",
-  },
+  context: { initialRisk: "0.75", maxHops: "3", distanceDecay: "0.70", affectedCompanies: "3" },
 };
 
-export const impactFixtures: Record<string, DemoImpactFixture> = {
+export const impactFixturesByOriginId: Record<string, DemoImpactFixture> = {
   "Company:demo-tsmc": companyTsmcFixture,
-  "Company:demo-company-tsmc": companyTsmcFixture,
   "Event:demo-event-001": eventFacilityOutageFixture,
 };
 
@@ -172,8 +132,7 @@ export function getImpactFixture(
   originId: string | undefined,
 ): DemoImpactFixture | undefined {
   if (!originType || !originId) return undefined;
-  return impactFixtures[`${originType}:${originId}`];
+  return impactFixturesByOriginId[`${originType}:${originId}`];
 }
 
-// Backward-compatible alias while Phase 2 components migrate to keyed fixtures.
 export const networkImpactDemo = companyTsmcFixture;
