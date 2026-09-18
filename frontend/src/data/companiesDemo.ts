@@ -42,11 +42,9 @@ export const companiesDemo: DemoCompany[] = [
     entityType: "Company",
     industryId: "semiconductor",
     seedSource: "Development fixture",
-
     riskScore: "0.75",
     riskLevel: "CRITICAL",
     contributingEventCount: 2,
-
     facilities: ["Demo NVIDIA Facility"],
     products: ["GPU"],
     materials: ["Silicon"],
@@ -59,11 +57,9 @@ export const companiesDemo: DemoCompany[] = [
     entityType: "Company",
     industryId: "semiconductor",
     seedSource: "Development fixture",
-
     riskScore: "0.61",
     riskLevel: "HIGH",
     contributingEventCount: 2,
-
     facilities: ["Demo Fab"],
     products: ["Semiconductor Components"],
     materials: ["Silicon"],
@@ -76,17 +72,28 @@ export const companiesDemo: DemoCompany[] = [
     entityType: "Company",
     industryId: "electronics",
     seedSource: "Development fixture",
-
     riskScore: "0.42",
     riskLevel: "MEDIUM",
     contributingEventCount: 1,
-
     facilities: ["Demo Electronics Facility"],
     products: ["Memory"],
     materials: ["Silicon"],
     technologies: ["Memory Technology"],
   },
 ];
+
+export const companyProfilesById: Record<string, DemoCompany> = Object.fromEntries(
+  companiesDemo.map((company) => [company.companyId, company]),
+);
+
+export function getCompanyProfile(companyId: string | null | undefined): DemoCompany | undefined {
+  if (!companyId) return undefined;
+  return companyProfilesById[companyId];
+}
+
+export function hasCompanyProfile(companyId: string | null | undefined): boolean {
+  return Boolean(getCompanyProfile(companyId));
+}
 
 export const demoNvidiaExposures: DemoCompanyExposure[] = [
   {
@@ -96,12 +103,10 @@ export const demoNvidiaExposures: DemoCompanyExposure[] = [
     source: "Development source",
     confidence: "94%",
     hopDistance: 1,
-
     initialRisk: "0.75",
     pathDependency: "1.00",
     distanceDecay: "1.00",
     propagatedRisk: "0.75",
-
     path: ["TSMC", "NVIDIA"],
   },
   {
@@ -111,20 +116,18 @@ export const demoNvidiaExposures: DemoCompanyExposure[] = [
     source: "Development source",
     confidence: "87%",
     hopDistance: 2,
-
     initialRisk: "0.50",
     pathDependency: "0.90",
     distanceDecay: "0.70",
     propagatedRisk: "0.315",
-
     path: ["ASML", "TSMC", "NVIDIA"],
   },
 ];
 
-export const companyExposureFixtures: Record<string, DemoCompanyExposure[]> = {
+export const companyExposuresById: Record<string, DemoCompanyExposure[]> = {
   "demo-nvidia": demoNvidiaExposures,
 };
 
 export function getCompanyExposureFixture(companyId: string): DemoCompanyExposure[] {
-  return companyExposureFixtures[companyId] ?? [];
+  return companyExposuresById[companyId] ?? [];
 }
