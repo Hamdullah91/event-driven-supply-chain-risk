@@ -23,8 +23,7 @@ const checks = [
     assert.match(companyData, /companyProfilesById/);
     assert.match(companyData, /getCompanyProfile/);
     assert.match(companiesPage, /Profile unavailable for this development entity/);
-    assert.match(companiesPage, /if \(props\.profileCompanyId\)/);
-    assert.doesNotMatch(companiesPage, /if \(selectedCompany\) return <CompanyProfile[\s\S]*return <CompaniesList/);
+    assert.match(companiesPage, /if \(props\.profileCompanyId\)[\s\S]*?getCompanyProfile\(props\.profileCompanyId\)[\s\S]*?CompanyProfileUnavailable/);
   }],
   ["unsupported Impact targets do not expose a false Open Profile action", () => {
     assert.match(inspector, /hasCompanyProfile\(context\.id\)/);
