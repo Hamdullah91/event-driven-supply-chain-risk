@@ -7,7 +7,7 @@ import { RiskBadge } from "../components/ui/RiskBadge";
 import { companiesDemo } from "../data/companiesDemo";
 import { eventsDemo } from "../data/eventsDemo";
 import type { InspectorContext } from "../data/inspectorDemo";
-import { domainExposureDemo, eventContributionDemo, hopExposureDemo, riskRankingDemo } from "../data/riskAnalysisDemo";
+import { domainExposureDemo, eventContributionDemo, hopExposureDemo, riskRankingDemo, type DemoEventContribution } from "../data/riskAnalysisDemo";
 
 import "./RiskAnalysisPage.css";
 import "./RiskAnalysisPhase2.css";
@@ -28,6 +28,7 @@ export function RiskAnalysisPage({ selectedInspectorId, onInspect, onOpenProfile
   const [industry] = useState("All Domains");
 
   const visibleContributions = useMemo(() => eventContributionDemo.filter((event) => !hop || event.hop === hop), [hop]);
+  const selectedContributionRecord = eventContributionDemo.find((item) => `${item.eventType}-${item.company}` === selectedContribution);
 
   const inspectRanking = (companyName: string) => {
     const company = companiesDemo.find((candidate) => candidate.name === companyName);
@@ -41,6 +42,32 @@ export function RiskAnalysisPage({ selectedInspectorId, onInspect, onOpenProfile
       riskScore: ranking.score,
       fields: [{ label: "Contributing events", value: String(ranking.contributingEvents) }, { label: "Scope", value: industry }],
       evidence: { availability: "UNAVAILABLE" },
+    });
+  };
+
+  const inspectContribution = (event: DemoEventContribution) => {
+    const sourceEvent = eventsDemo.find((candidate) => candidate.type === event.eventType);
+    const optionalTrace = [
+      ...(event.initialRisk ? [{ label: "Initial Risk", value: event.initialRisk }] : []),
+      ...(event.pathDependency ? [{ label: "Path Dependency", value: event.pathDependency }] : []),
+      ...(event.distanceDecay ? [{ label: "Distance Decay", value: event.distanceDecay }] : []),
+    ];
+
+    setSelectedContribution(`${event.eventType}-${event.company}`);
+    onInspect({
+      id: sourceEvent?.id ?? `${event.eventType}-${event.company}`,
+      type: "Event",
+      name: event.eventType,
+      subtitle: `Contribution to ${event.company}`,
+      riskScore: event.propagatedRisk,
+      fields: [
+        { label: "Affected company", value: event.company },
+        { label: "Hop", value: String(event.hop) },
+        ...optionalTrace,
+        { label: "Propagated Risk", value: event.propagatedRisk },
+      ],
+      path: event.path,
+      evidence: { availability: sourceEvent ? "PARTIAL" : "UNAVAILABLE", source: sourceEvent?.source, provenance: sourceEvent ? "Development fixture" : undefined },
     });
   };
 
@@ -78,10 +105,23 @@ export function RiskAnalysisPage({ selectedInspectorId, onInspect, onOpenProfile
         <Panel eyebrow="Why?" title="Event Contributions">
           <div className="event-contribution-list">{visibleContributions.length > 0 ? visibleContributions.map((event) => {
             const key = `${event.eventType}-${event.company}`;
-            const sourceEvent = eventsDemo.find((candidate) => candidate.type === event.eventType);
-            return <button type="button" className={`event-contribution-row phase2-contribution-button${selectedContribution === key ? " is-selected" : ""}`} key={key} onClick={() => { setSelectedContribution(key); onInspect({ id: sourceEvent?.id ?? key, type: "Event", name: event.eventType, subtitle: `Contribution to ${event.company}`, riskScore: event.propagatedRisk, fields: [{ label: "Affected company", value: event.company }, { label: "Hop", value: String(event.hop) }, { label: "Propagated Risk", value: event.propagatedRisk }], evidence: { availability: sourceEvent ? "PARTIAL" : "UNAVAILABLE", source: sourceEvent?.source, provenance: sourceEvent ? "Development fixture" : undefined } }); }}><div><AlertTriangle size={14} aria-hidden="true" /><div><strong>{event.eventType}</strong><span>{event.company}</span></div></div><div className="event-contribution-value"><span>Hop {event.hop}</span><strong>{event.propagatedRisk}</strong></div></button>;
+            return <button type="button" className={`event-contribution-row phase2-contribution-button${selectedContribution === key ? " is-selected" : ""}`} key={key} onClick={() => inspectContribution(event)}><div><AlertTriangle size={14} aria-hidden="true" /><div><strong>{event.eventType}</strong><span>{event.company}</span></div></div><div className="event-contribution-value"><span>Hop {event.hop}</span><strong>{event.propagatedRisk}</strong></div></button>;
           }) : <div className="phase2-interaction-note">No event contributions match Hop {hop}. Clear the Hop selection to restore all fixture contributions.</div>}</div>
-          {selectedContribution && (() => { const event = eventContributionDemo.find((item) => `${item.eventType}-${item.company}` === selectedContribution); const source = eventsDemo.find((candidate) => candidate.type === event?.eventType); return event ? <div className="phase2-inline-actions"><Button variant="primary" onClick={() => onOpenImpact({ id: source?.id ?? selectedContribution, name: event.eventType, type: "Event", eventId: source?.id })}>Open Impact</Button></div> : null; })()}
+
+          {selectedContributionRecord && (
+            <div className="phase2-contribution-trace">
+              <div><span>Event</span><strong>{selectedContributionRecord.eventType}</strong></div>
+              <div><span>Affected Company</span><strong>{selectedContributionRecord.company}</strong></div>
+              <div><span>Hop</span><strong>{selectedContributionRecord.hop}</strong></div>
+              {selectedContributionRecord.initialRisk && <div><span>Initial Risk</span><strong>{selectedContributionRecord.initialRisk}</strong></div>}
+              {selectedContributionRecord.pathDependency && <div><span>Path Dependency</span><strong>{selectedContributionRecord.pathDependency}</strong></div>}
+              {selectedContributionRecord.distanceDecay && <div><span>Distance Decay</span><strong>{selectedContributionRecord.distanceDecay}</strong></div>}
+              <div><span>Propagated Risk</span><strong>{selectedContributionRecord.propagatedRisk}</strong></div>
+              {selectedContributionRecord.path && <div className="phase2-contribution-path"><span>Path</span><strong>{selectedContributionRecord.path.join(" → ")}</strong></div>}
+            </div>
+          )}
+
+          {selectedContributionRecord && (() => { const source = eventsDemo.find((candidate) => candidate.type === selectedContributionRecord.eventType); return <div className="phase2-inline-actions"><Button variant="primary" onClick={() => onOpenImpact({ id: source?.id ?? selectedContribution!, name: selectedContributionRecord.eventType, type: "Event", eventId: source?.id })}>Open Impact</Button></div>; })()}
         </Panel>
 
         <Panel eyebrow="Interpretation" title="Risk Context"><div className="risk-context-body"><ShieldAlert size={20} aria-hidden="true" /><div><strong>History semantics remain backend-defined</strong><p>Historical interaction may select a point/event when live data is adapted, but this fixture does not claim persisted market-grade snapshots.</p></div></div></Panel>
