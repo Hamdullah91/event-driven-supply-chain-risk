@@ -73,10 +73,6 @@ export function EntityInspector({ context, onClose, onAction }: EntityInspectorP
     context.evidence && context.evidence.availability !== "UNAVAILABLE";
 
   useEffect(() => {
-    setShowEvidence(false);
-  }, [context.id]);
-
-  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
