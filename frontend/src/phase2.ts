@@ -33,8 +33,5 @@ export type Phase2HistoryState = {
 export const DEFAULT_NETWORK_INVESTIGATION: NetworkInvestigation = {
   mode: "structure",
   maxHops: 1,
-  focusId: "demo-company-tsmc",
-  focusName: "TSMC",
-  focusType: "Company",
   hopOnly: null,
 };
