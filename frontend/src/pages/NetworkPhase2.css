@@ -10,19 +10,63 @@
 .network-focus-control input { width: 150px; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-size: 12px; }
 .network-focus-control input::placeholder { color: var(--color-text-muted); }
 .network-focus-control small { margin-left: auto; color: var(--color-text-muted); font-size: 10px; text-transform: uppercase; }
-.network-focus-results { position: absolute; z-index: 35; top: calc(100% + 6px); left: 0; min-width: 240px; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: var(--radius-card); background: var(--color-chrome); box-shadow: 0 12px 30px rgb(0 0 0 / 30%); }
-.network-focus-results button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 10px; border: 0; border-bottom: 1px solid var(--color-border); background: transparent; color: var(--color-text-primary); cursor: pointer; text-align: left; }
+.network-focus-results { position: absolute; z-index: 35; top: calc(100% + 6px); left: 0; min-width: 300px; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: var(--radius-card); background: var(--color-chrome); box-shadow: 0 12px 30px rgb(0 0 0 / 30%); }
+.network-focus-results button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; min-height: 42px; padding: 8px 10px; border: 0; border-bottom: 1px solid var(--color-border); background: transparent; color: var(--color-text-primary); cursor: pointer; text-align: left; }
 .network-focus-results button:hover, .network-focus-results button:focus-visible { background: var(--color-elevated); outline: none; }
-.network-focus-results button span { color: var(--color-text-muted); font-size: 10px; text-transform: uppercase; }
+.network-focus-results button span { color: var(--color-text-muted); font-size: 10px; text-transform: none; text-align: right; }
 .network-focus-empty { padding: 12px; color: var(--color-text-muted); font-size: 11px; }
 
 .impact-toolbar-context select { border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-weight: 600; }
 .impact-toolbar-context option { background: var(--color-chrome); }
-.phase2-relationship-button { cursor: pointer; }
-.phase2-relationship-button.is-selected { border-color: var(--color-primary); color: var(--color-primary); }
-.phase2-structure-edge-highlight { stroke: var(--color-primary); stroke-width: 2.5; }
+
+.network-canvas--structure { min-height: 540px; grid-template-rows: auto minmax(420px, 1fr) auto; }
+.network-canvas--structure .network-graph-surface { min-height: 420px; }
+.network-canvas--state { min-height: 360px; grid-template-rows: auto 1fr; }
+
+.network-edge { stroke: #61758a; stroke-width: 1.7; }
+.network-arrow-head { fill: #8da2b8; }
+.phase2-structure-edge-highlight { stroke: var(--color-primary); stroke-width: 2.7; }
+
+.relationship-label {
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  padding: 1px 4px;
+  border: 0;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--color-app-bg) 88%, transparent);
+  color: var(--color-text-muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 14px;
+  cursor: pointer;
+}
+.relationship-label:hover, .relationship-label:focus-visible { background: var(--color-elevated); color: var(--color-text-primary); outline: 1px solid var(--color-border-strong); }
+.phase2-relationship-button.is-selected { outline: 1px solid var(--color-primary); color: var(--color-primary); }
+
 .graph-node { cursor: pointer; }
 .graph-node:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+.graph-node.is-focus {
+  width: 54px;
+  height: 54px;
+  border-width: 2.5px;
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-panel) 88%, var(--color-primary) 12%);
+  box-shadow: 0 0 0 5px rgb(59 130 246 / 10%);
+  color: var(--color-primary);
+}
+.graph-node--material.is-focus { width: 46px; height: 46px; transform: rotate(45deg); }
+.graph-node.is-focus + .graph-node-copy strong { font-size: 13px; font-weight: 700; color: var(--color-primary); }
+.graph-node.is-selected { box-shadow: 0 0 0 4px rgb(59 130 246 / 20%), inset 0 0 0 1px rgb(59 130 246 / 35%); }
+
+.phase2-impact-empty, .phase2-network-empty, .phase2-network-state { display: flex; align-items: center; gap: 14px; margin: 16px; padding: 18px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-panel); color: var(--color-text-secondary); }
+.phase2-impact-empty, .phase2-network-state { min-height: 240px; justify-content: center; flex-direction: column; text-align: center; }
+.phase2-impact-empty > div, .phase2-network-empty > div:first-of-type, .phase2-network-state > div { display: grid; gap: 5px; }
+.phase2-impact-empty strong, .phase2-network-empty strong, .phase2-network-state strong { color: var(--color-text-primary); }
+.phase2-impact-empty span, .phase2-network-empty span, .phase2-network-state span { max-width: 620px; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+.phase2-network-empty { justify-content: space-between; margin-inline: 0; }
+.phase2-profile-unavailable { display: inline-flex; margin-top: 10px; padding: 7px 9px; border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-text-muted); font-size: 11px; line-height: 16px; }
+
 .impact-company { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .impact-company.is-selected .impact-company-node { box-shadow: 0 0 0 4px rgb(59 130 246 / 24%); }
 .impact-company:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; border-radius: var(--radius-button); }
@@ -30,13 +74,6 @@
 .phase2-highlight-path-text { display: grid; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-border); }
 .phase2-highlight-path-text strong { color: var(--color-text-primary); font-size: 11px; }
 .phase2-highlight-path-text span { color: var(--color-text-secondary); font-size: 11px; line-height: 16px; }
-
-.phase2-impact-empty, .phase2-network-empty { display: flex; align-items: center; gap: 14px; margin: 16px; padding: 18px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-panel); color: var(--color-text-secondary); }
-.phase2-impact-empty { min-height: 220px; justify-content: center; flex-direction: column; text-align: center; }
-.phase2-impact-empty > div, .phase2-network-empty > div:first-of-type { display: grid; gap: 5px; }
-.phase2-impact-empty strong, .phase2-network-empty strong { color: var(--color-text-primary); }
-.phase2-impact-empty span, .phase2-network-empty span { max-width: 620px; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
-.phase2-network-empty { justify-content: space-between; margin-inline: 0; }
 
 .phase2-propagation-sequence .impact-company--nvidia { animation: phase2-reveal 260ms ease-out both 80ms; }
 .phase2-propagation-sequence .impact-company--demo-a { animation: phase2-reveal 260ms ease-out both 260ms; }
@@ -47,13 +84,19 @@
   .network-focus-control { min-width: 190px; }
   .network-focus-control input { width: 110px; }
   .network-toolbar { flex-wrap: wrap; }
+  .network-canvas--structure { min-height: 500px; grid-template-rows: auto minmax(390px, 1fr) auto; }
+  .network-canvas--structure .network-graph-surface { min-height: 390px; }
 }
 
 @media (max-width: 1024px) {
   .network-focus-control { min-width: 210px; flex: 1 1 210px; }
   .network-focus-control input { width: 100%; }
-  .network-focus-results { min-width: min(320px, 75vw); }
+  .network-focus-results { min-width: min(340px, 75vw); }
   .phase2-network-empty { align-items: flex-start; flex-direction: column; }
+  .network-canvas-actions > span { white-space: normal; text-align: right; }
 }
 
-@media (prefers-reduced-motion: reduce) { .phase2-propagation-sequence .impact-company { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  .phase2-propagation-sequence .impact-company { animation: none !important; }
+  .graph-node { transition: none !important; }
+}
