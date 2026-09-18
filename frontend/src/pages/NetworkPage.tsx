@@ -3,8 +3,6 @@ import {
   AlertTriangle,
   ChevronDown,
   CircleDot,
-  LocateFixed,
-  Maximize2,
   Network,
   RotateCcw,
   Search,
@@ -14,10 +12,11 @@ import {
 import { Button } from "../components/ui/Button";
 import { RiskBadge } from "../components/ui/RiskBadge";
 import type { InspectorContext } from "../data/inspectorDemo";
-import { networkImpactDemo, type DemoImpactCompany } from "../data/networkImpactDemo";
+import { getImpactFixture, type DemoImpactCompany } from "../data/networkImpactDemo";
 import {
   networkStructureDemoNodes,
   networkStructureDemoRelationships,
+  type DemoGraphNode,
   type DemoGraphNodeType,
   type DemoGraphRelationship,
 } from "../data/networkStructureDemo";
@@ -97,21 +96,58 @@ export function NetworkPage({
   );
   const [riskFilter, setRiskFilter] = useState("ALL");
   const [pendingUpdate, setPendingUpdate] = useState(false);
-  const [lastRefreshLabel, setLastRefreshLabel] = useState("Fixture baseline");
+  const [lastRefreshLabel, setLastRefreshLabel] = useState("CURRENT · Fixture baseline");
   const [replayKey, setReplayKey] = useState(0);
+  const [focusQuery, setFocusQuery] = useState(investigation.focusName ?? "");
+  const [focusOpen, setFocusOpen] = useState(false);
 
   const focusNode = graphFocusNode(investigation);
+  const allowedFocusNodes = investigation.mode === "impact"
+    ? networkStructureDemoNodes.filter((node) => node.type === "Company")
+    : networkStructureDemoNodes;
+  const normalizedFocusQuery = focusQuery.trim().toLowerCase();
+  const focusResults = allowedFocusNodes.filter((node) =>
+    !normalizedFocusQuery || `${node.label} ${node.type}`.toLowerCase().includes(normalizedFocusQuery),
+  );
 
   const setMode = (mode: NetworkInvestigation["mode"]) => {
-    onInvestigationChange({
-      ...investigation,
-      mode,
-      focusId: investigation.focusId ?? focusNode.id,
-      focusName: investigation.focusName ?? focusNode.label,
-      focusType: investigation.focusType ?? "Company",
-      selectedObjectId: undefined,
-      highlightedPath: undefined,
-    });
+    if (mode === investigation.mode) return;
+
+    if (mode === "impact") {
+      const hasExplicitFocus = Boolean(investigation.focusId || investigation.focusName || investigation.focusType);
+      onInvestigationChange({
+        ...investigation,
+        mode,
+        focusId: hasExplicitFocus ? investigation.focusId : undefined,
+        focusName: hasExplicitFocus ? investigation.focusName : undefined,
+        focusType: hasExplicitFocus ? investigation.focusType : undefined,
+        selectedObjectId: undefined,
+        highlightedPath: undefined,
+      });
+    } else {
+      const supportedEventFixture = investigation.focusType === "Event"
+        ? getImpactFixture("Event", investigation.focusId)
+        : undefined;
+      const eventStructureName = supportedEventFixture?.companies[0]?.path[1];
+      const eventStructureNode = eventStructureName
+        ? networkStructureDemoNodes.find((node) => node.label === eventStructureName)
+        : undefined;
+      const nextFocus = investigation.focusType === "Company"
+        ? graphFocusNode(investigation)
+        : eventStructureNode ?? focusNode;
+
+      onInvestigationChange({
+        ...investigation,
+        mode,
+        focusId: nextFocus.id,
+        focusName: nextFocus.label,
+        focusType: nextFocus.type,
+        eventId: undefined,
+        selectedObjectId: undefined,
+        highlightedPath: undefined,
+      });
+      setFocusQuery(nextFocus.label);
+    }
     onClearInspector();
   };
 
@@ -119,20 +155,49 @@ export function NetworkPage({
     onInvestigationChange({ ...investigation, maxHops });
   };
 
+  const selectFocus = (node: DemoGraphNode) => {
+    setFocusQuery(node.label);
+    setFocusOpen(false);
+    onInvestigationChange({
+      ...investigation,
+      focusId: node.id,
+      focusName: node.label,
+      focusType: node.type,
+      eventId: undefined,
+      hopOnly: null,
+      selectedObjectId: undefined,
+      highlightedPath: undefined,
+    });
+    onClearInspector();
+  };
+
   const reset = () => {
     setNodeTypes(new Set(networkStructureDemoNodes.map((node) => node.type)));
     setRelationshipTypes(new Set(networkStructureDemoRelationships.map((relationship) => relationship.type)));
     setRiskFilter("ALL");
-    onInvestigationChange({
-      ...investigation,
-      maxHops: 1,
-      hopOnly: null,
-      selectedObjectId: undefined,
-      highlightedPath: undefined,
-      focusId: focusNode.id,
-      focusName: focusNode.label,
-      focusType: investigation.focusType ?? "Company",
-    });
+
+    if (investigation.mode === "structure") {
+      onInvestigationChange({
+        ...investigation,
+        maxHops: 1,
+        hopOnly: null,
+        selectedObjectId: undefined,
+        highlightedPath: undefined,
+        focusId: focusNode.id,
+        focusName: focusNode.label,
+        focusType: focusNode.type,
+      });
+      setFocusQuery(focusNode.label);
+    } else {
+      onInvestigationChange({
+        ...investigation,
+        maxHops: 1,
+        hopOnly: null,
+        selectedObjectId: undefined,
+        highlightedPath: undefined,
+      });
+      setFocusQuery(investigation.focusName ?? "");
+    }
     onClearInspector();
   };
 
@@ -157,13 +222,34 @@ export function NetworkPage({
 
       {pendingUpdate && (
         <div className="phase2-update-banner" role="status">
-          <div><strong>New development risk signal available</strong><span>The active graph, selection, viewport concept, and Inspector are preserved until you refresh.</span></div>
-          <Button variant="secondary" onClick={() => { setPendingUpdate(false); setLastRefreshLabel("Refreshed without resetting investigation"); }}>Refresh Impact</Button>
+          <div><strong>STALE · New development risk signal available</strong><span>Last updated: fixture baseline. The active graph, selection, and Inspector remain unchanged until refresh.</span></div>
+          <Button variant="secondary" onClick={() => { setPendingUpdate(false); setLastRefreshLabel("CURRENT · Refreshed development fixture"); }}>Refresh Impact</Button>
         </div>
       )}
 
       <section className="network-toolbar" aria-label="Network controls">
-        <div className="network-search-control"><Search size={15} aria-hidden="true" /><span>{investigation.focusName ?? "Select focus"}</span><small>{investigation.focusType ?? "Focus"}</small></div>
+        <div className="network-focus-control">
+          <Search size={15} aria-hidden="true" />
+          <input
+            value={focusQuery}
+            onChange={(event) => { setFocusQuery(event.target.value); setFocusOpen(true); }}
+            onFocus={() => setFocusOpen(true)}
+            onKeyDown={(event) => { if (event.key === "Escape") setFocusOpen(false); }}
+            aria-label="Focus Network"
+            aria-expanded={focusOpen}
+            placeholder="Focus Network"
+          />
+          <small>{investigation.focusType ?? "Focus"}</small>
+          {focusOpen && (
+            <div className="network-focus-results" aria-label="Network focus results">
+              {focusResults.length > 0 ? focusResults.map((node) => (
+                <button type="button" key={node.id} onClick={() => selectFocus(node)}>
+                  <strong>{node.label}</strong><span>{node.type}</span>
+                </button>
+              )) : <div className="network-focus-empty">No fixture nodes match this search.</div>}
+            </div>
+          )}
+        </div>
         <div className="network-toolbar-divider" />
         <div className="network-control-group">
           <span className="network-control-label">{investigation.mode === "structure" ? "Depth" : "Max Hops"}</span>
@@ -227,6 +313,7 @@ export function NetworkPage({
           relationshipTypes={relationshipTypes}
           onInvestigationChange={onInvestigationChange}
           onInspect={onInspect}
+          onReset={reset}
         />
       ) : (
         <ImpactCanvas
@@ -252,9 +339,10 @@ type StructureCanvasProps = {
   relationshipTypes: Set<DemoGraphRelationship["type"]>;
   onInvestigationChange: (next: NetworkInvestigation) => void;
   onInspect: (context: InspectorContext) => void;
+  onReset: () => void;
 };
 
-function StructureCanvas({ focusNodeId, investigation, nodeTypes, relationshipTypes, onInvestigationChange, onInspect }: StructureCanvasProps) {
+function StructureCanvas({ focusNodeId, investigation, nodeTypes, relationshipTypes, onInvestigationChange, onInspect, onReset }: StructureCanvasProps) {
   const depthVisible = useMemo(() => structuralNeighborhood(focusNodeId, investigation.maxHops), [focusNodeId, investigation.maxHops]);
   const visibleNodes = networkStructureDemoNodes.filter((node) => depthVisible.has(node.id) && nodeTypes.has(node.type));
   const visibleIds = new Set(visibleNodes.map((node) => node.id));
@@ -271,7 +359,7 @@ function StructureCanvas({ focusNodeId, investigation, nodeTypes, relationshipTy
     });
   }
 
-  const selectNode = (node: (typeof networkStructureDemoNodes)[number]) => {
+  const selectNode = (node: DemoGraphNode) => {
     onInvestigationChange({ ...investigation, selectedObjectId: node.id, highlightedPath: undefined });
     onInspect({
       id: node.type === "Company" ? companyIdByName[node.label] ?? node.id : node.id,
@@ -319,7 +407,7 @@ function StructureCanvas({ focusNodeId, investigation, nodeTypes, relationshipTy
           {visibleRelationships.map((relationship, index) => {
             const coords = [[170,144,450,235],[470,235,750,170],[450,250,360,420],[755,185,670,420],[775,185,850,340]][networkStructureDemoRelationships.findIndex((candidate) => candidate.id === relationship.id)];
             const dim = selectedNode && !(relationship.source === selectedNode.id || relationship.target === selectedNode.id);
-            const selected = selectedRelationship?.id === relationship.id || investigation.highlightedPath?.includes(networkStructureDemoNodes.find((node) => node.id === relationship.source)?.label ?? "") && investigation.highlightedPath?.includes(networkStructureDemoNodes.find((node) => node.id === relationship.target)?.label ?? "");
+            const selected = selectedRelationship?.id === relationship.id || Boolean(investigation.highlightedPath?.includes(networkStructureDemoNodes.find((node) => node.id === relationship.source)?.label ?? "") && investigation.highlightedPath?.includes(networkStructureDemoNodes.find((node) => node.id === relationship.target)?.label ?? ""));
             return <line key={`${relationship.id}-${index}`} x1={coords[0]} y1={coords[1]} x2={coords[2]} y2={coords[3]} className={`network-edge${dim ? " phase2-dimmed" : ""}${selected ? " phase2-structure-edge-highlight" : ""}`} markerEnd="url(#structure-arrow)" />;
           })}
         </svg>
@@ -344,6 +432,16 @@ function StructureCanvas({ focusNodeId, investigation, nodeTypes, relationshipTy
 
         <div className="network-canvas-notice"><span>FOCUSED STRUCTURE</span><p>Depth {investigation.maxHops}. Click selects; Expand 1 Hop or depth controls deliberately add context.</p></div>
       </div>
+
+      {visibleRelationships.length === 0 && (
+        <div className="phase2-network-empty" role="status">
+          <div><strong>No relationships found at this depth or with the current filters.</strong><span>Increase depth or reset filters; no hidden relationship is invented.</span></div>
+          <div className="phase2-inline-actions">
+            {investigation.maxHops < 3 && <Button variant="secondary" onClick={() => onInvestigationChange({ ...investigation, maxHops: Math.min(3, investigation.maxHops + 1) as HopDepth })}>Increase Depth</Button>}
+            <Button variant="ghost" onClick={onReset}>Reset Filters</Button>
+          </div>
+        </div>
+      )}
 
       <div>
         <StructureLegend />
@@ -372,28 +470,52 @@ type ImpactCanvasProps = {
 };
 
 function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestigationChange, onInspect, onOpenCompanyProfile, onReplay, onSimulateUpdate }: ImpactCanvasProps) {
-  const isEventOrigin = investigation.focusType === "Event";
-  const originName = investigation.focusName ?? (isEventOrigin ? "Selected event" : networkImpactDemo.origin.company);
+  const validOriginType = investigation.focusType === "Company" || investigation.focusType === "Event"
+    ? investigation.focusType
+    : undefined;
+
+  if (!validOriginType || !investigation.focusId) {
+    return (
+      <ImpactUnavailableState
+        title="Select an event or origin company to analyze propagation."
+        detail="Impact does not render risk rings or paths without a valid origin context. Use Focus Network to select a Company, or open Impact from an Event."
+        investigation={investigation}
+        onInvestigationChange={onInvestigationChange}
+      />
+    );
+  }
+
+  const fixture = getImpactFixture(validOriginType, investigation.focusId);
+  if (!fixture) {
+    return (
+      <ImpactUnavailableState
+        title="Impact data is not available for this development origin."
+        detail={`${investigation.focusName ?? validOriginType} has no matching Phase 2 impact fixture. No TSMC path or other origin is substituted.`}
+        investigation={investigation}
+        onInvestigationChange={onInvestigationChange}
+      />
+    );
+  }
+
+  const isEventOrigin = fixture.origin.type === "Event";
+  const originName = fixture.origin.name;
   const riskOrder = ["NONE", "LOW", "MEDIUM", "HIGH", "CRITICAL"];
-  const visibleCompanies = networkImpactDemo.companies.filter((company) => {
+  const visibleCompanies = fixture.companies.filter((company) => {
     const hop = Number(company.hop.replace("Hop ", ""));
     const hopVisible = hop <= investigation.maxHops && (!investigation.hopOnly || hop === investigation.hopOnly);
     const riskVisible = riskFilter === "ALL" || riskOrder.indexOf(company.level) >= riskOrder.indexOf(riskFilter);
     return hopVisible && riskVisible;
   });
 
-  const pathForCompany = (company: DemoImpactCompany) => {
-    const hop = Number(company.hop.replace("Hop ", ""));
-    const companyPath = hop === 1 ? ["TSMC", "NVIDIA"] : hop === 2 ? ["TSMC", "NVIDIA", "Demo Company A"] : ["TSMC", "NVIDIA", "Demo Company A", "Demo Company B"];
-    if (isEventOrigin) return [originName, ...companyPath];
-    if (originName === "TSMC") return companyPath;
-    return [originName, ...companyPath.slice(1)];
-  };
-
   const selectCompany = (company: DemoImpactCompany) => {
-    const path = pathForCompany(company);
-    onInvestigationChange({ ...investigation, selectedObjectId: company.id, highlightedPath: path });
+    onInvestigationChange({ ...investigation, selectedObjectId: company.id, highlightedPath: company.path });
     const companyId = companyIdByName[company.company] ?? company.id;
+    const traceFields = isEventOrigin ? [
+      { label: "Initial Risk", value: fixture.context.initialRisk ?? "Not available" },
+      { label: "Path Dependency", value: company.pathDependency ?? "Not available" },
+      { label: "Distance Decay", value: company.distanceDecay ?? "Not available" },
+    ] : [];
+
     onInspect({
       id: companyId,
       type: "Company",
@@ -405,18 +527,14 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
         { label: "Hop", value: company.hop.replace("Hop ", "") },
         { label: "Origin", value: originName },
         { label: isEventOrigin ? "Propagated Risk" : "Transmission Factor", value: company.score },
-        ...(isEventOrigin ? [
-          { label: "Initial Risk", value: networkImpactDemo.context.initialRisk },
-          { label: "Path Dependency", value: company.company === "NVIDIA" ? "1.00" : "Development combined value" },
-          { label: "Distance Decay", value: company.hop === "Hop 1" ? "1.00" : company.hop === "Hop 2" ? "0.70" : "0.49" },
-        ] : []),
+        ...traceFields,
       ],
-      path,
+      path: company.path,
       evidence: { availability: "UNAVAILABLE" },
     });
   };
 
-  const selectedCompany = networkImpactDemo.companies.find((company) => company.id === investigation.selectedObjectId);
+  const selectedCompany = fixture.companies.find((company) => company.id === investigation.selectedObjectId);
 
   return (
     <section className="network-canvas impact-canvas" aria-label="Impact blast radius">
@@ -437,7 +555,7 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
 
           <svg className="impact-paths" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
             <defs><marker id="impact-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" className="impact-arrow-head" /></marker></defs>
-            {networkImpactDemo.paths.map((path, index) => {
+            {fixture.paths.map((path, index) => {
               const hop = index + 1;
               if (hop > investigation.maxHops || investigation.hopOnly && investigation.hopOnly !== hop) return null;
               const dim = investigation.highlightedPath && selectedCompany && hop > Number(selectedCompany.hop.replace("Hop ", ""));
@@ -449,16 +567,29 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
         <div className="impact-context-panel">
           <div><span className="metadata-text">PROPAGATION CONTEXT</span><strong>{investigation.maxHops}-hop maximum depth</strong></div>
           <div className="impact-context-grid">
-            {isEventOrigin ? <><div><span>Initial Risk</span><strong>{networkImpactDemo.context.initialRisk}</strong></div><div><span>Distance Decay</span><strong>{networkImpactDemo.context.distanceDecay}</strong></div></> : <><div><span>Metric</span><strong>Transmission Factor</strong></div><div><span>Unit Origin</span><strong>1.00</strong></div></>}
+            {isEventOrigin ? <><div><span>Initial Risk</span><strong>{fixture.context.initialRisk ?? "Not available"}</strong></div><div><span>Distance Decay</span><strong>{fixture.context.distanceDecay ?? "Not available"}</strong></div></> : <><div><span>Metric</span><strong>Transmission Factor</strong></div><div><span>Unit Origin</span><strong>1.00</strong></div></>}
             <div><span>Visible Results</span><strong>{visibleCompanies.length}</strong></div><div><span>Strongest Path</span><strong>Fixture only</strong></div>
           </div>
-          <p>{isEventOrigin ? "Selecting a company exposes the returned risk/path factors. Missing per-edge factors are not reconstructed." : "Company-origin analysis describes downstream transmission strength, not aggregate Current Risk."}</p>
+          <p>{isEventOrigin ? "Selecting a company exposes only the factors carried by this explicit event fixture. Missing per-edge factors are not reconstructed." : "Company-origin analysis describes fixture transmission strength, not aggregate Current Risk."}</p>
           {investigation.highlightedPath && <div className="phase2-highlight-path-text"><strong>Highlighted path</strong><span>{investigation.highlightedPath.join(" → ")}</span></div>}
           {selectedCompany && companyIdByName[selectedCompany.company] && <Button variant="secondary" onClick={() => onOpenCompanyProfile(companyIdByName[selectedCompany.company])}>Open Profile</Button>}
         </div>
       </div>
-      <footer className="impact-legend"><span>{isEventOrigin ? "Risk:" : "Exposure styling (fixture):"}</span><RiskBadge level="CRITICAL" /><RiskBadge level="HIGH" /><RiskBadge level="MEDIUM" /></footer>
+      <footer className="impact-legend"><span>{isEventOrigin ? "Risk:" : "Transmission bands (development fixture):"}</span>{isEventOrigin ? <><RiskBadge level="CRITICAL" /><RiskBadge level="HIGH" /><RiskBadge level="MEDIUM" /></> : <span className="phase2-interaction-note">Not Current Risk</span>}</footer>
       <div className="phase2-accessible-list"><h3>Accessible Blast Radius results</h3><ul>{visibleCompanies.map((company) => <li key={`impact-list-${company.id}`}><button type="button" onClick={() => selectCompany(company)}>{company.company} · {company.hop} · {isEventOrigin ? "Propagated Risk" : "Transmission Factor"} {company.score}</button></li>)}</ul></div>
+    </section>
+  );
+}
+
+function ImpactUnavailableState({ title, detail, investigation, onInvestigationChange }: { title: string; detail: string; investigation: NetworkInvestigation; onInvestigationChange: (next: NetworkInvestigation) => void }) {
+  return (
+    <section className="network-canvas impact-canvas" aria-label="Impact unavailable">
+      <div className="network-canvas-header"><div><span className="metadata-text">IMPACT MODE</span><strong>Blast Radius</strong></div><CanvasActions label="No impact fixture rendered" /></div>
+      <div className="phase2-impact-empty" role="status">
+        <AlertTriangle size={24} aria-hidden="true" />
+        <div><strong>{title}</strong><span>{detail}</span></div>
+        <Button variant="secondary" onClick={() => onInvestigationChange({ ...investigation, mode: "structure", selectedObjectId: undefined, highlightedPath: undefined })}>Return to Structure</Button>
+      </div>
     </section>
   );
 }
@@ -468,7 +599,7 @@ function ImpactCompany({ company, hop, score, level, className, valueLabel, sele
 }
 
 function CanvasActions({ label }: { label: string }) {
-  return <div className="network-canvas-actions"><span>{label}</span><button type="button" className="network-icon-button" aria-label="Center graph" title="Center graph"><LocateFixed size={15} /></button><button type="button" className="network-icon-button" aria-label="Expand graph canvas" title="Expand graph canvas"><Maximize2 size={15} /></button></div>;
+  return <div className="network-canvas-actions"><span>{label}</span></div>;
 }
 
 function StructureLegend() {
