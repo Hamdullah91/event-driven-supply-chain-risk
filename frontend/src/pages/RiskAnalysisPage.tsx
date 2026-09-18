@@ -71,7 +71,7 @@ export function RiskAnalysisPage({ selectedInspectorId, onInspect, onOpenProfile
 
       <Panel variant="workspace" eyebrow="Analytical view" title="Risk Concentration" description="Lens switching preserves the same fixture scope and hop selection.">
         <div className="risk-view-tabs">{(["network", "geography", "heatmap"] as RiskView[]).map((lens) => <button key={lens} type="button" className={`risk-view-tab${view === lens ? " is-active" : ""}`} aria-pressed={view === lens} onClick={() => setView(lens)}>{lens === "network" ? <Network size={14} aria-hidden="true" /> : lens === "geography" ? <Globe2 size={14} aria-hidden="true" /> : <BarChart3 size={14} aria-hidden="true" />}<span>{lens[0].toUpperCase() + lens.slice(1)}</span></button>)}</div>
-        <div className="risk-view-content">{view === "network" && <RiskNetworkView hop={hop} />}{view === "geography" && <GeographyView />}{view === "heatmap" && <HeatmapView />}</div>
+        <div className="risk-view-content">{view === "network" && <RiskNetworkView hop={hop} />}{view === "geography" && <GeographyView onInspect={onInspect} />}{view === "heatmap" && <HeatmapView />}</div>
       </Panel>
 
       <section className="risk-context-grid">
@@ -94,8 +94,14 @@ function RiskNetworkView({ hop }: { hop: number | null }) {
   return <div className="risk-network-view"><div className="risk-network-center"><ShieldAlert size={21} aria-hidden="true" /><strong>System Risk</strong><span>{hop ? `Hop ${hop} filter` : "Current exposure"}</span></div><div className="risk-network-company risk-network-company--critical"><strong>NVIDIA</strong><span>0.75</span><RiskBadge level="CRITICAL" /></div><div className="risk-network-company risk-network-company--high"><strong>TSMC</strong><span>0.61</span><RiskBadge level="HIGH" /></div><div className="risk-network-company risk-network-company--medium"><strong>Samsung</strong><span>0.42</span><RiskBadge level="MEDIUM" /></div><div className="risk-network-demo-label">DEMO NETWORK CONCENTRATION</div></div>;
 }
 
-function GeographyView() {
-  return <div className="geography-unavailable"><div className="geography-icon"><MapPin size={24} aria-hidden="true" /></div><div><span className="metadata-text">GEOGRAPHY LENS</span><h3>Verified geographic coordinates are backend-supported</h3><p>Click behavior is defined for Country / Location / Facility selection when live geographic entities are adapted. This fixture does not invent coordinates or shipment telemetry.</p><div className="geography-integrity-note">No synthetic coordinates are used.</div></div></div>;
+function GeographyView({ onInspect }: { onInspect: (context: InspectorContext) => void }) {
+  const entities: Array<{ id: string; type: "Country" | "Location" | "Facility"; name: string; related: string }> = [
+    { id: "demo-country-taiwan", type: "Country", name: "Taiwan", related: "TSMC development context" },
+    { id: "demo-location-hsinchu", type: "Location", name: "Hsinchu context", related: "Development location fixture · no coordinate invented" },
+    { id: "demo-facility-1", type: "Facility", name: "Demo Fab", related: "Related company: TSMC" },
+  ];
+
+  return <div className="geography-unavailable"><div className="geography-icon"><MapPin size={24} aria-hidden="true" /></div><div><span className="metadata-text">GEOGRAPHY LENS · DEVELOPMENT FIXTURE</span><h3>Geographic entities inspect without creating logistics telemetry</h3><p>No coordinate is fabricated here. Selecting a Country, Location, or Facility opens the same contextual Inspector pattern used elsewhere.</p><div className="phase2-geography-list">{entities.map((entity) => <button type="button" key={entity.id} onClick={() => onInspect({ id: entity.id, type: entity.type, name: entity.name, subtitle: entity.related, relatedCompanyId: entity.type === "Facility" ? "demo-tsmc" : undefined, fields: [{ label: "Geography role", value: entity.type }, { label: "Coordinate", value: "Not available in this fixture" }], evidence: { availability: "UNAVAILABLE" } })}><strong>{entity.name}</strong><span>{entity.type}</span></button>)}</div><div className="geography-integrity-note">No ships, routes, ETA, AIS, port telemetry, or synthetic coordinates.</div></div></div>;
 }
 
 function HeatmapView() {
