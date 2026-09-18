@@ -1,0 +1,24 @@
+/* Phase 2 adds interaction feedback only. Phase 1 visual tokens remain authoritative. */
+.phase2-selectable { cursor: pointer; }
+.phase2-selectable:hover { background: var(--color-elevated); }
+.phase2-selectable:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.phase2-selectable.is-selected { border-color: var(--color-primary) !important; box-shadow: inset 3px 0 0 var(--color-primary); }
+.phase2-inline-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.phase2-inline-actions .ui-button { min-height: 34px; }
+.phase2-interaction-note { color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+.phase2-filter-select, .phase2-search-input { min-height: 40px; border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-panel); color: var(--color-text-primary); padding: 0 12px; font: inherit; font-size: 12px; }
+.phase2-filter-select:focus-visible, .phase2-search-input:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.phase2-update-banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-button); background: var(--color-elevated); }
+.phase2-update-banner strong { display: block; font-size: 13px; }
+.phase2-update-banner span { color: var(--color-text-muted); font-size: 11px; }
+.phase2-dimmed { opacity: .22 !important; }
+.phase2-highlighted { filter: brightness(1.25); }
+.phase2-accessible-list { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--color-border); }
+.phase2-accessible-list h3 { margin: 0 0 8px; font-size: 12px; color: var(--color-text-secondary); }
+.phase2-accessible-list ul { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.phase2-accessible-list button { width: 100%; min-height: 36px; padding: 6px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-panel); color: var(--color-text-secondary); text-align: left; cursor: pointer; }
+.phase2-accessible-list button:hover, .phase2-accessible-list button:focus-visible { border-color: var(--color-primary); color: var(--color-text-primary); outline: none; }
+.inspector-path-text { margin: 8px 0 0; color: var(--color-text-secondary); font-size: 12px; line-height: 18px; }
+.evidence-availability { display: inline-flex; margin-top: 8px; padding: 3px 6px; border: 1px solid var(--color-border); border-radius: var(--radius-badge); color: var(--color-text-secondary); font-size: 10px; font-weight: 700; }
+.evidence-availability--unavailable { color: var(--color-text-muted); }
+.inspector-evidence-toggle { margin-top: 8px; }
