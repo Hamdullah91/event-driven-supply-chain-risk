@@ -162,10 +162,3 @@ export function getNetworkFocusEntity(focusId: string | null | undefined): Entit
   if (!focusId) return undefined;
   return entityCatalog[focusId];
 }
-
-export const networkStructureDemoNodes: DemoGraphNode[] = networkFocusEntities
-  .filter((entity) => entity.id !== "demo-samsung")
-  .map((entity) => {
-    const positioned = tsmcFixture.nodes.find((node) => node.id === entity.id);
-    return positioned ?? { ...entity, x: 50, y: 50 };
-  });
