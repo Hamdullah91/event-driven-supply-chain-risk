@@ -4,6 +4,18 @@
 .network-filter-popover { position: absolute; z-index: 20; top: calc(100% + 6px); left: 0; display: grid; min-width: 180px; gap: 8px; padding: 10px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-button); background: var(--color-chrome); box-shadow: 0 12px 30px rgb(0 0 0 / 28%); }
 .network-filter-popover label { display: flex; align-items: center; gap: 8px; color: var(--color-text-secondary); font-size: 12px; cursor: pointer; }
 .network-filter-popover input { accent-color: var(--color-primary); }
+
+.network-focus-control { position: relative; display: flex; align-items: center; gap: 7px; min-width: 220px; height: 34px; padding: 0 9px; border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-panel); color: var(--color-text-muted); }
+.network-focus-control:focus-within { border-color: var(--color-primary); }
+.network-focus-control input { width: 150px; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-size: 12px; }
+.network-focus-control input::placeholder { color: var(--color-text-muted); }
+.network-focus-control small { margin-left: auto; color: var(--color-text-muted); font-size: 10px; text-transform: uppercase; }
+.network-focus-results { position: absolute; z-index: 35; top: calc(100% + 6px); left: 0; min-width: 240px; overflow: hidden; border: 1px solid var(--color-border-strong); border-radius: var(--radius-card); background: var(--color-chrome); box-shadow: 0 12px 30px rgb(0 0 0 / 30%); }
+.network-focus-results button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 10px; border: 0; border-bottom: 1px solid var(--color-border); background: transparent; color: var(--color-text-primary); cursor: pointer; text-align: left; }
+.network-focus-results button:hover, .network-focus-results button:focus-visible { background: var(--color-elevated); outline: none; }
+.network-focus-results button span { color: var(--color-text-muted); font-size: 10px; text-transform: uppercase; }
+.network-focus-empty { padding: 12px; color: var(--color-text-muted); font-size: 11px; }
+
 .impact-toolbar-context select { border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-weight: 600; }
 .impact-toolbar-context option { background: var(--color-chrome); }
 .phase2-relationship-button { cursor: pointer; }
@@ -18,8 +30,30 @@
 .phase2-highlight-path-text { display: grid; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-border); }
 .phase2-highlight-path-text strong { color: var(--color-text-primary); font-size: 11px; }
 .phase2-highlight-path-text span { color: var(--color-text-secondary); font-size: 11px; line-height: 16px; }
+
+.phase2-impact-empty, .phase2-network-empty { display: flex; align-items: center; gap: 14px; margin: 16px; padding: 18px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-panel); color: var(--color-text-secondary); }
+.phase2-impact-empty { min-height: 220px; justify-content: center; flex-direction: column; text-align: center; }
+.phase2-impact-empty > div, .phase2-network-empty > div:first-of-type { display: grid; gap: 5px; }
+.phase2-impact-empty strong, .phase2-network-empty strong { color: var(--color-text-primary); }
+.phase2-impact-empty span, .phase2-network-empty span { max-width: 620px; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+.phase2-network-empty { justify-content: space-between; margin-inline: 0; }
+
 .phase2-propagation-sequence .impact-company--nvidia { animation: phase2-reveal 260ms ease-out both 80ms; }
 .phase2-propagation-sequence .impact-company--demo-a { animation: phase2-reveal 260ms ease-out both 260ms; }
 .phase2-propagation-sequence .impact-company--demo-b { animation: phase2-reveal 260ms ease-out both 440ms; }
 @keyframes phase2-reveal { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 1180px) {
+  .network-focus-control { min-width: 190px; }
+  .network-focus-control input { width: 110px; }
+  .network-toolbar { flex-wrap: wrap; }
+}
+
+@media (max-width: 1024px) {
+  .network-focus-control { min-width: 210px; flex: 1 1 210px; }
+  .network-focus-control input { width: 100%; }
+  .network-focus-results { min-width: min(320px, 75vw); }
+  .phase2-network-empty { align-items: flex-start; flex-direction: column; }
+}
+
 @media (prefers-reduced-motion: reduce) { .phase2-propagation-sequence .impact-company { animation: none !important; } }
