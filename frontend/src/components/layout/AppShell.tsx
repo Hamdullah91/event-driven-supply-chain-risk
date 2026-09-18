@@ -149,6 +149,7 @@ export function AppShell({
           <div className="workspace-content">{children}</div>
           {inspectorContext && (
             <EntityInspector
+              key={inspectorContext.id}
               context={inspectorContext}
               onClose={onCloseInspector}
               onAction={onInspectorAction}
