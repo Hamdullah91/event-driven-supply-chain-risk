@@ -16,9 +16,10 @@ import {
   X,
 } from "lucide-react";
 
+import { hasCompanyProfile } from "../../data/companiesDemo";
+import type { InspectorContext, InspectorEntityType } from "../../data/inspectorDemo";
 import { Button } from "../ui/Button";
 import { RiskBadge } from "../ui/RiskBadge";
-import type { InspectorContext, InspectorEntityType } from "../../data/inspectorDemo";
 
 import "./EntityInspector.css";
 
@@ -52,7 +53,9 @@ const entityIcons: Record<InspectorEntityType, typeof Building2> = {
 function contextualActions(context: InspectorContext): InspectorAction[] {
   switch (context.type) {
     case "Company":
-      return ["Open Profile", "Explore Network", "Open Impact"];
+      return hasCompanyProfile(context.id)
+        ? ["Open Profile", "Explore Network", "Open Impact"]
+        : ["Explore Network", "Open Impact"];
     case "Event":
       return ["Open Event", "Open Impact"];
     case "Relationship":
@@ -69,14 +72,12 @@ function contextualActions(context: InspectorContext): InspectorAction[] {
 export function EntityInspector({ context, onClose, onAction }: EntityInspectorProps) {
   const [showEvidence, setShowEvidence] = useState(false);
   const Icon = entityIcons[context.type];
-  const evidenceAvailable =
-    context.evidence && context.evidence.availability !== "UNAVAILABLE";
+  const evidenceAvailable = context.evidence && context.evidence.availability !== "UNAVAILABLE";
+  const actions = contextualActions(context);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
 
     window.addEventListener("keydown", onKeyDown);
@@ -90,13 +91,7 @@ export function EntityInspector({ context, onClose, onAction }: EntityInspectorP
           <span className="metadata-text">CONTEXT</span>
           <span className="inspector-demo-label">DEVELOPMENT FIXTURE</span>
         </div>
-
-        <button
-          type="button"
-          className="inspector-close-button"
-          aria-label="Close inspector"
-          onClick={onClose}
-        >
+        <button type="button" className="inspector-close-button" aria-label="Close inspector" onClick={onClose}>
           <X size={15} />
         </button>
       </div>
@@ -110,89 +105,87 @@ export function EntityInspector({ context, onClose, onAction }: EntityInspectorP
         </div>
       </section>
 
-      {(context.riskLevel || context.riskScore) && (
-        <section className="inspector-section">
-          <span className="inspector-section-label">RISK / EXPOSURE</span>
-          <div className="inspector-risk">
-            {context.riskScore !== undefined && <strong>{context.riskScore}</strong>}
-            {context.riskLevel && <RiskBadge level={context.riskLevel} />}
-          </div>
+      {actions.length > 0 && (
+        <section className="inspector-actions" aria-label="Inspector actions">
+          {actions.map((action, index) => (
+            <Button
+              key={action}
+              variant={index === 0 ? "secondary" : "ghost"}
+              icon={<ArrowRight size={14} />}
+              onClick={() => onAction?.(action, context)}
+            >
+              {action}
+            </Button>
+          ))}
         </section>
       )}
 
-      {context.fields.length > 0 && (
-        <section className="inspector-section">
-          <span className="inspector-section-label">OVERVIEW</span>
-          <div className="inspector-field-list">
-            {context.fields.map((field) => (
-              <div className="inspector-field" key={`${field.label}-${field.value}`}>
-                <span>{field.label}</span>
-                <strong>{field.value}</strong>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="entity-inspector-scroll">
+        {(context.riskLevel || context.riskScore) && (
+          <section className="inspector-section">
+            <span className="inspector-section-label">RISK / EXPOSURE</span>
+            <div className="inspector-risk">
+              {context.riskScore !== undefined && <strong>{context.riskScore}</strong>}
+              {context.riskLevel && <RiskBadge level={context.riskLevel} />}
+            </div>
+          </section>
+        )}
 
-      {context.path && context.path.length > 1 && (
-        <section className="inspector-section">
-          <div className="inspector-section-heading">
-            <span className="inspector-section-label">PATH</span>
-            <Route size={14} aria-hidden="true" />
-          </div>
-          <p className="inspector-path-text">{context.path.join(" → ")}</p>
-        </section>
-      )}
-
-      {context.evidence && (
-        <section className="inspector-section">
-          <div className="inspector-section-heading">
-            <span className="inspector-section-label">EVIDENCE</span>
-            <FileText size={14} aria-hidden="true" />
-          </div>
-
-          <div className={`evidence-availability evidence-availability--${context.evidence.availability.toLowerCase()}`}>
-            {context.evidence.availability}
-          </div>
-
-          {evidenceAvailable ? (
-            <>
-              <Button
-                variant="ghost"
-                className="inspector-evidence-toggle"
-                onClick={() => setShowEvidence((value) => !value)}
-                aria-expanded={showEvidence}
-              >
-                View Evidence
-              </Button>
-
-              {showEvidence && (
-                <div className="inspector-evidence" aria-live="polite">
-                  <InspectorEvidenceField label="Source" value={context.evidence.source ?? "Not available"} />
-                  <InspectorEvidenceField label="Confidence" value={context.evidence.confidence ?? "Not available"} />
-                  <InspectorEvidenceField label="Provenance" value={context.evidence.provenance ?? "Not available"} />
-                  <InspectorEvidenceField label="Extracted context" value={context.evidence.excerpt ?? "Not available"} />
+        {context.fields.length > 0 && (
+          <section className="inspector-section">
+            <span className="inspector-section-label">OVERVIEW</span>
+            <div className="inspector-field-list">
+              {context.fields.map((field) => (
+                <div className="inspector-field" key={`${field.label}-${field.value}`}>
+                  <span>{field.label}</span>
+                  <strong>{field.value}</strong>
                 </div>
-              )}
-            </>
-          ) : (
-            <span className="inspector-unavailable">Evidence unavailable</span>
-          )}
-        </section>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
 
-      <section className="inspector-actions" aria-label="Inspector actions">
-        {contextualActions(context).map((action, index) => (
-          <Button
-            key={action}
-            variant={index === 0 ? "secondary" : "ghost"}
-            icon={<ArrowRight size={14} />}
-            onClick={() => onAction?.(action, context)}
-          >
-            {action}
-          </Button>
-        ))}
-      </section>
+        {context.path && context.path.length > 1 && (
+          <section className="inspector-section">
+            <div className="inspector-section-heading">
+              <span className="inspector-section-label">PATH</span>
+              <Route size={14} aria-hidden="true" />
+            </div>
+            <p className="inspector-path-text">{context.path.join(" → ")}</p>
+          </section>
+        )}
+
+        {context.evidence && (
+          <section className="inspector-section">
+            <div className="inspector-section-heading">
+              <span className="inspector-section-label">EVIDENCE</span>
+              <FileText size={14} aria-hidden="true" />
+            </div>
+
+            <div className={`evidence-availability evidence-availability--${context.evidence.availability.toLowerCase()}`}>
+              {context.evidence.availability}
+            </div>
+
+            {evidenceAvailable ? (
+              <>
+                <Button variant="ghost" className="inspector-evidence-toggle" onClick={() => setShowEvidence((value) => !value)} aria-expanded={showEvidence}>
+                  View Evidence
+                </Button>
+                {showEvidence && (
+                  <div className="inspector-evidence" aria-live="polite">
+                    <InspectorEvidenceField label="Source" value={context.evidence.source ?? "Not available"} />
+                    <InspectorEvidenceField label="Confidence" value={context.evidence.confidence ?? "Not available"} />
+                    <InspectorEvidenceField label="Provenance" value={context.evidence.provenance ?? "Not available"} />
+                    <InspectorEvidenceField label="Extracted context" value={context.evidence.excerpt ?? "Not available"} />
+                  </div>
+                )}
+              </>
+            ) : (
+              <span className="inspector-unavailable">Evidence unavailable</span>
+            )}
+          </section>
+        )}
+      </div>
     </aside>
   );
 }
