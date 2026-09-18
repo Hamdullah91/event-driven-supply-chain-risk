@@ -6,53 +6,110 @@ const root = new URL("../", import.meta.url);
 const read = (path) => readFileSync(fileURLToPath(new URL(path, root)), "utf8");
 
 const impactData = read("src/data/networkImpactDemo.ts");
+const structureData = read("src/data/networkStructureDemo.ts");
 const companyData = read("src/data/companiesDemo.ts");
 const companiesPage = read("src/pages/CompaniesPage.tsx");
 const networkPage = read("src/pages/NetworkPage.tsx");
+const networkCss = read("src/pages/NetworkPhase2.css");
+const phase2State = read("src/phase2.ts");
 const app = read("src/App.tsx");
 const appShell = read("src/components/layout/AppShell.tsx");
 const appShellCss = read("src/components/layout/AppShell.css");
+const inspector = read("src/components/layout/EntityInspector.tsx");
+const inspectorCss = read("src/components/layout/EntityInspector.css");
 
 const checks = [
-  ["impact fixtures are keyed to explicit supported origins", () => {
-    assert.match(impactData, /"Company:demo-tsmc"/);
-    assert.match(impactData, /"Event:demo-event-001"/);
-    assert.doesNotMatch(networkPage, /pathForCompany/);
+  ["unsupported Company Profile IDs render an explicit unavailable state", () => {
+    assert.match(companyData, /companyProfilesById/);
+    assert.match(companyData, /getCompanyProfile/);
+    assert.match(companiesPage, /Profile unavailable for this development entity/);
+    assert.match(companiesPage, /if \(props\.profileCompanyId\)/);
+    assert.doesNotMatch(companiesPage, /if \(selectedCompany\) return <CompanyProfile[\s\S]*return <CompaniesList/);
   }],
-  ["unsupported impact origins render an honest unavailable state", () => {
-    assert.match(networkPage, /Impact data is not available for this development origin\./);
-    assert.match(networkPage, /No TSMC path or other origin is substituted\./);
+  ["unsupported Impact targets do not expose a false Open Profile action", () => {
+    assert.match(inspector, /hasCompanyProfile\(context\.id\)/);
+    assert.match(networkPage, /Profile unavailable for this development entity\./);
+    assert.match(networkPage, /selectedProfileId && hasCompanyProfile\(selectedProfileId\)/);
   }],
-  ["impact without a valid origin renders no-context guidance", () => {
-    assert.match(networkPage, /Select an event or origin company to analyze propagation\./);
-    assert.match(networkPage, /does not render risk rings or paths without a valid origin context/);
+  ["Samsung Structure focus cannot resolve to a TSMC fixture", () => {
+    assert.match(structureData, /"demo-samsung"/);
+    assert.match(structureData, /structureFixturesByFocusId/);
+    assert.doesNotMatch(structureData, /"demo-samsung": tsmcFixture/);
+    assert.match(networkPage, /No development network fixture is available for/);
+    assert.match(networkPage, /No TSMC or other topology is substituted/);
   }],
-  ["company exposure fixtures do not leak NVIDIA paths to other companies", () => {
-    assert.match(companyData, /companyExposureFixtures/);
-    assert.match(companyData, /"demo-nvidia": demoNvidiaExposures/);
-    assert.doesNotMatch(companiesPage, /demoNvidiaExposures\.slice/);
-    assert.match(companiesPage, /No development exposure fixture is available for this company\./);
+  ["Structure fixture lookup has no unrelated default fallback", () => {
+    assert.match(structureData, /return structureFixturesByFocusId\[focusId\]/);
+    assert.doesNotMatch(structureData, /\?\?\s*tsmcFixture/);
+    assert.doesNotMatch(networkPage, /find\(\(node\) => node\.label === "TSMC"\)!/);
   }],
-  ["Network Focus\/Search is interactive", () => {
+  ["Structure to Impact mode switching preserves full focus identity", () => {
+    assert.match(networkPage, /const setMode = \(mode:[\s\S]*?onInvestigationChange\(\{[\s\S]*?\.\.\.investigation,[\s\S]*?mode,/);
+    assert.doesNotMatch(networkPage, /const setMode[\s\S]*?focusId:\s*.*TSMC/);
+  }],
+  ["NVIDIA and ASML unsupported Impact origins cannot become TSMC", () => {
+    assert.match(structureData, /"demo-nvidia": nvidiaFixture/);
+    assert.match(structureData, /"demo-asml": asmlFixture/);
+    assert.doesNotMatch(impactData, /"Company:demo-nvidia"/);
+    assert.doesNotMatch(impactData, /"Company:demo-asml"/);
+    assert.match(networkPage, /The current origin is preserved\. No TSMC path or other origin is substituted\./);
+  }],
+  ["returning from unavailable Impact keeps the original Structure focus", () => {
+    assert.match(networkPage, /onReturnToStructure=\{\(\) => setMode\("structure"\)\}/);
+    assert.match(networkPage, /onReturnToStructure\}>Return to Structure/);
+    assert.doesNotMatch(networkPage, /normalize.*TSMC/i);
+  }],
+  ["supported TSMC Structure and Impact fixtures remain explicit", () => {
+    assert.match(structureData, /"demo-tsmc": tsmcFixture/);
+    assert.match(impactData, /"Company:demo-tsmc": companyTsmcFixture/);
+  }],
+  ["Network Focus Search remains interactive and uses stable IDs", () => {
     assert.match(networkPage, /aria-label="Focus Network"/);
     assert.match(networkPage, /selectFocus\(node\)/);
-    assert.match(networkPage, /network-focus-results/);
+    assert.match(networkPage, /networkFocusEntities/);
+    assert.match(structureData, /id: "demo-nvidia"/);
+    assert.doesNotMatch(structureData, /id: "demo-company-nvidia"/);
   }],
-  ["Intelligence Show Network replaces stale focus identity", () => {
+  ["Reset preserves focus while resetting depth filters selection and path", () => {
+    assert.match(networkPage, /const reset = \(\) => \{[\s\S]*?\.\.\.investigation,[\s\S]*?maxHops: 1,[\s\S]*?selectedObjectId: undefined,[\s\S]*?highlightedPath: undefined/);
+    assert.doesNotMatch(networkPage, /const reset[\s\S]*?focusId:\s*"demo-tsmc"/);
+  }],
+  ["Intelligence Show Network still replaces stale focus identity", () => {
     assert.match(app, /const focusNode = networkStructureDemoNodes\.find/);
     assert.match(app, /focusId: focusNode\?\.id/);
     assert.match(app, /focusName: path\[0\]/);
   }],
-  ["~1024px keeps Search and Inspector accessible", () => {
-    assert.match(appShellCss, /@media \(max-width: 1024px\)/);
-    assert.match(appShellCss, /\.global-search \{ display: flex;/);
-    assert.match(appShellCss, /\.entity-inspector \{[\s\S]*?position: fixed;/);
-    assert.doesNotMatch(appShellCss, /\.entity-inspector \{ display: none;/);
+  ["unsupported and missing Impact origins remain distinct honest states", () => {
+    assert.match(networkPage, /Select an event or origin company to analyze propagation\./);
+    assert.match(networkPage, /Impact data is not available for/);
+    assert.match(networkPage, /does not render risk rings or paths without a valid origin context/);
   }],
-  ["dead graph canvas controls and incorrect listbox semantics are absent", () => {
+  ["company exposure fixtures remain isolated", () => {
+    assert.match(companyData, /companyExposuresById/);
+    assert.match(companyData, /"demo-nvidia": demoNvidiaExposures/);
+    assert.doesNotMatch(companiesPage, /demoNvidiaExposures\.slice/);
+    assert.match(companiesPage, /Detailed development exposure paths are unavailable for this company\./);
+  }],
+  ["Inspector primary actions remain near the identity and above scrollable analysis", () => {
+    const identityIndex = inspector.indexOf("inspector-identity");
+    const actionsIndex = inspector.indexOf("inspector-actions");
+    const scrollIndex = inspector.indexOf("entity-inspector-scroll");
+    assert.ok(identityIndex >= 0 && actionsIndex > identityIndex && scrollIndex > actionsIndex);
+    assert.match(inspectorCss, /\.entity-inspector-scroll[\s\S]*?overflow-y: auto/);
+    assert.doesNotMatch(inspectorCss, /\.inspector-actions[\s\S]*?margin-top: auto/);
+    assert.match(appShellCss, /@media \(max-width: 1024px\)[\s\S]*?\.entity-inspector \{[\s\S]*?display: flex;[\s\S]*?overflow: hidden;/);
+  }],
+  ["focused graph prototype uses deterministic layout without the old canvas help card", () => {
+    assert.match(structureData, /nodesFromLayout/);
+    assert.match(networkPage, /source\.x \+ target\.x/);
+    assert.match(networkCss, /\.graph-node\.is-focus/);
+    assert.doesNotMatch(networkPage, /network-canvas-notice/);
+  }],
+  ["dead graph controls and incorrect listbox semantics are not reintroduced", () => {
     assert.doesNotMatch(networkPage, /aria-label="Center graph"/);
     assert.doesNotMatch(networkPage, /aria-label="Expand graph canvas"/);
     assert.doesNotMatch(appShell, /role="listbox"/);
+    assert.match(phase2State, /mode: "structure"/);
   }],
 ];
 
