@@ -24,6 +24,10 @@ export type DemoEventContribution = {
   company: string;
   propagatedRisk: string;
   hop: number;
+  initialRisk?: string;
+  pathDependency?: string;
+  distanceDecay?: string;
+  path?: string[];
 };
 
 export const riskRankingDemo: DemoRiskRanking[] = [
@@ -95,6 +99,10 @@ export const eventContributionDemo: DemoEventContribution[] = [
     company: "NVIDIA",
     propagatedRisk: "0.75",
     hop: 1,
+    initialRisk: "0.75",
+    pathDependency: "1.00",
+    distanceDecay: "1.00",
+    path: ["TSMC", "NVIDIA"],
   },
   {
     eventType: "SUPPLY_DISRUPTION",
