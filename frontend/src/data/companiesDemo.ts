@@ -120,3 +120,11 @@ export const demoNvidiaExposures: DemoCompanyExposure[] = [
     path: ["ASML", "TSMC", "NVIDIA"],
   },
 ];
+
+export const companyExposureFixtures: Record<string, DemoCompanyExposure[]> = {
+  "demo-nvidia": demoNvidiaExposures,
+};
+
+export function getCompanyExposureFixture(companyId: string): DemoCompanyExposure[] {
+  return companyExposureFixtures[companyId] ?? [];
+}
