@@ -582,13 +582,24 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
 }
 
 function ImpactUnavailableState({ title, detail, investigation, onInvestigationChange }: { title: string; detail: string; investigation: NetworkInvestigation; onInvestigationChange: (next: NetworkInvestigation) => void }) {
+  const structureFocus = graphFocusNode(investigation);
+
   return (
     <section className="network-canvas impact-canvas" aria-label="Impact unavailable">
       <div className="network-canvas-header"><div><span className="metadata-text">IMPACT MODE</span><strong>Blast Radius</strong></div><CanvasActions label="No impact fixture rendered" /></div>
       <div className="phase2-impact-empty" role="status">
         <AlertTriangle size={24} aria-hidden="true" />
         <div><strong>{title}</strong><span>{detail}</span></div>
-        <Button variant="secondary" onClick={() => onInvestigationChange({ ...investigation, mode: "structure", selectedObjectId: undefined, highlightedPath: undefined })}>Return to Structure</Button>
+        <Button variant="secondary" onClick={() => onInvestigationChange({
+          ...investigation,
+          mode: "structure",
+          focusId: structureFocus.id,
+          focusName: structureFocus.label,
+          focusType: structureFocus.type,
+          eventId: undefined,
+          selectedObjectId: undefined,
+          highlightedPath: undefined,
+        })}>Return to Structure</Button>
       </div>
     </section>
   );
