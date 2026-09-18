@@ -1,8 +1,10 @@
 .intelligence-query-copy { flex: 1; }
 .intelligence-query-copy input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-size: 13px; }
 .intelligence-query-copy input::placeholder { color: var(--color-text-muted); }
-.phase2-intelligence-loading { display: flex; min-height: 180px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-panel); color: var(--color-text-secondary); }
-.phase2-intelligence-loading span { color: var(--color-text-muted); font-size: 12px; }
+.phase2-intelligence-loading, .phase2-intelligence-error { display: flex; min-height: 180px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-panel); color: var(--color-text-secondary); text-align: center; }
+.phase2-intelligence-loading span, .phase2-intelligence-error span { max-width: 520px; color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+.phase2-intelligence-error { border-color: var(--color-border-strong); }
+.phase2-intelligence-error strong { color: var(--color-text-primary); }
 .phase2-path-button, .phase2-path-summary, .phase2-intelligence-entity { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .phase2-path-button:hover, .phase2-path-summary:hover, .phase2-intelligence-entity:hover { background: var(--color-elevated); }
 .phase2-path-button.is-selected, .phase2-path-summary.is-selected { outline: 1px solid var(--color-primary); border-radius: var(--radius-button); }
