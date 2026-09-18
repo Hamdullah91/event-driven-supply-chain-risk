@@ -22,7 +22,17 @@
   outline-offset: 2px;
 }
 
+.phase2-contribution-trace { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-panel); }
+.phase2-contribution-trace > div { display: grid; gap: 3px; min-width: 0; }
+.phase2-contribution-trace span { color: var(--color-text-muted); font-size: 10px; text-transform: uppercase; }
+.phase2-contribution-trace strong { overflow-wrap: anywhere; color: var(--color-text-primary); font-size: 12px; }
+.phase2-contribution-path { grid-column: 1 / -1; padding-top: 8px; border-top: 1px solid var(--color-border); }
+
 .phase2-geography-list { display: grid; gap: 8px; margin: 14px 0; }
 .phase2-geography-list button { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-panel); color: var(--color-text-primary); cursor: pointer; text-align: left; }
 .phase2-geography-list button span { color: var(--color-text-muted); font-size: 11px; text-transform: uppercase; }
 .phase2-geography-list button:hover, .phase2-geography-list button:focus-visible { border-color: var(--color-primary); outline: none; }
+
+@media (max-width: 1024px) {
+  .phase2-contribution-trace { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
