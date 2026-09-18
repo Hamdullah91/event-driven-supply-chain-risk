@@ -1,22 +1,22 @@
 .entity-inspector {
   display: flex;
   min-width: 0;
+  min-height: 0;
+  max-height: calc(100vh - var(--topbar-height));
   flex-direction: column;
-
   border-left: 1px solid var(--color-border);
-
   background: var(--color-panel);
+  overflow: hidden;
 }
 
 .entity-inspector-toolbar {
   display: flex;
   min-height: 58px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-
   padding: 0 var(--space-4);
-
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -28,12 +28,9 @@
 
 .inspector-demo-label {
   padding: 2px 5px;
-
   border: 1px solid var(--color-border);
   border-radius: var(--radius-badge);
-
   color: var(--color-text-muted);
-
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -45,33 +42,27 @@
   height: 32px;
   align-items: center;
   justify-content: center;
-
   border: 1px solid transparent;
   border-radius: var(--radius-button);
-
   background: transparent;
   color: var(--color-text-muted);
-
   cursor: pointer;
 }
 
-.inspector-close-button:hover {
+.inspector-close-button:hover,
+.inspector-close-button:focus-visible {
   border-color: var(--color-border);
   background: var(--color-elevated);
   color: var(--color-text-primary);
+  outline: none;
 }
-
-/* =========================================================
-   IDENTITY
-   ========================================================= */
 
 .inspector-identity {
   display: flex;
+  flex: 0 0 auto;
   align-items: flex-start;
   gap: var(--space-3);
-
-  padding: var(--space-5) var(--space-4);
-
+  padding: var(--space-4);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -82,10 +73,8 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-card);
-
   background: var(--color-app-bg);
   color: var(--color-primary);
 }
@@ -99,7 +88,6 @@
 
 .inspector-identity span {
   color: var(--color-text-muted);
-
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -108,9 +96,7 @@
 
 .inspector-identity h2 {
   overflow-wrap: anywhere;
-
   color: var(--color-text-primary);
-
   font-size: 17px;
   font-weight: 600;
   line-height: 23px;
@@ -118,28 +104,41 @@
 
 .inspector-identity p {
   color: var(--color-text-muted);
-
   font-size: 12px;
   line-height: 16px;
 }
 
-/* =========================================================
-   SECTIONS
-   ========================================================= */
+.inspector-actions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-panel) 92%, var(--color-primary) 8%);
+}
+
+.inspector-actions > * {
+  flex: 0 1 auto;
+}
+
+.entity-inspector-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 .inspector-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-
   padding: var(--space-4);
-
   border-bottom: 1px solid var(--color-border);
 }
 
 .inspector-section-label {
   color: var(--color-text-muted);
-
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -149,7 +148,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   color: var(--color-text-muted);
 }
 
@@ -162,15 +160,10 @@
 
 .inspector-risk > strong {
   color: var(--color-text-primary);
-
   font-size: 24px;
   font-weight: 650;
   line-height: 30px;
 }
-
-/* =========================================================
-   FIELDS
-   ========================================================= */
 
 .inspector-field-list,
 .inspector-evidence {
@@ -181,13 +174,11 @@
 .inspector-field,
 .inspector-evidence-field {
   display: flex;
+  min-height: 34px;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
-
-  min-height: 34px;
   padding: var(--space-2) 0;
-
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -199,55 +190,29 @@
 .inspector-field span,
 .inspector-evidence-field span {
   color: var(--color-text-muted);
-
   font-size: 12px;
 }
 
 .inspector-field strong,
 .inspector-evidence-field strong {
   max-width: 58%;
-
   overflow-wrap: anywhere;
-
   color: var(--color-text-secondary);
-
   font-size: 12px;
   font-weight: 600;
-
   text-align: right;
 }
 
 .inspector-unavailable {
   color: var(--color-text-muted);
-
   font-size: 12px;
 }
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
-
-.inspector-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-
-  padding: var(--space-4);
-
-  margin-top: auto;
-}
-
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
 
 .inspector-header {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-
   padding: var(--space-4);
-
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -258,9 +223,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-
   padding: var(--space-6);
-
   text-align: center;
 }
 
@@ -270,25 +233,45 @@
   height: 40px;
   align-items: center;
   justify-content: center;
-
   border: 1px solid var(--color-border-strong);
   border-radius: 50%;
-
   color: var(--color-text-muted);
 }
 
 .inspector-empty p {
   color: var(--color-text-secondary);
-
   font-size: 12px;
   font-weight: 600;
 }
 
 .inspector-empty > span {
   max-width: 240px;
-
   color: var(--color-text-muted);
-
   font-size: 12px;
   line-height: 15px;
+}
+
+@media (max-width: 1180px) {
+  .inspector-actions {
+    gap: 6px;
+  }
+
+  .inspector-actions > * {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .inspector-identity {
+    padding: var(--space-3);
+  }
+
+  .inspector-actions {
+    padding: var(--space-3);
+  }
+
+  .inspector-actions > * {
+    flex-basis: 100%;
+  }
 }
