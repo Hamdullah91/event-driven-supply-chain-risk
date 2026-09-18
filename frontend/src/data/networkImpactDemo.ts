@@ -134,5 +134,3 @@ export function getImpactFixture(
   if (!originType || !originId) return undefined;
   return impactFixturesByOriginId[`${originType}:${originId}`];
 }
-
-export const networkImpactDemo = companyTsmcFixture;
