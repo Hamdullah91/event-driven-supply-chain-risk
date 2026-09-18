@@ -5,6 +5,7 @@ import type { InspectorAction } from "./components/layout/EntityInspector";
 import type { NavigationSection } from "./components/layout/PrimaryNavigation";
 import type { InspectorContext } from "./data/inspectorDemo";
 import { eventsDemo } from "./data/eventsDemo";
+import { networkStructureDemoNodes } from "./data/networkStructureDemo";
 import {
   DEFAULT_NETWORK_INVESTIGATION,
   type NetworkInvestigation,
@@ -156,10 +157,13 @@ function App() {
   };
 
   const showStructurePath = (path: string[]) => {
+    const focusNode = networkStructureDemoNodes.find((node) => node.label === path[0]);
     openNetwork({
       mode: "structure",
+      focusId: focusNode?.id,
       focusName: path[0],
-      focusType: "Company",
+      focusType: focusNode?.type ?? "Company",
+      eventId: undefined,
       highlightedPath: path,
       selectedObjectId: undefined,
     });
