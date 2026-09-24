@@ -20,6 +20,7 @@ export type DemoCompany = {
 
 export type DemoCompanyExposure = {
   id: string;
+  eventId: string;
   eventType: string;
   severity: string;
   source: string;
@@ -98,6 +99,7 @@ export function hasCompanyProfile(companyId: string | null | undefined): boolean
 export const demoNvidiaExposures: DemoCompanyExposure[] = [
   {
     id: "demo-exposure-001",
+    eventId: "demo-event-001",
     eventType: "FACILITY_OUTAGE",
     severity: "HIGH",
     source: "Development source",
@@ -111,6 +113,7 @@ export const demoNvidiaExposures: DemoCompanyExposure[] = [
   },
   {
     id: "demo-exposure-002",
+    eventId: "demo-event-002",
     eventType: "SUPPLY_DISRUPTION",
     severity: "MEDIUM",
     source: "Development source",
