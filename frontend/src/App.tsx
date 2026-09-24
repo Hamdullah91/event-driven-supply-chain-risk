@@ -24,7 +24,7 @@ import "./phase2.css";
 function App() {
   const [activeSection, setActiveSection] = useState<NavigationSection>("overview");
   const [inspectorContext, setInspectorContext] = useState<InspectorContext | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState(eventsDemo[0].id);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(eventsDemo[0].id);
   const [companyProfileId, setCompanyProfileId] = useState<string | null>(null);
   const [network, setNetwork] = useState<NetworkInvestigation>(DEFAULT_NETWORK_INVESTIGATION);
 
@@ -192,6 +192,7 @@ function App() {
           selectedEventId={selectedEventId}
           onSelectEvent={setSelectedEventId}
           onInspect={setInspectorContext}
+          onClearInspector={() => setInspectorContext(null)}
           onOpenImpact={openImpact}
           onOpenCompanyProfile={openCompanyProfile}
         />
