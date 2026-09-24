@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Building2, Clock3, FileText, MapPin, Search, ShieldCheck } from "lucide-react";
 
 import { Button } from "../components/ui/Button";
@@ -16,9 +16,10 @@ const severityClasses: Record<EventSeverity, string> = {
 };
 
 type EventsPageProps = {
-  selectedEventId: string;
-  onSelectEvent: (id: string) => void;
+  selectedEventId: string | null;
+  onSelectEvent: (id: string | null) => void;
   onInspect: (context: InspectorContext) => void;
+  onClearInspector: () => void;
   onOpenImpact: (focus: { id: string; name: string; type: "Company" | "Event"; eventId?: string }) => void;
   onOpenCompanyProfile: (companyId: string) => void;
 };
@@ -45,7 +46,7 @@ function eventContext(event: DemoEvent): InspectorContext {
   };
 }
 
-export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onOpenImpact, onOpenCompanyProfile }: EventsPageProps) {
+export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onClearInspector, onOpenImpact, onOpenCompanyProfile }: EventsPageProps) {
   const [query, setQuery] = useState("");
   const [severity, setSeverity] = useState<"ALL" | EventSeverity>("ALL");
   const [showEvidence, setShowEvidence] = useState(false);
@@ -54,12 +55,22 @@ export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onOpenIm
     const normalized = query.trim().toLowerCase();
     return eventsDemo.filter((event) => {
       const matchesSeverity = severity === "ALL" || event.severity === severity;
-      const matchesQuery = !normalized || `${event.type} ${event.title} ${event.affectedEntities.join(" ")}`.toLowerCase().includes(normalized);
+      const affectedNames = event.affectedEntities.map((entity) => entity.name).join(" ");
+      const matchesQuery = !normalized || `${event.type} ${event.title} ${affectedNames}`.toLowerCase().includes(normalized);
       return matchesSeverity && matchesQuery;
     });
   }, [query, severity]);
 
-  const selectedEvent = eventsDemo.find((event) => event.id === selectedEventId) ?? filteredEvents[0] ?? eventsDemo[0];
+  const selectedEvent = selectedEventId ? eventsDemo.find((event) => event.id === selectedEventId) : undefined;
+  const selectedEventVisible = selectedEvent ? filteredEvents.some((event) => event.id === selectedEvent.id) : false;
+  const activeEvent = selectedEventVisible ? selectedEvent : undefined;
+
+  useEffect(() => {
+    if (!selectedEventId || !selectedEvent || selectedEventVisible) return;
+    onSelectEvent(null);
+    onClearInspector();
+    setShowEvidence(false);
+  }, [onClearInspector, onSelectEvent, selectedEvent, selectedEventId, selectedEventVisible]);
 
   const selectEvent = (event: DemoEvent) => {
     onSelectEvent(event.id);
@@ -67,7 +78,10 @@ export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onOpenIm
     setShowEvidence(false);
   };
 
-  const affectedCompany = companiesDemo.find((company) => selectedEvent.affectedEntities.includes(company.name));
+  const affectedCompanyEntity = activeEvent?.affectedEntities.find((entity) => entity.type === "Company");
+  const affectedCompany = affectedCompanyEntity
+    ? companiesDemo.find((company) => company.companyId === affectedCompanyEntity.id || company.name === affectedCompanyEntity.name)
+    : undefined;
 
   return (
     <div className="events-page">
@@ -98,7 +112,7 @@ export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onOpenIm
         <Panel className="events-list-panel" eyebrow="Detected context" title="Disruption Events" description="Finite development fixture supports safe client-side search/severity filtering.">
           <div className="events-list">
             {filteredEvents.length > 0 ? filteredEvents.map((event) => {
-              const isSelected = event.id === selectedEvent.id;
+              const isSelected = event.id === activeEvent?.id;
               return (
                 <button type="button" key={event.id} className={`events-list-item${isSelected ? " is-selected" : ""}`} aria-pressed={isSelected} onClick={() => selectEvent(event)}>
                   <span className="events-selection-accent" aria-hidden="true" />
@@ -117,67 +131,84 @@ export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onOpenIm
         </Panel>
 
         <section className="event-detail" aria-label="Selected event detail">
-          <div className="event-detail-header">
-            <div><span className="metadata-text">SELECTED DEVELOPMENT EVENT</span><h2>{selectedEvent.title}</h2></div>
-            <span className={severityClasses[selectedEvent.severity]}>{selectedEvent.severity}</span>
-          </div>
+          {activeEvent ? (
+            <>
+              <div className="event-detail-header">
+                <div><span className="metadata-text">SELECTED DEVELOPMENT EVENT</span><h2>{activeEvent.title}</h2></div>
+                <span className={severityClasses[activeEvent.severity]}>{activeEvent.severity}</span>
+              </div>
 
-          <div className="event-detail-identity">
-            <div><span>Event type</span><strong>{selectedEvent.type}</strong></div>
-            <div><span>Classifier confidence</span><strong>{(selectedEvent.confidence * 100).toFixed(0)}%</strong></div>
-            <div><span>Timestamp</span><strong>{selectedEvent.timestamp}</strong></div>
-            <div><span>Source</span><strong>{selectedEvent.source}</strong></div>
-          </div>
-          <p className="phase2-interaction-note">Severity describes operational impact; classifier confidence describes model certainty. They are not risk equivalents.</p>
+              <div className="event-detail-identity">
+                <div><span>Event type</span><strong>{activeEvent.type}</strong></div>
+                <div><span>Classifier confidence</span><strong>{(activeEvent.confidence * 100).toFixed(0)}%</strong></div>
+                <div><span>Timestamp</span><strong>{activeEvent.timestamp}</strong></div>
+                <div><span>Source</span><strong>{activeEvent.source}</strong></div>
+              </div>
+              <p className="phase2-interaction-note">Severity describes operational impact; classifier confidence describes model certainty. They are not risk equivalents.</p>
 
-          <section className="event-detail-section"><span className="event-detail-label">DESCRIPTION</span><p>{selectedEvent.description}</p></section>
+              <section className="event-detail-section"><span className="event-detail-label">DESCRIPTION</span><p>{activeEvent.description}</p></section>
 
-          <section className="event-detail-section">
-            <div className="event-section-heading"><div><span className="event-detail-label">AFFECTED ENTITIES</span><h3>Known event context</h3></div><Building2 size={17} aria-hidden="true" /></div>
-            <div className="affected-entity-list">
-              {selectedEvent.affectedEntities.map((entity) => (
-                <button
-                  type="button"
-                  className="affected-entity phase2-entity-button"
-                  key={entity}
-                  onClick={() => {
-                    const company = companiesDemo.find((candidate) => candidate.name === entity);
-                    onInspect({
-                      id: company?.companyId ?? `demo-${entity.toLowerCase().replaceAll(" ", "-")}`,
-                      type: company ? "Company" : "Industry",
-                      name: entity,
-                      subtitle: "Affected entity from development event",
-                      riskLevel: company?.riskLevel,
-                      riskScore: company?.riskScore,
-                      fields: [{ label: "Related event", value: selectedEvent.type }],
-                      evidence: { availability: "UNAVAILABLE" },
-                    });
-                  }}
-                ><Building2 size={15} aria-hidden="true" /><span>{entity}</span></button>
-              ))}
+              <section className="event-detail-section">
+                <div className="event-section-heading"><div><span className="event-detail-label">AFFECTED ENTITIES</span><h3>Known event context</h3></div><Building2 size={17} aria-hidden="true" /></div>
+                <div className="affected-entity-list">
+                  {activeEvent.affectedEntities.map((entity) => {
+                    const company = entity.type === "Company"
+                      ? companiesDemo.find((candidate) => candidate.companyId === entity.id || candidate.name === entity.name)
+                      : undefined;
+                    return (
+                      <button
+                        type="button"
+                        className="affected-entity phase2-entity-button"
+                        key={entity.id}
+                        onClick={() => onInspect({
+                          id: entity.id,
+                          type: entity.type,
+                          name: entity.name,
+                          subtitle: "Affected entity from development event",
+                          relatedCompanyId: entity.type === "Facility" && entity.id === "demo-facility-1" ? "demo-tsmc" : undefined,
+                          riskLevel: company?.riskLevel,
+                          riskScore: company?.riskScore,
+                          fields: [{ label: "Related event", value: activeEvent.type }],
+                          evidence: { availability: "UNAVAILABLE" },
+                        })}
+                      ><Building2 size={15} aria-hidden="true" /><span>{entity.name}</span></button>
+                    );
+                  })}
+                </div>
+                {affectedCompany && <div className="phase2-inline-actions"><Button variant="ghost" onClick={() => onOpenCompanyProfile(affectedCompany.companyId)}>Open Company</Button></div>}
+              </section>
+
+              <section className="event-detail-section">
+                <div className="event-section-heading"><div><span className="event-detail-label">LOCATION CONTEXT</span><h3>Geography</h3></div><MapPin size={17} aria-hidden="true" /></div>
+                <div className="event-unavailable"><span>{activeEvent.location}</span><p>This fixture does not invent a plotted location.</p></div>
+              </section>
+
+              <section className="event-detail-section">
+                <div className="event-section-heading"><div><span className="event-detail-label">EVIDENCE</span><h3>Available provenance context</h3></div><FileText size={17} aria-hidden="true" /></div>
+                <div className="event-evidence">
+                  <div><ShieldCheck size={16} aria-hidden="true" /><div><strong>{activeEvent.evidence}</strong><span>Production rendering must use returned provenance only.</span></div></div>
+                  <Button variant="secondary" aria-expanded={showEvidence} onClick={() => setShowEvidence((value) => !value)}>View Evidence</Button>
+                </div>
+                {showEvidence && <div className="phase2-evidence-detail"><strong>PARTIAL · DEVELOPMENT FIXTURE</strong><span>Source: {activeEvent.source}</span><span>Confidence: {(activeEvent.confidence * 100).toFixed(0)}%</span><span>Extracted context: Not available</span></div>}
+              </section>
+
+              <div className="event-detail-actions">
+                <Button variant="primary" onClick={() => onOpenImpact({ id: activeEvent.id, name: activeEvent.type, type: "Event", eventId: activeEvent.id })}>Open Impact</Button>
+                <Button variant="secondary" onClick={() => onInspect(eventContext(activeEvent))}>Inspect Event</Button>
+                <Button variant="ghost" disabled title="No valid URL exists in the development fixture">Open Source</Button>
+              </div>
+            </>
+          ) : selectedEventId && !selectedEvent ? (
+            <div className="event-unavailable" role="status">
+              <strong>Event data is not available for this development event.</strong>
+              <span>Requested event ID: {selectedEventId}. No unrelated Event is substituted.</span>
             </div>
-            {affectedCompany && <div className="phase2-inline-actions"><Button variant="ghost" onClick={() => onOpenCompanyProfile(affectedCompany.companyId)}>Open Company</Button></div>}
-          </section>
-
-          <section className="event-detail-section">
-            <div className="event-section-heading"><div><span className="event-detail-label">LOCATION CONTEXT</span><h3>Geography</h3></div><MapPin size={17} aria-hidden="true" /></div>
-            <div className="event-unavailable"><span>{selectedEvent.location}</span><p>This fixture does not invent a plotted location.</p></div>
-          </section>
-
-          <section className="event-detail-section">
-            <div className="event-section-heading"><div><span className="event-detail-label">EVIDENCE</span><h3>Available provenance context</h3></div><FileText size={17} aria-hidden="true" /></div>
-            <div className="event-evidence">
-              <div><ShieldCheck size={16} aria-hidden="true" /><div><strong>{selectedEvent.evidence}</strong><span>Production rendering must use returned provenance only.</span></div></div>
-              <Button variant="secondary" aria-expanded={showEvidence} onClick={() => setShowEvidence((value) => !value)}>View Evidence</Button>
+          ) : (
+            <div className="event-unavailable" role="status">
+              <strong>Select an event to inspect.</strong>
+              <span>Choose a visible development event from the list to populate this detail panel.</span>
             </div>
-            {showEvidence && <div className="phase2-evidence-detail"><strong>PARTIAL · DEVELOPMENT FIXTURE</strong><span>Source: {selectedEvent.source}</span><span>Confidence: {(selectedEvent.confidence * 100).toFixed(0)}%</span><span>Extracted context: Not available</span></div>}
-          </section>
-
-          <div className="event-detail-actions">
-            <Button variant="primary" onClick={() => onOpenImpact({ id: selectedEvent.id, name: selectedEvent.type, type: "Event", eventId: selectedEvent.id })}>Open Impact</Button>
-            <Button variant="secondary" onClick={() => onInspect(eventContext(selectedEvent))}>Inspect Event</Button>
-            <Button variant="ghost" disabled title="No valid URL exists in the development fixture">Open Source</Button>
-          </div>
+          )}
         </section>
       </div>
     </div>
