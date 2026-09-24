@@ -22,6 +22,7 @@ export function IntelligencePage({ onInspect, onShowNetwork, onOpenImpact }: Int
   const [failed, setFailed] = useState(false);
   const [selectedPath, setSelectedPath] = useState(false);
   const [showEvidence, setShowEvidence] = useState(false);
+  const canSubmit = question.trim().length > 0 && !preparing;
 
   useEffect(() => {
     if (!preparing) return;
@@ -30,8 +31,8 @@ export function IntelligencePage({ onInspect, onShowNetwork, onOpenImpact }: Int
   }, [preparing]);
 
   const submit = () => {
+    if (!canSubmit) return;
     const trimmed = question.trim();
-    if (!trimmed) return;
     setSubmittedQuestion(trimmed);
     setFailed(false);
     setPreparing(true);
@@ -62,10 +63,10 @@ export function IntelligencePage({ onInspect, onShowNetwork, onOpenImpact }: Int
         <div className="intelligence-api-state"><BrainCircuit size={15} aria-hidden="true" /><div><strong>Agent API available</strong><span>Runtime provider configuration may still be required</span></div></div>
       </header>
 
-      <form className="intelligence-query-composer" aria-label="Intelligence query composer" onSubmit={(event) => { event.preventDefault(); submit(); }}>
+      <form className="intelligence-query-composer" aria-label="Intelligence query composer" onSubmit={(event) => { event.preventDefault(); if (canSubmit) submit(); }}>
         <Search size={18} aria-hidden="true" />
         <label className="intelligence-query-copy"><span className="metadata-text">ASK INTELLIGENCE</span><input value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="Ask a question about the graph, companies, risk, events, or evidence..." aria-label="Intelligence question" /></label>
-        <Button type="submit" variant="primary" icon={<Sparkles size={15} />} disabled={!question.trim() || preparing}>{preparing ? "Preparing response..." : "Send"}</Button>
+        <Button type="submit" variant="primary" icon={<Sparkles size={15} />} disabled={!canSubmit} aria-disabled={!canSubmit}>{preparing ? "Preparing response..." : "Send"}</Button>
       </form>
 
       <div className="intelligence-api-note"><ShieldCheck size={14} aria-hidden="true" /><span>This Phase 2 interaction uses a clearly labeled development response fixture. It does not display hidden reasoning or chain-of-thought.</span><Button variant="ghost" onClick={() => { setPreparing(false); setFailed(true); setShowEvidence(false); }}>DEMO FAILURE</Button></div>
