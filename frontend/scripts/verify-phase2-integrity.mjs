@@ -9,6 +9,7 @@ const impactData = read("src/data/networkImpactDemo.ts");
 const structureData = read("src/data/networkStructureDemo.ts");
 const companyData = read("src/data/companiesDemo.ts");
 const companiesPage = read("src/pages/CompaniesPage.tsx");
+const intelligencePage = read("src/pages/IntelligencePage.tsx");
 const networkPage = read("src/pages/NetworkPage.tsx");
 const networkCss = read("src/pages/NetworkPhase2.css");
 const phase2State = read("src/phase2.ts");
@@ -98,7 +99,23 @@ const checks = [
     assert.ok(identityIndex >= 0 && actionsIndex > identityIndex && scrollIndex > actionsIndex);
     assert.match(inspectorCss, /\.entity-inspector-scroll[\s\S]*?overflow-y: auto/);
     assert.doesNotMatch(inspectorCss, /\.inspector-actions[\s\S]*?margin-top: auto/);
-    assert.match(appShellCss, /@media \(max-width: 1024px\)[\s\S]*?\.entity-inspector \{[\s\S]*?display: flex;[\s\S]*?overflow: hidden;/);
+  }],
+  ["1024px Inspector reserves workspace instead of overlaying Network", () => {
+    assert.match(appShellCss, /@media \(max-width: 1024px\)[\s\S]*?\.app-workspace \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\) clamp\(280px, 31vw, 320px\);/);
+    assert.match(appShellCss, /@media \(max-width: 1024px\)[\s\S]*?\.entity-inspector \{[\s\S]*?position: sticky;[\s\S]*?height: calc\(100vh - var\(--topbar-height\)\);/);
+    assert.match(appShellCss, /@media \(max-width: 760px\)[\s\S]*?\.entity-inspector \{[\s\S]*?position: fixed;/);
+  }],
+  ["Intelligence cannot submit a trimmed-empty question", () => {
+    assert.match(intelligencePage, /const canSubmit = question\.trim\(\)\.length > 0 && !preparing;/);
+    assert.match(intelligencePage, /const submit = \(\) => \{[\s\S]*?if \(!canSubmit\) return;/);
+    assert.match(intelligencePage, /onSubmit=\{\(event\) => \{ event\.preventDefault\(\); if \(canSubmit\) submit\(\); \}\}/);
+    assert.match(intelligencePage, /disabled=\{!canSubmit\}/);
+    assert.match(intelligencePage, /aria-disabled=\{!canSubmit\}/);
+  }],
+  ["Impact NONE filter cannot behave like All", () => {
+    assert.match(networkPage, /riskFilter === "NONE"[\s\S]*?\? false/);
+    assert.match(networkPage, /visibleCompanies\.length === 0/);
+    assert.match(networkPage, /No impact results match the current risk \/ exposure filter\./);
   }],
   ["focused graph prototype uses deterministic layout without the old canvas help card", () => {
     assert.match(structureData, /nodesFromLayout/);
