@@ -131,12 +131,13 @@ function CompanyProfile({ company, onBackFromProfile, onInspect, onExploreNetwor
   const inspectExposure = (exposure: DemoCompanyExposure) => {
     setSelectedExposureId(exposure.id);
     onInspect({
-      id: exposure.id,
+      id: exposure.eventId,
       type: "Event",
       name: exposure.eventType,
       subtitle: `Contributing event · ${company.name}`,
       riskScore: exposure.propagatedRisk,
       fields: [
+        { label: "Exposure record", value: exposure.id },
         { label: "Severity", value: exposure.severity },
         { label: "Classifier confidence", value: exposure.confidence },
         { label: "Hop distance", value: String(exposure.hopDistance) },
