@@ -25,7 +25,7 @@ export type Phase2HistoryState = {
   phase2: true;
   section: NavigationSection;
   companyProfileId: string | null;
-  selectedEventId: string;
+  selectedEventId: string | null;
   network: NetworkInvestigation;
   inspector: InspectorContext | null;
 };
