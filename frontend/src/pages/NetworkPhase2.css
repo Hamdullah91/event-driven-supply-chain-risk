@@ -67,6 +67,25 @@
 .phase2-network-empty { justify-content: space-between; margin-inline: 0; }
 .phase2-profile-unavailable { display: inline-flex; margin-top: 10px; padding: 7px 9px; border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-text-muted); font-size: 11px; line-height: 16px; }
 
+.phase2-impact-filter-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 8;
+  display: grid;
+  width: min(360px, 78%);
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-panel) 94%, transparent);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 24%);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.phase2-impact-filter-empty strong { color: var(--color-text-primary); font-size: 12px; }
+.phase2-impact-filter-empty span { color: var(--color-text-muted); font-size: 11px; line-height: 16px; }
+
 .impact-company { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .impact-company.is-selected .impact-company-node { box-shadow: 0 0 0 4px rgb(59 130 246 / 24%); }
 .impact-company:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; border-radius: var(--radius-button); }
