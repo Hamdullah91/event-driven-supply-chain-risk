@@ -519,11 +519,15 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
 
   const isEventOrigin = fixture.origin.type === "Event";
   const originName = fixture.origin.name;
-  const riskOrder = ["NONE", "LOW", "MEDIUM", "HIGH", "CRITICAL"];
+  const riskOrder = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
   const visibleCompanies = fixture.companies.filter((company) => {
     const hop = Number(company.hop.replace("Hop ", ""));
     const hopVisible = hop <= investigation.maxHops && (!investigation.hopOnly || hop === investigation.hopOnly);
-    const riskVisible = riskFilter === "ALL" || riskOrder.indexOf(company.level) >= riskOrder.indexOf(riskFilter);
+    const riskVisible = riskFilter === "ALL"
+      ? true
+      : riskFilter === "NONE"
+        ? false
+        : riskOrder.indexOf(company.level) >= riskOrder.indexOf(riskFilter);
     return hopVisible && riskVisible;
   });
 
@@ -577,13 +581,20 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
 
           <svg className="impact-paths" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
             <defs><marker id="impact-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" className="impact-arrow-head" /></marker></defs>
-            {fixture.paths.map((path, index) => {
+            {visibleCompanies.length > 0 && fixture.paths.map((path, index) => {
               const hop = index + 1;
               if (hop > investigation.maxHops || investigation.hopOnly && investigation.hopOnly !== hop) return null;
               const dim = investigation.highlightedPath && selectedCompany && hop > Number(selectedCompany.hop.replace("Hop ", ""));
               return <line key={path.id} x1={path.x1} y1={path.y1} x2={path.x2} y2={path.y2} className={`impact-path impact-path--${path.tone}${dim ? " phase2-dimmed" : ""}${investigation.highlightedPath ? " phase2-impact-path-highlight" : ""}`} markerEnd="url(#impact-arrow)" />;
             })}
           </svg>
+
+          {visibleCompanies.length === 0 && (
+            <div className="phase2-impact-filter-empty" role="status">
+              <strong>No impact results match the current risk / exposure filter.</strong>
+              <span>The development fixture contains no {riskFilter} results.</span>
+            </div>
+          )}
         </div>
 
         <div className="impact-context-panel">
