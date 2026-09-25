@@ -19,7 +19,7 @@ describe("risk stream targeted invalidation", () => {
       timestamp: "2026-09-25T01:00:00Z",
     });
 
-    const keys = invalidate.mock.calls.map(([filters]) => filters.queryKey);
+    const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
     expect(keys).toEqual(expect.arrayContaining([
       ["company-risk", "nvidia"],
       ["company-exposure", "nvidia"],
@@ -47,7 +47,7 @@ describe("risk stream targeted invalidation", () => {
       timestamp: "2026-09-25T01:00:00Z",
     });
 
-    const keys = invalidate.mock.calls.map(([filters]) => filters.queryKey);
+    const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
     expect(keys).toHaveLength(4);
     expect(keys.some((key) => key?.[0] === "event" || key?.[0] === "events")).toBe(false);
   });
