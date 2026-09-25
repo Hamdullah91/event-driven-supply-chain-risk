@@ -4,11 +4,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { adaptRiskStreamMessage } from "../api/adapters";
 import { environment } from "../config/environment";
 import { useUiStore } from "../state/uiStore";
+import { reconnectDelayForAttempt, STABLE_CONNECTION_RESET_MS } from "./riskStreamBackoff";
 import { RiskStreamContext, type RiskStreamConnectionState } from "./riskStreamContext";
 import { invalidateForRiskUpdate } from "./riskStreamInvalidation";
 import { parseRiskStreamPayload } from "./riskStreamPayload";
-
-const RECONNECT_DELAYS_MS = [1_000, 2_000, 5_000, 10_000, 30_000] as const;
 
 export function RiskStreamProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
@@ -16,11 +15,19 @@ export function RiskStreamProvider({ children }: { children: ReactNode }) {
   const [lastUpdated, setLastUpdated] = useState<string>();
   const reconnectAttempt = useRef(0);
   const reconnectTimer = useRef<number | null>(null);
+  const stableConnectionTimer = useRef<number | null>(null);
   const stopped = useRef(false);
 
   useEffect(() => {
     stopped.current = false;
     let socket: WebSocket | null = null;
+
+    const clearStableReset = () => {
+      if (stableConnectionTimer.current !== null) {
+        window.clearTimeout(stableConnectionTimer.current);
+        stableConnectionTimer.current = null;
+      }
+    };
 
     const connect = () => {
       if (stopped.current) return;
@@ -34,8 +41,12 @@ export function RiskStreamProvider({ children }: { children: ReactNode }) {
       socket = new WebSocket(`${base}/risk-stream`);
 
       socket.onopen = () => {
-        reconnectAttempt.current = 0;
+        clearStableReset();
         setConnectionState("CONNECTED");
+        stableConnectionTimer.current = window.setTimeout(() => {
+          reconnectAttempt.current = 0;
+          stableConnectionTimer.current = null;
+        }, STABLE_CONNECTION_RESET_MS);
       };
 
       socket.onmessage = (event) => {
@@ -62,20 +73,21 @@ export function RiskStreamProvider({ children }: { children: ReactNode }) {
       };
 
       socket.onclose = () => {
+        clearStableReset();
         if (stopped.current) {
           setConnectionState("DISCONNECTED");
           return;
         }
         reconnectAttempt.current += 1;
         setConnectionState("RECONNECTING");
-        const delay = RECONNECT_DELAYS_MS[Math.min(reconnectAttempt.current - 1, RECONNECT_DELAYS_MS.length - 1)];
-        reconnectTimer.current = window.setTimeout(connect, delay);
+        reconnectTimer.current = window.setTimeout(connect, reconnectDelayForAttempt(reconnectAttempt.current));
       };
     };
 
     connect();
     return () => {
       stopped.current = true;
+      clearStableReset();
       if (reconnectTimer.current !== null) window.clearTimeout(reconnectTimer.current);
       socket?.close();
     };
