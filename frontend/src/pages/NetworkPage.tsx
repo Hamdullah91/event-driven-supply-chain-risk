@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ChevronDown,
@@ -77,6 +77,32 @@ function pathIncludesDirectedEdge(path: string[] | undefined, source: string, ta
   return path.some((label, index) => label === source && path[index + 1] === target);
 }
 
+function selectedStructureNodeFromImpact(investigation: NetworkInvestigation): string | undefined {
+  if (
+    investigation.mode !== "impact" ||
+    !investigation.focusId ||
+    !investigation.selectedObjectId ||
+    (investigation.focusType !== "Company" && investigation.focusType !== "Event")
+  ) {
+    return undefined;
+  }
+
+  const impactFixture = getImpactFixture(investigation.focusType, investigation.focusId);
+  const selectedImpactCompany = impactFixture?.companies.find(
+    (company) => company.id === investigation.selectedObjectId,
+  );
+  const structureFixture = getStructureFixture(investigation.focusId);
+  if (!selectedImpactCompany || !structureFixture) return undefined;
+
+  const canonicalCompanyId = companyIdByName[selectedImpactCompany.company]
+    ?? networkFocusEntities.find((entity) => entity.label === selectedImpactCompany.company)?.id;
+
+  if (!canonicalCompanyId) return undefined;
+  return structureFixture.nodes.some((node) => node.id === canonicalCompanyId)
+    ? canonicalCompanyId
+    : undefined;
+}
+
 export function NetworkPage({
   investigation,
   onInvestigationChange,
@@ -105,8 +131,26 @@ export function NetworkPage({
     !normalizedFocusQuery || `${node.label} ${node.type}`.toLowerCase().includes(normalizedFocusQuery),
   );
 
+  const structureFixture = investigation.focusId
+    ? getStructureFixture(investigation.focusId)
+    : undefined;
+
   const setMode = (mode: NetworkInvestigation["mode"]) => {
     if (mode === investigation.mode) return;
+
+    if (investigation.mode === "impact" && mode === "structure") {
+      const preservedSelectionId = selectedStructureNodeFromImpact(investigation);
+      onInvestigationChange({
+        ...investigation,
+        mode,
+        hopOnly: null,
+        selectedObjectId: preservedSelectionId,
+        highlightedPath: undefined,
+      });
+      if (investigation.selectedObjectId && !preservedSelectionId) onClearInspector();
+      return;
+    }
+
     onInvestigationChange({
       ...investigation,
       mode,
@@ -152,14 +196,20 @@ export function NetworkPage({
     onClearInspector();
   };
 
+  const clearHighlight = () => {
+    const hadPrimarySelection = Boolean(investigation.selectedObjectId);
+    onInvestigationChange({
+      ...investigation,
+      highlightedPath: undefined,
+      selectedObjectId: undefined,
+    });
+    if (hadPrimarySelection) onClearInspector();
+  };
+
   const chooseAnotherEntity = () => {
     setFocusQuery("");
     setFocusOpen(true);
   };
-
-  const structureFixture = investigation.focusId
-    ? getStructureFixture(investigation.focusId)
-    : undefined;
 
   return (
     <div className="network-page">
@@ -230,7 +280,7 @@ export function NetworkPage({
                   setNodeTypes(next);
                   const selected = structureFixture?.nodes.find((node) => node.id === investigation.selectedObjectId);
                   if (selected && !next.has(selected.type)) {
-                    onInvestigationChange({ ...investigation, selectedObjectId: undefined });
+                    onInvestigationChange({ ...investigation, selectedObjectId: undefined, highlightedPath: undefined });
                     onClearInspector();
                   }
                 }} />{item.label}</label>)}
@@ -245,7 +295,7 @@ export function NetworkPage({
                   setRelationshipTypes(next);
                   const selectedRelationship = structureFixture?.relationships.find((relationship) => relationship.id === investigation.selectedObjectId);
                   if (selectedRelationship && !next.has(selectedRelationship.type)) {
-                    onInvestigationChange({ ...investigation, selectedObjectId: undefined });
+                    onInvestigationChange({ ...investigation, selectedObjectId: undefined, highlightedPath: undefined });
                     onClearInspector();
                   }
                 }} />{type}</label>)}
@@ -269,7 +319,7 @@ export function NetworkPage({
         )}
 
         <div className="network-toolbar-spacer" />
-        {investigation.highlightedPath && <Button variant="ghost" onClick={() => onInvestigationChange({ ...investigation, highlightedPath: undefined, selectedObjectId: undefined })}>Clear Highlight</Button>}
+        {investigation.highlightedPath && <Button variant="ghost" onClick={clearHighlight}>Clear Highlight</Button>}
         <Button variant="ghost" icon={<RotateCcw size={14} />} onClick={reset}>Reset</Button>
       </section>
 
@@ -289,6 +339,7 @@ export function NetworkPage({
             relationshipTypes={relationshipTypes}
             onInvestigationChange={onInvestigationChange}
             onInspect={onInspect}
+            onClearInspector={onClearInspector}
             onReset={reset}
           />
         ) : (
@@ -307,6 +358,7 @@ export function NetworkPage({
           lastRefreshLabel={lastRefreshLabel}
           onInvestigationChange={onInvestigationChange}
           onInspect={onInspect}
+          onClearInspector={onClearInspector}
           onOpenCompanyProfile={onOpenCompanyProfile}
           onReplay={() => setReplayKey((value) => value + 1)}
           onSimulateUpdate={() => setPendingUpdate(true)}
@@ -324,10 +376,11 @@ type StructureCanvasProps = {
   relationshipTypes: Set<DemoGraphRelationship["type"]>;
   onInvestigationChange: (next: NetworkInvestigation) => void;
   onInspect: (context: InspectorContext) => void;
+  onClearInspector: () => void;
   onReset: () => void;
 };
 
-function StructureCanvas({ fixture, investigation, nodeTypes, relationshipTypes, onInvestigationChange, onInspect, onReset }: StructureCanvasProps) {
+function StructureCanvas({ fixture, investigation, nodeTypes, relationshipTypes, onInvestigationChange, onInspect, onClearInspector, onReset }: StructureCanvasProps) {
   const depthVisible = useMemo(
     () => structuralNeighborhood(fixture.relationships, fixture.focusId, investigation.maxHops),
     [fixture, investigation.maxHops],
@@ -337,7 +390,16 @@ function StructureCanvas({ fixture, investigation, nodeTypes, relationshipTypes,
   const visibleRelationships = fixture.relationships.filter((relationship) => visibleIds.has(relationship.source) && visibleIds.has(relationship.target) && relationshipTypes.has(relationship.type));
   const selectedNode = fixture.nodes.find((node) => node.id === investigation.selectedObjectId);
   const selectedRelationship = fixture.relationships.find((relationship) => relationship.id === investigation.selectedObjectId);
+  const selectedObjectStillVisible = !investigation.selectedObjectId
+    || visibleNodes.some((node) => node.id === investigation.selectedObjectId)
+    || visibleRelationships.some((relationship) => relationship.id === investigation.selectedObjectId);
   const connectedIds = new Set<string>();
+
+  useEffect(() => {
+    if (selectedObjectStillVisible || !investigation.selectedObjectId) return;
+    onInvestigationChange({ ...investigation, selectedObjectId: undefined, highlightedPath: undefined });
+    onClearInspector();
+  }, [investigation, onClearInspector, onInvestigationChange, selectedObjectStillVisible]);
 
   if (selectedNode) {
     connectedIds.add(selectedNode.id);
@@ -485,16 +547,46 @@ type ImpactCanvasProps = {
   lastRefreshLabel: string;
   onInvestigationChange: (next: NetworkInvestigation) => void;
   onInspect: (context: InspectorContext) => void;
+  onClearInspector: () => void;
   onOpenCompanyProfile: (companyId: string) => void;
   onReplay: () => void;
   onSimulateUpdate: () => void;
   onReturnToStructure: () => void;
 };
 
-function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestigationChange, onInspect, onOpenCompanyProfile, onReplay, onSimulateUpdate, onReturnToStructure }: ImpactCanvasProps) {
+function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestigationChange, onInspect, onClearInspector, onOpenCompanyProfile, onReplay, onSimulateUpdate, onReturnToStructure }: ImpactCanvasProps) {
   const validOriginType = investigation.focusType === "Company" || investigation.focusType === "Event"
     ? investigation.focusType
     : undefined;
+  const fixture = validOriginType && investigation.focusId
+    ? getImpactFixture(validOriginType, investigation.focusId)
+    : undefined;
+  const riskOrder = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+
+  const visibleCompanies = useMemo(() => {
+    if (!fixture) return [];
+    return fixture.companies.filter((company) => {
+      const hop = Number(company.hop.replace("Hop ", ""));
+      const hopVisible = hop <= investigation.maxHops && (!investigation.hopOnly || hop === investigation.hopOnly);
+      const riskVisible = riskFilter === "ALL"
+        ? true
+        : riskFilter === "NONE"
+          ? false
+          : riskOrder.indexOf(company.level) >= riskOrder.indexOf(riskFilter);
+      return hopVisible && riskVisible;
+    });
+  }, [fixture, investigation.hopOnly, investigation.maxHops, riskFilter]);
+
+  const selectedCompany = fixture?.companies.find((company) => company.id === investigation.selectedObjectId);
+  const selectedCompanyVisible = selectedCompany
+    ? visibleCompanies.some((company) => company.id === selectedCompany.id)
+    : true;
+
+  useEffect(() => {
+    if (!selectedCompany || selectedCompanyVisible) return;
+    onInvestigationChange({ ...investigation, selectedObjectId: undefined, highlightedPath: undefined });
+    onClearInspector();
+  }, [investigation, onClearInspector, onInvestigationChange, selectedCompany, selectedCompanyVisible]);
 
   if (!validOriginType || !investigation.focusId) {
     return (
@@ -506,7 +598,6 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
     );
   }
 
-  const fixture = getImpactFixture(validOriginType, investigation.focusId);
   if (!fixture) {
     return (
       <ImpactUnavailableState
@@ -519,17 +610,6 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
 
   const isEventOrigin = fixture.origin.type === "Event";
   const originName = fixture.origin.name;
-  const riskOrder = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
-  const visibleCompanies = fixture.companies.filter((company) => {
-    const hop = Number(company.hop.replace("Hop ", ""));
-    const hopVisible = hop <= investigation.maxHops && (!investigation.hopOnly || hop === investigation.hopOnly);
-    const riskVisible = riskFilter === "ALL"
-      ? true
-      : riskFilter === "NONE"
-        ? false
-        : riskOrder.indexOf(company.level) >= riskOrder.indexOf(riskFilter);
-    return hopVisible && riskVisible;
-  });
 
   const selectCompany = (company: DemoImpactCompany) => {
     onInvestigationChange({ ...investigation, selectedObjectId: company.id, highlightedPath: company.path });
@@ -559,7 +639,6 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
     });
   };
 
-  const selectedCompany = fixture.companies.find((company) => company.id === investigation.selectedObjectId);
   const selectedProfileId = selectedCompany ? companyIdByName[selectedCompany.company] : undefined;
 
   return (
