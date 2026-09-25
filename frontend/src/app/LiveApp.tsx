@@ -4,6 +4,7 @@ import type { NavigationSection } from "../components/layout/PrimaryNavigation";
 import { LiveAppShell, type LiveInspectorAction } from "../components/live/LiveAppShell";
 import { LiveCompaniesPage } from "../pages/live/LiveCompaniesPage";
 import { LiveEventsPage } from "../pages/live/LiveEventsPage";
+import { LiveNetworkPage } from "../pages/live/LiveNetworkPage";
 import { LiveUnavailablePage } from "../pages/live/LiveUnavailablePage";
 import { useUiStore, type InspectorRef } from "../state/uiStore";
 
@@ -16,14 +17,7 @@ function sectionFromPath(pathname: string): NavigationSection {
   return "overview";
 }
 
-const sectionRoutes: Record<NavigationSection, string> = {
-  overview: "/overview",
-  events: "/events",
-  network: "/network",
-  companies: "/companies",
-  risk: "/risk-analysis",
-  intelligence: "/intelligence",
-};
+const sectionRoutes: Record<NavigationSection, string> = { overview: "/overview", events: "/events", network: "/network", companies: "/companies", risk: "/risk-analysis", intelligence: "/intelligence" };
 
 export function LiveApp() {
   const navigate = useNavigate();
@@ -31,11 +25,7 @@ export function LiveApp() {
   const inspectorRef = useUiStore((state) => state.inspectorRef);
   const setInspectorRef = useUiStore((state) => state.setInspectorRef);
 
-  const onSectionChange = (section: NavigationSection) => {
-    if (section === sectionFromPath(location.pathname)) return;
-    navigate(sectionRoutes[section]);
-  };
-
+  const onSectionChange = (section: NavigationSection) => { if (section !== sectionFromPath(location.pathname)) navigate(sectionRoutes[section]); };
   const inspectorAction = (action: LiveInspectorAction, ref: InspectorRef) => {
     if (action === "Open Profile" && ref.entityType === "Company") navigate(`/companies/${encodeURIComponent(ref.id)}`);
     else if (action === "Open Event" && ref.entityType === "Event") navigate(`/events/${encodeURIComponent(ref.id)}`);
@@ -45,20 +35,13 @@ export function LiveApp() {
     else if (action === "Open Impact" && ref.entityType === "Event") navigate(`/network?mode=impact&focusType=Event&focusId=${encodeURIComponent(ref.id)}&eventId=${encodeURIComponent(ref.id)}&maxHops=3`);
   };
 
-  return (
-    <LiveAppShell activeSection={sectionFromPath(location.pathname)} onSectionChange={onSectionChange} inspectorRef={inspectorRef} onInspect={setInspectorRef} onCloseInspector={() => setInspectorRef(null)} onInspectorAction={inspectorAction}>
-      <Routes>
-        <Route path="/overview" element={<LiveUnavailablePage title="Overview" description="Live Overview aggregation is being integrated from verified backend contracts; unsupported system-wide metrics are not replaced with demo values." />} />
-        <Route path="/events" element={<LiveEventsPage />} />
-        <Route path="/events/:eventId" element={<LiveEventsPage />} />
-        <Route path="/network" element={<LiveUnavailablePage title="Network" description="The live Structure/Impact workspace will consume URL-owned focus and hop state without importing development fixtures." />} />
-        <Route path="/companies" element={<LiveCompaniesPage />} />
-        <Route path="/companies/:companyId" element={<LiveCompaniesPage />} />
-        <Route path="/risk-analysis" element={<LiveUnavailablePage title="Risk Analysis" description="No system-wide risk ranking is fabricated while the backend lacks a dedicated aggregate contract." />} />
-        <Route path="/intelligence" element={<LiveUnavailablePage title="Intelligence" description="The public Agent API will be integrated without exposing hidden reasoning." />} />
-        <Route path="/" element={<Navigate to="/overview" replace />} />
-        <Route path="*" element={<Navigate to="/overview" replace />} />
-      </Routes>
-    </LiveAppShell>
-  );
+  return <LiveAppShell activeSection={sectionFromPath(location.pathname)} onSectionChange={onSectionChange} inspectorRef={inspectorRef} onInspect={setInspectorRef} onCloseInspector={() => setInspectorRef(null)} onInspectorAction={inspectorAction}><Routes>
+    <Route path="/overview" element={<LiveUnavailablePage title="Overview" description="Live Overview aggregation is being integrated from verified backend contracts; unsupported system-wide metrics are not replaced with demo values." />} />
+    <Route path="/events" element={<LiveEventsPage />} /><Route path="/events/:eventId" element={<LiveEventsPage />} />
+    <Route path="/network" element={<LiveNetworkPage />} />
+    <Route path="/companies" element={<LiveCompaniesPage />} /><Route path="/companies/:companyId" element={<LiveCompaniesPage />} />
+    <Route path="/risk-analysis" element={<LiveUnavailablePage title="Risk Analysis" description="No system-wide risk ranking is fabricated while the backend lacks a dedicated aggregate contract." />} />
+    <Route path="/intelligence" element={<LiveUnavailablePage title="Intelligence" description="The public Agent API will be integrated without exposing hidden reasoning." />} />
+    <Route path="/" element={<Navigate to="/overview" replace />} /><Route path="*" element={<Navigate to="/overview" replace />} />
+  </Routes></LiveAppShell>;
 }

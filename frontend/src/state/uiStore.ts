@@ -1,12 +1,17 @@
 import { create } from "zustand";
-import type { EntityType } from "../domain/types";
+import type { EntityType, HopDepth } from "../domain/types";
 
 export type InspectorRef = {
   kind: "entity" | "relationship" | "event" | "risk";
   id: string;
   entityType?: EntityType;
   name?: string;
-  context?: { relatedCompanyId?: string; graphFocusId?: string; relationshipId?: string };
+  context?: {
+    relatedCompanyId?: string;
+    graphFocusId?: string;
+    graphDepth?: HopDepth;
+    relationshipId?: string;
+  };
 };
 
 type RiskNotification = { companyId: string; eventId?: string; timestamp: string };
