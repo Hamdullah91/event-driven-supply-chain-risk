@@ -15,7 +15,7 @@ const intelligencePage = read("src/pages/IntelligencePage.tsx");
 const networkPage = read("src/pages/NetworkPage.tsx");
 const networkCss = read("src/pages/NetworkPhase2.css");
 const phase2State = read("src/phase2.ts");
-const app = read("src/App.tsx");
+const app = read("src/app/DemoApp.tsx");
 const appShell = read("src/components/layout/AppShell.tsx");
 const appShellCss = read("src/components/layout/AppShell.css");
 const inspector = read("src/components/layout/EntityInspector.tsx");
@@ -131,7 +131,6 @@ const checks = [
     assert.doesNotMatch(appShell, /role="listbox"/);
     assert.match(phase2State, /mode: "structure"/);
   }],
-
   ["Impact to Structure preserves a valid selected Company as a Structure node", () => {
     assert.match(networkPage, /function selectedStructureNodeFromImpact/);
     assert.match(networkPage, /const canonicalCompanyId = companyIdByName\[selectedImpactCompany\.company\]/);
