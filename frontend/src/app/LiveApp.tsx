@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-
 import type { NavigationSection } from "../components/layout/PrimaryNavigation";
 import { LiveAppShell, type LiveInspectorAction } from "../components/live/LiveAppShell";
 import { LiveCompaniesPage } from "../pages/live/LiveCompaniesPage";
+import { LiveEventsPage } from "../pages/live/LiveEventsPage";
 import { LiveUnavailablePage } from "../pages/live/LiveUnavailablePage";
 import { useUiStore, type InspectorRef } from "../state/uiStore";
 
@@ -36,27 +37,20 @@ export function LiveApp() {
   };
 
   const inspectorAction = (action: LiveInspectorAction, ref: InspectorRef) => {
-    if (action === "Open Profile" && ref.entityType === "Company") {
-      navigate(`/companies/${encodeURIComponent(ref.id)}`);
-    } else if (action === "Open Event" && ref.entityType === "Event") {
-      navigate(`/events/${encodeURIComponent(ref.id)}`);
-    } else if (action === "Open Company" && ref.context?.relatedCompanyId) {
-      navigate(`/companies/${encodeURIComponent(ref.context.relatedCompanyId)}`);
-    } else if (action === "Explore Network" && ref.entityType === "Company") {
-      navigate(`/network?mode=structure&focusType=Company&focusId=${encodeURIComponent(ref.id)}&depth=1`);
-    } else if (action === "Open Impact" && ref.entityType === "Company") {
-      navigate(`/network?mode=impact&focusType=Company&focusId=${encodeURIComponent(ref.id)}&maxHops=3`);
-    } else if (action === "Open Impact" && ref.entityType === "Event") {
-      navigate(`/network?mode=impact&focusType=Event&focusId=${encodeURIComponent(ref.id)}&eventId=${encodeURIComponent(ref.id)}&maxHops=3`);
-    }
+    if (action === "Open Profile" && ref.entityType === "Company") navigate(`/companies/${encodeURIComponent(ref.id)}`);
+    else if (action === "Open Event" && ref.entityType === "Event") navigate(`/events/${encodeURIComponent(ref.id)}`);
+    else if (action === "Open Company" && ref.context?.relatedCompanyId) navigate(`/companies/${encodeURIComponent(ref.context.relatedCompanyId)}`);
+    else if (action === "Explore Network" && ref.entityType === "Company") navigate(`/network?mode=structure&focusType=Company&focusId=${encodeURIComponent(ref.id)}&depth=1`);
+    else if (action === "Open Impact" && ref.entityType === "Company") navigate(`/network?mode=impact&focusType=Company&focusId=${encodeURIComponent(ref.id)}&maxHops=3`);
+    else if (action === "Open Impact" && ref.entityType === "Event") navigate(`/network?mode=impact&focusType=Event&focusId=${encodeURIComponent(ref.id)}&eventId=${encodeURIComponent(ref.id)}&maxHops=3`);
   };
 
   return (
     <LiveAppShell activeSection={sectionFromPath(location.pathname)} onSectionChange={onSectionChange} inspectorRef={inspectorRef} onInspect={setInspectorRef} onCloseInspector={() => setInspectorRef(null)} onInspectorAction={inspectorAction}>
       <Routes>
         <Route path="/overview" element={<LiveUnavailablePage title="Overview" description="Live Overview aggregation is being integrated from verified backend contracts; unsupported system-wide metrics are not replaced with demo values." />} />
-        <Route path="/events" element={<LiveUnavailablePage title="Events" description="Live event list integration is the next controlled migration stage." />} />
-        <Route path="/events/:eventId" element={<LiveUnavailablePage title="Event Detail" description="The requested Event ID is preserved in the URL; no unrelated Event is substituted." />} />
+        <Route path="/events" element={<LiveEventsPage />} />
+        <Route path="/events/:eventId" element={<LiveEventsPage />} />
         <Route path="/network" element={<LiveUnavailablePage title="Network" description="The live Structure/Impact workspace will consume URL-owned focus and hop state without importing development fixtures." />} />
         <Route path="/companies" element={<LiveCompaniesPage />} />
         <Route path="/companies/:companyId" element={<LiveCompaniesPage />} />
