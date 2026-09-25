@@ -69,7 +69,6 @@ export function EventsPage({ selectedEventId, onSelectEvent, onInspect, onClearI
     if (!selectedEventId || !selectedEvent || selectedEventVisible) return;
     onSelectEvent(null);
     onClearInspector();
-    setShowEvidence(false);
   }, [onClearInspector, onSelectEvent, selectedEvent, selectedEventId, selectedEventVisible]);
 
   const selectEvent = (event: DemoEvent) => {
