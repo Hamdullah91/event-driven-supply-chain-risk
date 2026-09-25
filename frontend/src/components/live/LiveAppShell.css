@@ -1,5 +1,7 @@
-.live-risk-notification { position: fixed; top: calc(var(--topbar-height) + 12px); right: 20px; z-index: 48; display: flex; max-width: 430px; align-items: center; gap: 18px; padding: 10px 12px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-card); background: var(--color-chrome); box-shadow: 0 12px 36px rgb(0 0 0 / 32%); }
-.live-risk-notification > div { display: grid; gap: 2px; }
+.live-risk-notification { position: fixed; top: calc(var(--topbar-height) + 12px); right: 20px; z-index: 48; display: flex; max-width: 500px; align-items: center; gap: 18px; padding: 10px 12px; border: 1px solid var(--color-border-strong); border-radius: var(--radius-card); background: var(--color-chrome); box-shadow: 0 12px 36px rgb(0 0 0 / 32%); }
+.live-risk-notification > div:first-child { display: grid; gap: 2px; }
 .live-risk-notification strong { color: var(--color-text-primary); font-size: 12px; }
 .live-risk-notification span { color: var(--color-text-muted); font-size: 11px; }
-.live-risk-notification button { display: grid; width: 28px; height: 28px; place-items: center; border: 0; background: transparent; color: var(--color-text-muted); cursor: pointer; }
+.live-risk-notification-actions { display: flex; align-items: center; gap: 4px; }
+.live-risk-notification-actions button { min-width: 28px; height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: var(--radius-control); background: transparent; color: var(--color-text-muted); cursor: pointer; font: inherit; font-size: 11px; }
+.live-risk-notification-actions button:hover { border-color: var(--color-border-strong); color: var(--color-text-primary); }

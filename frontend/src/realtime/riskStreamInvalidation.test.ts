@@ -1,9 +1,9 @@
 import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
-import { invalidateForRiskUpdate } from "./riskStreamInvalidation";
+import { invalidateForRiskUpdate, refetchForRiskUpdate } from "./riskStreamInvalidation";
 
 describe("risk stream targeted invalidation", () => {
-  it("invalidates only the affected company risk families and referenced Event families", async () => {
+  it("marks only the affected company and Event query families stale without refetching active analysis", async () => {
     const client = new QueryClient();
     const invalidate = vi.spyOn(client, "invalidateQueries").mockResolvedValue(undefined);
 
@@ -19,7 +19,8 @@ describe("risk stream targeted invalidation", () => {
       timestamp: "2026-09-25T01:00:00Z",
     });
 
-    const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
+    const filters = invalidate.mock.calls.map(([value]) => value);
+    const keys = filters.map((value) => value?.queryKey);
     expect(keys).toEqual(expect.arrayContaining([
       ["company-risk", "nvidia"],
       ["company-exposure", "nvidia"],
@@ -29,6 +30,7 @@ describe("risk stream targeted invalidation", () => {
       ["event-blast-radius", "evt-1"],
       ["events"],
     ]));
+    expect(filters.every((value) => value?.refetchType === "none")).toBe(true);
     expect(keys).not.toContainEqual(["companies"]);
     expect(keys).not.toContainEqual([]);
   });
@@ -50,5 +52,17 @@ describe("risk stream targeted invalidation", () => {
     const keys = invalidate.mock.calls.map(([filters]) => filters?.queryKey);
     expect(keys).toHaveLength(4);
     expect(keys.some((key) => key?.[0] === "event" || key?.[0] === "events")).toBe(false);
+  });
+
+  it("refetches only active targeted query families after the analyst explicitly refreshes", async () => {
+    const client = new QueryClient();
+    const refetch = vi.spyOn(client, "refetchQueries").mockResolvedValue(undefined);
+
+    await refetchForRiskUpdate(client, { companyId: "nvidia", eventId: "evt-1" });
+
+    expect(refetch).toHaveBeenCalledTimes(7);
+    expect(refetch.mock.calls.every(([filters]) => filters?.type === "active")).toBe(true);
+    expect(refetch.mock.calls.map(([filters]) => filters?.queryKey)).toContainEqual(["company-risk", "nvidia"]);
+    expect(refetch.mock.calls.map(([filters]) => filters?.queryKey)).toContainEqual(["events"]);
   });
 });

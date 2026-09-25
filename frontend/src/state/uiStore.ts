@@ -14,7 +14,7 @@ export type InspectorRef = {
   };
 };
 
-type RiskNotification = { companyId: string; eventId?: string; timestamp: string };
+export type RiskNotification = { companyId: string; eventId?: string; timestamp: string };
 
 type UiState = {
   inspectorRef: InspectorRef | null;
