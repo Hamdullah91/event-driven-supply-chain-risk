@@ -6,7 +6,7 @@ import { ApiError } from "../../api/error";
 import { Button } from "../../components/ui/Button";
 import { Panel } from "../../components/ui/Panel";
 import { RiskBadge } from "../../components/ui/RiskBadge";
-import type { Company, ExposureContribution } from "../../domain/types";
+import type { ExposureContribution } from "../../domain/types";
 import { useCompanies, useCompany, useCompanyExposure, useCompanyNetwork, useCompanyRisk } from "../../query/hooks";
 import { useUiStore } from "../../state/uiStore";
 
