@@ -8,7 +8,9 @@ const read = (path) => readFileSync(fileURLToPath(new URL(path, root)), "utf8");
 const impactData = read("src/data/networkImpactDemo.ts");
 const structureData = read("src/data/networkStructureDemo.ts");
 const companyData = read("src/data/companiesDemo.ts");
+const eventData = read("src/data/eventsDemo.ts");
 const companiesPage = read("src/pages/CompaniesPage.tsx");
+const eventsPage = read("src/pages/EventsPage.tsx");
 const intelligencePage = read("src/pages/IntelligencePage.tsx");
 const networkPage = read("src/pages/NetworkPage.tsx");
 const networkCss = read("src/pages/NetworkPhase2.css");
@@ -45,7 +47,7 @@ const checks = [
     assert.doesNotMatch(networkPage, /find\(\(node\) => node\.label === "TSMC"\)!/);
   }],
   ["Structure to Impact mode switching preserves full focus identity", () => {
-    assert.match(networkPage, /const setMode = \(mode:[\s\S]*?onInvestigationChange\(\{[\s\S]*?\.\.\.investigation,[\s\S]*?mode,/);
+    assert.match(networkPage, /const setMode = \(mode:[\s\S]*?\.\.\.investigation,[\s\S]*?mode,/);
     assert.doesNotMatch(networkPage, /const setMode[\s\S]*?focusId:\s*.*TSMC/);
   }],
   ["NVIDIA and ASML unsupported Impact origins cannot become TSMC", () => {
@@ -128,6 +130,77 @@ const checks = [
     assert.doesNotMatch(networkPage, /aria-label="Expand graph canvas"/);
     assert.doesNotMatch(appShell, /role="listbox"/);
     assert.match(phase2State, /mode: "structure"/);
+  }],
+
+  ["Impact to Structure preserves a valid selected Company as a Structure node", () => {
+    assert.match(networkPage, /function selectedStructureNodeFromImpact/);
+    assert.match(networkPage, /const canonicalCompanyId = companyIdByName\[selectedImpactCompany\.company\]/);
+    assert.match(networkPage, /structureFixture\.nodes\.some\(\(node\) => node\.id === canonicalCompanyId\)/);
+    assert.match(networkPage, /const preservedSelectionId = selectedStructureNodeFromImpact\(investigation\)/);
+    assert.match(networkPage, /selectedObjectId: preservedSelectionId/);
+    assert.match(companyData, /companyId: "demo-nvidia"/);
+  }],
+  ["Impact to Structure clears an invalid Impact-only selected entity", () => {
+    assert.match(networkPage, /if \(!selectedImpactCompany \|\| !structureFixture\) return undefined/);
+    assert.match(networkPage, /if \(!canonicalCompanyId\) return undefined/);
+    assert.match(networkPage, /investigation\.selectedObjectId && !preservedSelectionId\) onClearInspector\(\)/);
+  }],
+  ["Clear Highlight cannot leave a stale Inspector selection", () => {
+    assert.match(networkPage, /const clearHighlight = \(\) => \{[\s\S]*?selectedObjectId: undefined,[\s\S]*?if \(hadPrimarySelection\) onClearInspector\(\)/);
+    assert.match(networkPage, /onClick=\{clearHighlight\}>Clear Highlight/);
+  }],
+  ["Impact visibility filtering clears hidden selected targets and Inspector", () => {
+    assert.match(networkPage, /const selectedCompanyVisible = selectedCompany[\s\S]*?visibleCompanies\.some/);
+    assert.match(networkPage, /if \(!selectedCompany \|\| selectedCompanyVisible\) return;/);
+    assert.match(networkPage, /selectedObjectId: undefined, highlightedPath: undefined/);
+    assert.match(networkPage, /onClearInspector\(\)/);
+  }],
+  ["Impact filtering preserves selection while the selected target remains visible", () => {
+    assert.match(networkPage, /if \(!selectedCompany \|\| selectedCompanyVisible\) return;/);
+    assert.doesNotMatch(networkPage, /if \(selectedCompanyVisible\)[\s\S]*?selectedObjectId: undefined/);
+  }],
+  ["Demo Facility resolves canonically as a Facility", () => {
+    assert.match(eventData, /name: "Demo Facility", type: "Facility"/);
+    assert.match(eventData, /id: "demo-facility-1"/);
+    assert.match(eventsPage, /type: entity\.type/);
+  }],
+  ["Events no longer use a generic non-company to Industry fallback", () => {
+    assert.doesNotMatch(eventsPage, /type:\s*company\s*\?\s*"Company"\s*:\s*"Industry"/);
+    assert.match(eventData, /type: "Industry"/);
+  }],
+  ["Event filters clear a selected event that is no longer visible", () => {
+    assert.match(eventsPage, /const selectedEventVisible = selectedEvent \? filteredEvents\.some/);
+    assert.match(eventsPage, /if \(!selectedEventId \|\| !selectedEvent \|\| selectedEventVisible\) return;/);
+    assert.match(eventsPage, /onSelectEvent\(null\)/);
+    assert.match(eventsPage, /Select an event to inspect\./);
+  }],
+  ["Event filters preserve a selected event that remains visible", () => {
+    assert.match(eventsPage, /const activeEvent = selectedEventVisible \? selectedEvent : undefined/);
+    assert.match(eventsPage, /event\.id === activeEvent\?\.id/);
+  }],
+  ["Company exposure records carry canonical Event IDs", () => {
+    assert.match(companyData, /eventId: string/);
+    assert.match(companyData, /id: "demo-exposure-001",[\s\S]*?eventId: "demo-event-001"/);
+    assert.match(companyData, /id: "demo-exposure-002",[\s\S]*?eventId: "demo-event-002"/);
+  }],
+  ["FACILITY_OUTAGE exposure resolves the canonical FACILITY_OUTAGE Event", () => {
+    assert.match(companyData, /eventId: "demo-event-001",[\s\S]*?eventType: "FACILITY_OUTAGE"/);
+    assert.match(eventData, /id: "demo-event-001",[\s\S]*?type: "FACILITY_OUTAGE"/);
+  }],
+  ["SUPPLY_DISRUPTION exposure resolves the canonical SUPPLY_DISRUPTION Event", () => {
+    assert.match(companyData, /eventId: "demo-event-002",[\s\S]*?eventType: "SUPPLY_DISRUPTION"/);
+    assert.match(eventData, /id: "demo-event-002",[\s\S]*?type: "SUPPLY_DISRUPTION"/);
+  }],
+  ["Exposure record IDs are never passed to Event navigation from Company Profile", () => {
+    assert.match(companiesPage, /id: exposure\.eventId,[\s\S]*?type: "Event"/);
+    assert.doesNotMatch(companiesPage, /id: exposure\.id,[\s\S]*?type: "Event"/);
+    assert.match(companiesPage, /Exposure record/);
+  }],
+  ["Invalid explicit Event IDs never silently fall back to another Event", () => {
+    assert.match(eventsPage, /Event data is not available for this development event\./);
+    assert.match(eventsPage, /No unrelated Event is substituted\./);
+    assert.doesNotMatch(eventsPage, /eventsDemo\.find\([\s\S]*?\?\?\s*filteredEvents\[0\]/);
+    assert.doesNotMatch(eventsPage, /filteredEvents\[0\]\s*\?\?\s*eventsDemo\[0\]/);
   }],
 ];
 
