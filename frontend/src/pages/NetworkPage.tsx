@@ -51,6 +51,8 @@ const companyIdByName: Record<string, string> = {
   "Samsung Electronics": "demo-samsung",
 };
 
+const impactRiskOrder: string[] = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
+
 function structuralNeighborhood(
   relationships: DemoGraphRelationship[],
   focusId: string,
@@ -561,7 +563,6 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
   const fixture = validOriginType && investigation.focusId
     ? getImpactFixture(validOriginType, investigation.focusId)
     : undefined;
-  const riskOrder = ["LOW", "MEDIUM", "HIGH", "CRITICAL"];
 
   const visibleCompanies = useMemo(() => {
     if (!fixture) return [];
@@ -572,7 +573,7 @@ function ImpactCanvas({ investigation, riskFilter, lastRefreshLabel, onInvestiga
         ? true
         : riskFilter === "NONE"
           ? false
-          : riskOrder.indexOf(company.level) >= riskOrder.indexOf(riskFilter);
+          : impactRiskOrder.indexOf(company.level) >= impactRiskOrder.indexOf(riskFilter);
       return hopVisible && riskVisible;
     });
   }, [fixture, investigation.hopOnly, investigation.maxHops, riskFilter]);
