@@ -1,0 +1,25 @@
+.live-risk-search { position: relative; display: flex; min-width: 280px; min-height: 38px; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-app-bg); color: var(--color-text-muted); }
+.live-risk-search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-size: 12px; }
+.live-risk-hop { width: 28px; height: 28px; border: 0; border-radius: 4px; background: transparent; color: var(--color-text-muted); cursor: pointer; }
+.live-risk-hop.is-active { background: var(--color-elevated); color: var(--color-primary); }
+.live-risk-primary { display: grid; gap: 10px; }
+.live-risk-primary > strong { color: var(--color-text-primary); font-size: 30px; }
+.live-risk-primary > span { color: var(--color-text-muted); font-size: 12px; }
+.live-history-summary { display: grid; gap: 5px; }
+.live-history-summary strong { color: var(--color-text-primary); font-size: 28px; }
+.live-history-summary span, .live-history-summary p { color: var(--color-text-muted); font-size: 12px; line-height: 18px; }
+.live-risk-driver { display: flex; width: 100%; min-height: 58px; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; border: 0; border-bottom: 1px solid var(--color-border); background: transparent; color: inherit; cursor: pointer; text-align: left; }
+.live-risk-driver:hover, .live-risk-driver:focus-visible { background: var(--color-elevated); outline: none; }
+.live-risk-driver > div { display: grid; gap: 3px; }
+.live-risk-driver strong { color: var(--color-text-primary); }
+.live-risk-driver span { color: var(--color-text-muted); font-size: 11px; }
+.live-risk-driver > div:last-child { text-align: right; }
+.live-risk-lens-bar { display: flex; align-items: center; gap: 8px; }
+.live-risk-lens-bar > button { display: inline-flex; min-height: 34px; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-panel); color: var(--color-text-muted); cursor: pointer; }
+.live-risk-lens-bar > button.is-active { border-color: var(--color-border-strong); color: var(--color-primary); }
+.live-risk-history-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.live-risk-history-list button { display: grid; gap: 5px; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-app-bg); color: var(--color-text-secondary); cursor: pointer; text-align: left; }
+.live-risk-history-list small, .live-risk-history-list span { color: var(--color-text-muted); }
+.live-risk-state { display: flex; min-height: 120px; align-items: center; justify-content: center; gap: 10px; color: var(--color-text-muted); text-align: center; }
+.live-risk-state.is-compact { min-height: 80px; }
+@media (max-width: 1180px) { .risk-summary-grid { grid-template-columns: 1fr; } .risk-scope-bar { flex-wrap: wrap; } .live-risk-search { min-width: 240px; flex: 1; } }
