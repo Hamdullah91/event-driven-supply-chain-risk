@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseRiskStreamPayload } from "./RiskStreamProvider";
+import { parseRiskStreamPayload } from "./riskStreamPayload";
 
 describe("risk stream schema boundary", () => {
   it("accepts the verified handshake and risk.updated contract", () => {
@@ -10,6 +10,6 @@ describe("risk stream schema boundary", () => {
   it("rejects unknown and malformed messages rather than mutating state", () => {
     expect(parseRiskStreamPayload('{"type":"event.created","event_id":"evt-1"}')).toBeNull();
     expect(parseRiskStreamPayload('{"type":"risk.updated","company_id":"nvidia"}')).toBeNull();
-    expect(parseRiskStreamPayload('not-json')).toBeNull();
+    expect(parseRiskStreamPayload("not-json")).toBeNull();
   });
 });

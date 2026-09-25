@@ -3,7 +3,7 @@ import { Search, X } from "lucide-react";
 
 import { useEntitySearch, useDetailedHealth } from "../../query/hooks";
 import type { SearchResult } from "../../domain/types";
-import { useRiskStream } from "../../realtime/RiskStreamProvider";
+import { useRiskStream } from "../../realtime/riskStreamContext";
 import { useUiStore, type InspectorRef } from "../../state/uiStore";
 import { PrimaryNavigation, type NavigationSection } from "../layout/PrimaryNavigation";
 import { LiveEntityInspector } from "./LiveEntityInspector";
