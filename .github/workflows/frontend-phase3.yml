@@ -1,0 +1,74 @@
+name: Frontend Phase 3 Verification
+
+on:
+  push:
+    branches:
+      - feat/frontend-phase3
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frontend-phase3-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-lock:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/frontend-phase3
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Refresh lockfile if package metadata changed
+        run: npm install --package-lock-only
+      - name: Commit refreshed lockfile
+        working-directory: .
+        run: |
+          if git diff --quiet -- frontend/package-lock.json; then
+            echo "package-lock.json already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/package-lock.json
+          git commit -m "chore: refresh frontend phase 3 dependency lock"
+          git push origin HEAD:feat/frontend-phase3
+
+  frontend-validation:
+    needs: dependency-lock
+    if: always()
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/frontend-phase3
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Lint
+        run: npm run lint
+      - name: Phase 2 + Phase 3 tests
+        run: npm test
