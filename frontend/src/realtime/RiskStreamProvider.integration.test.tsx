@@ -8,12 +8,14 @@ import { STABLE_CONNECTION_RESET_MS } from "./riskStreamBackoff";
 class FakeWebSocket {
   static instances: FakeWebSocket[] = [];
 
+  readonly url: string;
   onopen: ((event: Event) => void) | null = null;
   onmessage: ((event: MessageEvent) => void) | null = null;
   onerror: ((event: Event) => void) | null = null;
   onclose: ((event: CloseEvent) => void) | null = null;
 
-  constructor(readonly url: string) {
+  constructor(url: string) {
+    this.url = url;
     FakeWebSocket.instances.push(this);
   }
 
