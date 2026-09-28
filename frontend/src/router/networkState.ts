@@ -8,6 +8,8 @@ export type NetworkUrlState = {
   depth: HopDepth;
   maxHops: HopDepth;
   eventId?: string;
+  selectedTargetId?: string;
+  pathId?: string;
 };
 
 const ENTITY_TYPES: EntityType[] = ["Company", "Facility", "Product", "Material", "Technology", "Industry", "Location", "Country", "Event"];
@@ -26,6 +28,8 @@ export function parseNetworkUrlState(params: URLSearchParams): NetworkUrlState {
   const focusId = params.get("focusId") || undefined;
   const focusType = entityType(params.get("focusType"));
   const eventId = params.get("eventId") || undefined;
+  const selectedTargetId = mode === "impact" ? params.get("targetId") || undefined : undefined;
+  const pathId = mode === "impact" ? params.get("pathId") || undefined : undefined;
   return {
     mode,
     ...(focusId ? { focusId } : {}),
@@ -33,6 +37,8 @@ export function parseNetworkUrlState(params: URLSearchParams): NetworkUrlState {
     depth: hop(params.get("depth"), 1),
     maxHops: hop(params.get("maxHops"), 3),
     ...(eventId ? { eventId } : {}),
+    ...(selectedTargetId ? { selectedTargetId } : {}),
+    ...(pathId ? { pathId } : {}),
   };
 }
 
@@ -44,5 +50,7 @@ export function serializeNetworkUrlState(state: NetworkUrlState): URLSearchParam
   if (state.mode === "structure") params.set("depth", String(state.depth));
   else params.set("maxHops", String(state.maxHops));
   if (state.eventId) params.set("eventId", state.eventId);
+  if (state.mode === "impact" && state.selectedTargetId) params.set("targetId", state.selectedTargetId);
+  if (state.mode === "impact" && state.pathId) params.set("pathId", state.pathId);
   return params;
 }
