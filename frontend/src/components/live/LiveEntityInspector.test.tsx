@@ -5,23 +5,25 @@ import type { ExposureContribution } from "../../domain/types";
 import type { InspectorRef } from "../../state/uiStore";
 import { LiveEntityInspector } from "./LiveEntityInspector";
 
-const exposure: ExposureContribution = {
-  exposureId: "exposure:evt-1:nvidia:1:tsmc>nvidia",
-  eventId: "evt-1",
-  eventType: "SUPPLY_DISRUPTION",
-  severity: "high",
-  sourceEntity: { id: "tsmc", type: "Company", name: "TSMC" },
-  targetCompany: { id: "nvidia", type: "Company", name: "NVIDIA" },
-  hop: 1,
-  initialRisk: 0.75,
-  combinedPathDependency: 0.8,
-  distanceDecay: 1,
-  propagatedRisk: 0.6,
-  path: [{ id: "tsmc", type: "Company", name: "TSMC" }, { id: "nvidia", type: "Company", name: "NVIDIA" }],
-  confidence: 0.91,
-  source: "wire",
-  evidence: { availability: "PARTIAL", source: "wire", eventId: "evt-1" },
-};
+const { exposure } = vi.hoisted(() => ({
+  exposure: {
+    exposureId: "exposure:evt-1:nvidia:1:tsmc>nvidia",
+    eventId: "evt-1",
+    eventType: "SUPPLY_DISRUPTION",
+    severity: "high",
+    sourceEntity: { id: "tsmc", type: "Company", name: "TSMC" },
+    targetCompany: { id: "nvidia", type: "Company", name: "NVIDIA" },
+    hop: 1,
+    initialRisk: 0.75,
+    combinedPathDependency: 0.8,
+    distanceDecay: 1,
+    propagatedRisk: 0.6,
+    path: [{ id: "tsmc", type: "Company", name: "TSMC" }, { id: "nvidia", type: "Company", name: "NVIDIA" }],
+    confidence: 0.91,
+    source: "wire",
+    evidence: { availability: "PARTIAL", source: "wire", eventId: "evt-1" },
+  } satisfies ExposureContribution,
+}));
 
 vi.mock("../../query/hooks", () => ({
   useCompany: () => ({ data: undefined, isPending: false, isError: false }),
