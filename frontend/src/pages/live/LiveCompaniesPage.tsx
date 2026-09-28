@@ -95,7 +95,12 @@ function LiveCompanyProfile({ companyId }: { companyId: string }) {
 
   const inspectExposure = (item: ExposureContribution) => {
     setSelectedExposureId(item.exposureId);
-    setInspectorRef({ kind: "event", id: item.eventId, entityType: "Event", name: item.eventType ?? item.eventId, context: { relatedCompanyId: companyId } });
+    setInspectorRef({
+      kind: "exposure",
+      id: item.exposureId,
+      name: item.eventType ? `${item.eventType} exposure` : "Risk exposure",
+      context: { relatedCompanyId: companyId, eventId: item.eventId },
+    });
   };
 
   return (
