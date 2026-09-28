@@ -7,13 +7,13 @@ import type { EntityType, GraphEdge, GraphNode, ImpactAnalysis, ImpactTarget, Se
 import { useCompany, useCompanyImpact, useCompanyNetwork, useEntitySearch, useEvent, useEventImpact } from "../../query/hooks";
 import { parseNetworkUrlState, serializeNetworkUrlState, type NetworkMode, type NetworkUrlState } from "../../router/networkState";
 import { useUiStore } from "../../state/uiStore";
+import { relationshipLabelPositions, STRUCTURE_RELATIONSHIP_TYPES, type NetworkPosition } from "./networkLayout";
 
 import "../NetworkPage.css";
 import "../NetworkPhase2.css";
 import "./LiveNetworkPage.css";
 
-type Position = { x: number; y: number };
-
+type Position = NetworkPosition;
 type FocusFilter = "ALL" | EntityType;
 
 export function LiveNetworkPage() {
@@ -37,27 +37,61 @@ export function LiveNetworkPage() {
   }, [focusQuery]);
 
   const search = useEntitySearch(debouncedFocusQuery, 20);
-
   const updateUrl = (next: NetworkUrlState) => setSearchParams(serializeNetworkUrlState(next));
+
+  const restoreImpactTarget = (target: ImpactTarget) => {
+    setSelectedId(target.company.id);
+    setHighlightedPathId(target.pathId);
+    setInspectorRef({ kind: "entity", id: target.company.id, entityType: "Company", name: target.company.name });
+  };
+
+  const selectImpactTarget = (target: ImpactTarget) => {
+    restoreImpactTarget(target);
+    updateUrl({ ...state, selectedTargetId: target.company.id, pathId: target.pathId });
+  };
+
+  const clearImpactSelection = () => {
+    updateUrl({ ...state, selectedTargetId: undefined, pathId: undefined });
+    clearSelection();
+  };
+
   const changeMode = (mode: NetworkMode) => {
-    updateUrl({ ...state, mode, ...(mode === "impact" && state.focusType === "Event" && state.focusId ? { eventId: state.focusId } : {}) });
+    updateUrl({
+      ...state,
+      mode,
+      selectedTargetId: undefined,
+      pathId: undefined,
+      ...(mode === "impact" && state.focusType === "Event" && state.focusId ? { eventId: state.focusId } : {}),
+    });
     setNodeTypeFilter("ALL");
     setRelationshipFilter("ALL");
     clearSelection();
   };
+
   const chooseFocus = (result: SearchResult) => {
     const type = result.entity.type;
     updateUrl({
       ...state,
       focusType: type,
       focusId: result.entity.id,
+      selectedTargetId: undefined,
+      pathId: undefined,
       ...(type === "Event" ? { eventId: result.entity.id } : { eventId: undefined }),
     });
     setFocusQuery("");
     clearSelection();
   };
+
+  const changeDepth = (value: 1 | 2 | 3) => {
+    updateUrl({
+      ...state,
+      ...(state.mode === "structure" ? { depth: value } : { maxHops: value, selectedTargetId: undefined, pathId: undefined }),
+    });
+    if (state.mode === "impact") clearSelection();
+  };
+
   const reset = () => {
-    updateUrl({ ...state, depth: 1, maxHops: 1 });
+    updateUrl({ ...state, depth: 1, maxHops: 1, selectedTargetId: undefined, pathId: undefined });
     setNodeTypeFilter("ALL");
     setRelationshipFilter("ALL");
     clearSelection();
@@ -73,25 +107,25 @@ export function LiveNetworkPage() {
       <section className="network-toolbar" aria-label="Network controls">
         <div className="network-focus-control"><Search size={14} aria-hidden="true" /><input value={focusQuery} onChange={(event) => setFocusQuery(event.target.value)} placeholder={state.focusId ? "Change focus…" : "Choose focus…"} aria-label="Focus Network" /><small>{state.focusType ?? "None"}</small>{focusQuery.trim().length >= 2 && <div className="network-focus-results">{search.isPending ? <div className="network-focus-empty">Searching live graph…</div> : search.isError ? <div className="network-focus-empty">Search unavailable. Current focus is unchanged.</div> : search.data?.length ? search.data.map((result) => <button type="button" key={`${result.entity.type}:${result.entity.id}`} onClick={() => chooseFocus(result)}><strong>{result.entity.name}</strong><span>{result.entity.type} · {result.entity.id}</span></button>) : <div className="network-focus-empty">No matching entity.</div>}</div>}</div>
         <span className="network-toolbar-divider" />
-        <div className="network-control-group"><span className="network-control-label">{state.mode === "structure" ? "Depth" : "Max Hops"}</span>{([1, 2, 3] as const).map((value) => <button type="button" className={`depth-button${(state.mode === "structure" ? state.depth : state.maxHops) === value ? " is-active" : ""}`} key={value} onClick={() => updateUrl({ ...state, ...(state.mode === "structure" ? { depth: value } : { maxHops: value }) })}>{value}</button>)}</div>
-        {state.mode === "structure" && <><label className="live-network-select">Node type<select value={nodeTypeFilter} onChange={(event) => setNodeTypeFilter(event.target.value as FocusFilter)}><option value="ALL">All</option><option value="Company">Company</option><option value="Facility">Facility</option><option value="Product">Product</option><option value="Material">Material</option><option value="Technology">Technology</option><option value="Industry">Industry</option><option value="Location">Location</option><option value="Country">Country</option></select></label><label className="live-network-select">Relationship<select value={relationshipFilter} onChange={(event) => setRelationshipFilter(event.target.value)}><option value="ALL">All</option><option value="SUPPLIES">SUPPLIES</option><option value="DEPENDS_ON">DEPENDS_ON</option><option value="OPERATES">OPERATES</option><option value="OWNS">OWNS</option><option value="USES">USES</option><option value="PRODUCES">PRODUCES</option><option value="LOCATED_IN">LOCATED_IN</option><option value="OPERATES_IN">OPERATES_IN</option></select></label></>}
+        <div className="network-control-group"><span className="network-control-label">{state.mode === "structure" ? "Depth" : "Max Hops"}</span>{([1, 2, 3] as const).map((value) => <button type="button" className={`depth-button${(state.mode === "structure" ? state.depth : state.maxHops) === value ? " is-active" : ""}`} key={value} onClick={() => changeDepth(value)}>{value}</button>)}</div>
+        {state.mode === "structure" && <><label className="live-network-select">Node type<select value={nodeTypeFilter} onChange={(event) => setNodeTypeFilter(event.target.value as FocusFilter)}><option value="ALL">All</option><option value="Company">Company</option><option value="Facility">Facility</option><option value="Product">Product</option><option value="Material">Material</option><option value="Technology">Technology</option><option value="Industry">Industry</option><option value="Location">Location</option><option value="Country">Country</option></select></label><label className="live-network-select">Relationship<select value={relationshipFilter} onChange={(event) => setRelationshipFilter(event.target.value)}><option value="ALL">All</option>{STRUCTURE_RELATIONSHIP_TYPES.map((relationshipType) => <option value={relationshipType} key={relationshipType}>{relationshipType}</option>)}</select></label></>}
         <div className="network-toolbar-spacer" /><Button variant="ghost" icon={<RotateCcw size={14} />} onClick={reset}>Reset</Button>
       </section>
 
       {!state.focusId || !state.focusType ? <NetworkState title="Choose a focus" detail="Use live graph search to choose an entity. Search typing alone never replaces the current analytical focus." />
         : state.mode === "structure" ? <StructureWorkspace state={state} nodeTypeFilter={nodeTypeFilter} relationshipFilter={relationshipFilter} selectedId={selectedId} inspectorId={inspectorRef?.id} onInspect={(node) => { setSelectedId(node.id); setInspectorRef({ kind: "entity", id: node.entityId, entityType: node.entityType, name: node.label }); }} onInspectEdge={(edge) => { setSelectedId(edge.id); setInspectorRef({ kind: "relationship", id: edge.id, name: edge.type, context: { graphFocusId: state.focusId, graphDepth: state.depth, relationshipId: edge.id } }); }} onFilteredSelection={() => clearSelection()} />
-        : <ImpactWorkspace state={state} selectedId={selectedId} highlightedPathId={highlightedPathId} onSelect={(target) => { setSelectedId(target.company.id); setHighlightedPathId(target.pathId); setInspectorRef({ kind: "entity", id: target.company.id, entityType: "Company", name: target.company.name }); }} onClear={() => clearSelection()} />}
+        : <ImpactWorkspace state={state} selectedId={selectedId} highlightedPathId={highlightedPathId} onSelect={selectImpactTarget} onRestore={restoreImpactTarget} onClear={clearImpactSelection} />}
     </div>
   );
 }
 
 function StructureWorkspace({ state, nodeTypeFilter, relationshipFilter, selectedId, inspectorId, onInspect, onInspectEdge, onFilteredSelection }: { state: NetworkUrlState; nodeTypeFilter: FocusFilter; relationshipFilter: string; selectedId: string | null; inspectorId?: string; onInspect: (node: GraphNode) => void; onInspectEdge: (edge: GraphEdge) => void; onFilteredSelection: () => void }) {
   const graph = useCompanyNetwork(state.focusType === "Company" ? state.focusId : undefined, state.depth);
-
   const visibleNodes = useMemo(() => (graph.data?.nodes ?? []).filter((node) => nodeTypeFilter === "ALL" || node.entityType === nodeTypeFilter), [graph.data?.nodes, nodeTypeFilter]);
   const visibleIds = useMemo(() => new Set(visibleNodes.map((node) => node.id)), [visibleNodes]);
   const visibleEdges = useMemo(() => (graph.data?.edges ?? []).filter((edge) => visibleIds.has(edge.sourceId) && visibleIds.has(edge.targetId) && (relationshipFilter === "ALL" || edge.type === relationshipFilter)), [graph.data?.edges, relationshipFilter, visibleIds]);
   const positions = useMemo(() => graph.data ? structurePositions(graph.data, visibleNodes) : new Map<string, Position>(), [graph.data, visibleNodes]);
+  const labelPositions = useMemo(() => relationshipLabelPositions(visibleEdges, positions), [positions, visibleEdges]);
 
   useEffect(() => {
     if (!selectedId && !inspectorId) return;
@@ -107,18 +141,24 @@ function StructureWorkspace({ state, nodeTypeFilter, relationshipFilter, selecte
 
   return <div className="network-canvas network-canvas--structure"><div className="network-canvas-header"><div><strong>{graph.data.focus.name}</strong><span className="metadata-text">STRUCTURE · DEPTH {graph.data.depth}</span></div><div className="network-canvas-actions"><span>{visibleNodes.length} nodes · {visibleEdges.length} visible relationships</span></div></div><div className="network-graph-surface">
     <svg className="network-edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><defs><marker id="live-structure-arrow" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0 L5,2.5 L0,5 z" className="network-arrow-head" /></marker></defs>{visibleEdges.map((edge) => { const source = positions.get(edge.sourceId); const target = positions.get(edge.targetId); if (!source || !target) return null; return <line key={edge.id} x1={source.x} y1={source.y} x2={target.x} y2={target.y} className={`network-edge${selectedId === edge.id ? " phase2-structure-edge-highlight" : ""}`} markerEnd="url(#live-structure-arrow)" />; })}</svg>
-    {visibleEdges.map((edge) => { const source = positions.get(edge.sourceId); const target = positions.get(edge.targetId); if (!source || !target) return null; return <button type="button" className={`relationship-label live-relationship-label${selectedId === edge.id ? " is-selected" : ""}`} style={{ left: `${(source.x + target.x) / 2}%`, top: `${(source.y + target.y) / 2}%` }} key={`label:${edge.id}`} onClick={() => onInspectEdge(edge)}>{edge.type}</button>; })}
+    {visibleEdges.map((edge) => { const position = labelPositions.get(edge.id); if (!position) return null; return <button type="button" className={`relationship-label live-relationship-label${selectedId === edge.id ? " is-selected" : ""}`} style={{ left: `${position.x}%`, top: `${position.y}%` }} key={`label:${edge.id}`} aria-label={`Inspect ${edge.type} ${edge.sourceId} to ${edge.targetId}`} onClick={() => onInspectEdge(edge)}>{edge.type}</button>; })}
     {visibleNodes.map((node) => { const position = positions.get(node.id) ?? { x: 50, y: 50 }; const cssType = node.entityType.toLowerCase(); const selected = selectedId === node.id || inspectorId === node.entityId; return <div className="graph-node-wrapper" style={{ left: `${position.x}%`, top: `${position.y}%` }} key={node.id}><button type="button" className={`graph-node graph-node--${cssType}${node.entityId === graph.data!.focus.id ? " is-focus" : ""}${selected ? " is-selected" : ""}`} onClick={() => onInspect(node)} aria-label={`Inspect ${node.label}`} /><div className="graph-node-copy"><strong>{node.label}</strong><span>{node.entityType}</span></div></div>; })}
   </div><div className="network-legend"><span className="network-legend-title">Live semantics</span><span className="network-legend-item">Arrow direction = backend relationship direction</span><span className="network-legend-item">Depth = structural distance, not risk hop</span></div></div>;
 }
 
-function ImpactWorkspace({ state, selectedId, highlightedPathId, onSelect, onClear }: { state: NetworkUrlState; selectedId: string | null; highlightedPathId: string | null; onSelect: (target: ImpactTarget) => void; onClear: () => void }) {
+function ImpactWorkspace({ state, selectedId, highlightedPathId, onSelect, onRestore, onClear }: { state: NetworkUrlState; selectedId: string | null; highlightedPathId: string | null; onSelect: (target: ImpactTarget) => void; onRestore: (target: ImpactTarget) => void; onClear: () => void }) {
   const companyImpact = useCompanyImpact(state.focusType === "Company" ? state.focusId : undefined, state.maxHops);
   const eventImpact = useEventImpact(state.focusType === "Event" ? state.eventId ?? state.focusId : undefined, state.maxHops);
   const company = useCompany(state.focusType === "Company" ? state.focusId : undefined);
   const event = useEvent(state.focusType === "Event" ? state.eventId ?? state.focusId : undefined);
   const query = state.focusType === "Company" ? companyImpact : state.focusType === "Event" ? eventImpact : undefined;
   const analysis = query?.data;
+  const urlTarget = useMemo(() => analysis?.targets.find((target) => target.company.id === state.selectedTargetId && (!state.pathId || target.pathId === state.pathId)), [analysis, state.pathId, state.selectedTargetId]);
+
+  useEffect(() => {
+    if (!urlTarget) return;
+    if (selectedId !== urlTarget.company.id || highlightedPathId !== urlTarget.pathId) onRestore(urlTarget);
+  }, [highlightedPathId, onRestore, selectedId, urlTarget]);
 
   if (state.focusType !== "Company" && state.focusType !== "Event") return <NetworkState title="Impact origin not supported" detail={`Impact requires a Company or Event origin. ${state.focusType ?? "Unknown"}:${state.focusId} remains preserved; no origin is substituted.`} />;
   if (query?.isPending) return <NetworkState title="Loading Impact analysis" detail="Retrieving backend-authoritative propagation results…" />;
