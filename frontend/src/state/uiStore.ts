@@ -2,12 +2,13 @@ import { create } from "zustand";
 import type { EntityType, HopDepth } from "../domain/types";
 
 export type InspectorRef = {
-  kind: "entity" | "relationship" | "event" | "risk";
+  kind: "entity" | "relationship" | "event" | "risk" | "exposure";
   id: string;
   entityType?: EntityType;
   name?: string;
   context?: {
     relatedCompanyId?: string;
+    eventId?: string;
     graphFocusId?: string;
     graphDepth?: HopDepth;
     relationshipId?: string;
