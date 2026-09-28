@@ -108,9 +108,10 @@ GitHub Actions workflow:
 
 Repair verification run:
 
-- Run ID: `36480926231`
-- HEAD: `73bcedf326adddd540006b064ec8cb35b59b5191`
+- Run ID: `36481224004`
+- HEAD: `8ba6a948846aff02dd44f1625407b209feed667b`
 - Dependency lock: PASS
+- Focused backend Company-filter contract: PASS
 - Production build: PASS
 - ESLint: PASS
 - Phase 2 integrity checks: 33 PASS
@@ -126,13 +127,9 @@ New regression coverage includes:
 - first-class Exposure Inspector semantics,
 - Company repository filter placement.
 
-The frontend workflow does not execute Python backend tests. The new focused backend regression test should also be run locally with:
+The Phase 3 workflow now includes a focused Python backend-contract job that runs `tests/test_company_repository_filters.py`, so the corrected Cypher filter boundary is CI-enforced in addition to frontend verification.
 
-```powershell
-pytest tests/test_company_repository_filters.py -q
-```
-
-The repaired Company search must additionally be verified against the live Neo4j-backed application during the browser rerun by searching for a guaranteed nonexistent Company and confirming zero results with no Industry corruption.
+The repaired Company search must still be verified against the live Neo4j-backed application during the browser rerun by searching for a guaranteed nonexistent Company and confirming zero results with no Industry corruption.
 
 ## Still Blocked by Environment / Testability
 
