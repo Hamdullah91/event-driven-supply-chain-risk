@@ -46,6 +46,22 @@ jobs:
           git commit -m "chore: refresh frontend phase 3 dependency lock"
           git push origin HEAD:feat/frontend-phase3
 
+  backend-contract-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/frontend-phase3
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install focused backend test dependencies
+        run: python -m pip install pytest neo4j python-dotenv
+      - name: Company directory filter contract
+        run: pytest tests/test_company_repository_filters.py -q
+
   frontend-validation:
     needs: dependency-lock
     if: always()
