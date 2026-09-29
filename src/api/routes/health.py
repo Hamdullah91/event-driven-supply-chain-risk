@@ -36,12 +36,23 @@ def detailed_health(
         )
 
     provider = settings.LLM_PROVIDER.strip().lower()
-    if provider == "openai" and settings.LLM_API_KEY.strip() and settings.LLM_MODEL.strip():
-        services["agent_llm"] = ServiceHealth(status="configured")
+    model = settings.LLM_MODEL.strip()
+    if provider == "openai" and settings.LLM_API_KEY.strip() and model:
+        services["agent_llm"] = ServiceHealth(
+            status="configured",
+            detail=f"provider=openai; model={model}",
+        )
     else:
+        missing: list[str] = []
+        if provider != "openai":
+            missing.append("LLM_PROVIDER=openai")
+        if not settings.LLM_API_KEY.strip():
+            missing.append("LLM_API_KEY")
+        if not model:
+            missing.append("LLM_MODEL")
         services["agent_llm"] = ServiceHealth(
             status="unconfigured",
-            detail="Set LLM_PROVIDER=openai, LLM_API_KEY, and LLM_MODEL.",
+            detail=f"Missing agent configuration: {', '.join(missing)}.",
         )
 
     services["websocket"] = ServiceHealth(
