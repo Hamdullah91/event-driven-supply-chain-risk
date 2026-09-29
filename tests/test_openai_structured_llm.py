@@ -13,7 +13,8 @@ def test_openai_structured_llm_returns_json_object() -> None:
         payload = __import__("json").loads(request.content)
         assert payload["model"] == "test-model"
         assert payload["instructions"] == "system"
-        assert payload["input"] == "question"
+        assert "json" in payload["input"].lower()
+        assert payload["input"].endswith("question")
         assert payload["text"]["format"] == {"type": "json_object"}
         return httpx.Response(
             200,
