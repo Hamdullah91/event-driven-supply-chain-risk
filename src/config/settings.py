@@ -87,9 +87,12 @@ class Settings:
     # LLM / Agentic RAG
     # ============================================
 
-    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "")
+    # OpenAI is the production provider supported by src/agent/openai_llm.py.
+    # The default model is intentionally cost-conscious and Responses-API compatible.
+    # LLM_API_KEY remains mandatory and must be supplied through the local environment.
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "openai")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "gpt-5.6-luna")
 
     # ============================================
     # API
