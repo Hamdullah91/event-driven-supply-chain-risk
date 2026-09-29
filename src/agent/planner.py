@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from src.agent.llm import StructuredLLM
 from src.agent.models import AgentPlan
-from src.agent.prompts import PLANNER_SYSTEM_PROMPT
+from src.agent.prompts import build_planner_system_prompt
 
 
 class AgentPlanner:
@@ -16,7 +16,7 @@ class AgentPlanner:
             raise ValueError("question must not be blank")
 
         payload = await self.llm.complete_json(
-            system_prompt=PLANNER_SYSTEM_PROMPT,
+            system_prompt=build_planner_system_prompt(),
             user_prompt=question.strip(),
         )
         return AgentPlan.model_validate(payload)

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from src.agent.llm import LLMProviderError
 from src.api.dependencies import get_agent_service
 from src.api.schemas import AgentQueryRequest, AgentQueryResponse, EvidenceProvenance
 from src.api.services.agent import AgentQueryService
@@ -17,6 +18,11 @@ async def query_agent(
     """Answer a supply-chain graph question using validated grounded evidence."""
     try:
         explanation = await service.answer(request.question)
+    except LLMProviderError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=str(exc),
+        ) from exc
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

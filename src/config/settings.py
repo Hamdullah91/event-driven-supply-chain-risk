@@ -87,9 +87,14 @@ class Settings:
     # LLM / Agentic RAG
     # ============================================
 
-    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "")
+    # Supported production providers: gemini and openai.
+    # Gemini 3.5 Flash-Lite is the default because it is a stable, cost-efficient
+    # model suitable for structured planner/Cypher calls and is available on the
+    # Gemini API free tier for eligible projects.
+    # LLM_API_KEY must always be supplied through the local environment.
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "gemini-3.5-flash-lite")
 
     # ============================================
     # API

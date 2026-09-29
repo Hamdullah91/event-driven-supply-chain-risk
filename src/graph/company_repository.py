@@ -35,13 +35,14 @@ class CompanyGraphRepository:
     def list_companies(self, *, limit: int = 100, offset: int = 0, search: str | None = None, industry_id: str | None = None, entity_type: str | None = None) -> list[dict[str, Any]]:
         query = """
         MATCH (c:Company)
-        OPTIONAL MATCH (c)-[:OPERATES_IN]->(i:Industry)
         WHERE ($search IS NULL OR
                toLower(coalesce(c.name, '')) CONTAINS toLower($search) OR
                toLower(coalesce(c.legal_name, '')) CONTAINS toLower($search) OR
                toLower(coalesce(c.company_id, '')) CONTAINS toLower($search))
-          AND ($industry_id IS NULL OR i.industry_id = $industry_id)
           AND ($entity_type IS NULL OR c.entity_type = $entity_type)
+        OPTIONAL MATCH (c)-[:OPERATES_IN]->(i:Industry)
+        WITH c, i
+        WHERE ($industry_id IS NULL OR i.industry_id = $industry_id)
         RETURN DISTINCT c.company_id AS company_id, c.name AS name, c.legal_name AS legal_name,
                c.entity_type AS entity_type, i.industry_id AS industry_id
         ORDER BY toLower(coalesce(c.name, c.company_id))
@@ -55,13 +56,14 @@ class CompanyGraphRepository:
     def count_companies(self, *, search: str | None = None, industry_id: str | None = None, entity_type: str | None = None) -> int:
         query = """
         MATCH (c:Company)
-        OPTIONAL MATCH (c)-[:OPERATES_IN]->(i:Industry)
         WHERE ($search IS NULL OR
                toLower(coalesce(c.name, '')) CONTAINS toLower($search) OR
                toLower(coalesce(c.legal_name, '')) CONTAINS toLower($search) OR
                toLower(coalesce(c.company_id, '')) CONTAINS toLower($search))
-          AND ($industry_id IS NULL OR i.industry_id = $industry_id)
           AND ($entity_type IS NULL OR c.entity_type = $entity_type)
+        OPTIONAL MATCH (c)-[:OPERATES_IN]->(i:Industry)
+        WITH c, i
+        WHERE ($industry_id IS NULL OR i.industry_id = $industry_id)
         RETURN count(DISTINCT c) AS count
         """
         params = self._company_filter_params(search=search, industry_id=industry_id, entity_type=entity_type)

@@ -1,0 +1,8 @@
+.live-network-select { display: inline-flex; min-height: 40px; align-items: center; gap: 7px; padding: 0 9px; border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-text-muted); font-size: 11px; }
+.live-network-select select { border: 0; outline: 0; background: transparent; color: var(--color-text-primary); font: inherit; font-weight: 600; }
+.live-network-select option { background: var(--color-chrome); }
+.live-relationship-label { position: absolute; transform: translate(-50%, -50%); cursor: pointer; }
+.live-relationship-label.is-selected { outline: 1px solid var(--color-primary); color: var(--color-primary); }
+.live-impact-company { transform: translate(-50%, -50%); }
+.live-impact-company .impact-company-node { color: var(--color-primary); }
+@media (max-width: 1024px) { .live-network-select { flex: 1 1 180px; } }
