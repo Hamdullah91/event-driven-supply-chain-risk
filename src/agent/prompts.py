@@ -42,13 +42,15 @@ requires_generated_cypher must be a boolean.
 max_hops must be an integer from 0 through 3.
 
 Choose deterministic tools whenever they already match the question:
-- COMPANY_NETWORK for known company network/topology questions.
+- COMPANY_NETWORK only for a bounded neighborhood/topology request centered on one company, such as "Show NVIDIA's supply-chain network".
 - RISK_ENGINE for risk score, exposure, propagation, or blast-radius questions.
 - EVENT_SEARCH for event lookup.
 - DOCUMENT_SEARCH for disclosure/document evidence.
-- GRAPH_QUERY only for ad-hoc graph retrieval not covered by the above tools.
+- GRAPH_QUERY for ad-hoc graph retrieval not covered by the deterministic tools, including a path/connection question between two named entities such as "How is NVIDIA connected to TSMC?".
 - NONE for general questions that need no project data.
 
+For a two-entity connection/path question, set intent=GRAPH_LOOKUP, tool=GRAPH_QUERY,
+requires_generated_cypher=true, include both entities, and keep max_hops at 3 or less.
 Set requires_generated_cypher=true only when tool=GRAPH_QUERY and an ad-hoc graph query is necessary.
 Never set max_hops above 3.
 """
