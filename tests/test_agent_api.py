@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+import src.api.dependencies as dependencies
 from src.agent.evidence import EvidenceStatus
 from src.agent.explainer import GroundedExplanation
 from src.api.app import app
@@ -77,14 +78,23 @@ def test_agent_query_maps_unsupported_route_to_422() -> None:
     assert "graph query" in response.json()["detail"]
 
 
-def test_agent_query_is_unavailable_until_provider_is_configured() -> None:
-    with TestClient(app) as client:
-        response = client.post(
-            "/api/v1/agent/query",
-            json={"question": "How is NVIDIA exposed to TSMC?"},
-        )
+def test_agent_query_is_unavailable_until_provider_is_configured(monkeypatch) -> None:
+    dependencies.get_structured_llm.cache_clear()
+    monkeypatch.setattr(dependencies.settings, "LLM_PROVIDER", "")
+    monkeypatch.setattr(dependencies.settings, "LLM_API_KEY", "")
+    monkeypatch.setattr(dependencies.settings, "LLM_MODEL", "")
+
+    try:
+        with TestClient(app) as client:
+            response = client.post(
+                "/api/v1/agent/query",
+                json={"question": "How is NVIDIA exposed to TSMC?"},
+            )
+    finally:
+        dependencies.get_structured_llm.cache_clear()
 
     assert response.status_code == 503
     detail = response.json()["detail"]
     assert "Agentic RAG provider is not configured" in detail
     assert "LLM_PROVIDER=openai" in detail
+    assert "LLM_PROVIDER=gemini" in detail
