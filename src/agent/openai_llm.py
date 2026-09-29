@@ -39,10 +39,15 @@ class OpenAIStructuredLLM:
         system_prompt: str,
         user_prompt: str,
     ) -> Mapping[str, Any]:
+        # OpenAI JSON mode requires the conversation input to explicitly mention
+        # JSON. Keep that transport requirement inside the adapter so every
+        # structured Agent call satisfies it without coupling domain prompts to
+        # provider-specific behavior.
+        json_input = f"Return a JSON object only.\n\n{user_prompt}"
         payload = {
             "model": self.model,
             "instructions": system_prompt,
-            "input": user_prompt,
+            "input": json_input,
             "text": {"format": {"type": "json_object"}},
         }
         headers = {
