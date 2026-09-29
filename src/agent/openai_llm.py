@@ -6,9 +6,7 @@ from typing import Any
 
 import httpx
 
-
-class LLMProviderError(RuntimeError):
-    """Raised when the configured external LLM provider cannot complete a request."""
+from src.agent.llm import LLMProviderError
 
 
 class OpenAIStructuredLLM:
