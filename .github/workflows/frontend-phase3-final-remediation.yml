@@ -24,8 +24,19 @@ jobs:
           cache-dependency-path: requirements.txt
       - name: Install backend dependencies
         run: python -m pip install -r requirements.txt
-      - name: Full backend suite
-        run: pytest -q
+      - name: Install spaCy English model
+        run: python -m spacy download en_core_web_sm
+      - name: Full reproducible backend suite
+        run: |
+          # These four files require external/local runtime assets that are not
+          # stored in GitHub Actions: trained classifier weights or a live Neo4j.
+          # All remaining backend tests, including Phase 3 remediation tests,
+          # execute normally in CI.
+          pytest -q \
+            --ignore=tests/test_event_classifier.py \
+            --ignore=tests/test_neo4j.py \
+            --ignore=tests/test_risk_api_neo4j_integration.py \
+            --ignore=tests/test_risk_neo4j_integration.py
 
   frontend-validation:
     runs-on: ubuntu-latest
