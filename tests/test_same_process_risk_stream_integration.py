@@ -33,6 +33,25 @@ class EventBackedRiskRepository:
     def __init__(self, graph_repository: InMemoryGraphRepository) -> None:
         self.graph_repository = graph_repository
 
+    def get_event_blast_radius(self, event_id: str, *, max_hops: int = 3) -> list[dict]:
+        event = self.graph_repository.event
+        assert event is not None
+        assert str(event.event_id) == event_id
+        return [
+            {
+                "event_id": str(event.event_id),
+                "event_type": event.event_type.value,
+                "severity": event.severity.value,
+                "affected_company_id": "tsmc",
+                "affected_company_name": "TSMC",
+                "target_company_id": "tsmc",
+                "target_company_name": "TSMC",
+                "hop_distance": 0,
+                "dependency_weights": [],
+                "path_nodes": [{"company_id": "tsmc", "name": "TSMC"}],
+            }
+        ]
+
     def get_company_event_exposure(self, company_id: str, *, max_hops: int = 3) -> list[dict]:
         event = self.graph_repository.event
         assert event is not None
@@ -98,9 +117,9 @@ def test_processed_event_reaches_connected_risk_stream_client() -> None:
     risk_service = RiskAnalyticsService(EventBackedRiskRepository(graph_repository))
     risk_stream = RiskStreamService(risk_service)
 
-    # _publish_event_risk only needs the configured stream service. Keeping the
-    # real method in the test verifies the NewsPoller event->stream wiring without
-    # calling an external news provider.
+    # _publish_event_risk uses the real Event blast-radius scope and the same
+    # in-process connection manager as the WebSocket route. This verifies the
+    # production event->risk-scope->stream wiring without an external news API.
     poller = object.__new__(NewsPoller)
     poller.risk_stream_service = risk_stream
 
