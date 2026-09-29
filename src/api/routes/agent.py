@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.agent.openai_llm import LLMProviderError
+from src.agent.llm import LLMProviderError
 from src.api.dependencies import get_agent_service
 from src.api.schemas import AgentQueryRequest, AgentQueryResponse, EvidenceProvenance
 from src.api.services.agent import AgentQueryService
