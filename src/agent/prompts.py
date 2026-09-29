@@ -1,10 +1,45 @@
 from __future__ import annotations
 
+import json
+
+from src.agent.models import AgentPlan
 from src.agent.schema import build_graph_schema_context
 
 
 PLANNER_SYSTEM_PROMPT = """You are the planning layer for a supply-chain risk intelligence agent.
-Return only structured JSON matching the requested AgentPlan schema.
+Return only one JSON object that matches the AgentPlan contract exactly.
+
+Required top-level fields:
+- intent
+- tool
+- objective
+
+Optional top-level fields (use these exact names only):
+- entities
+- requires_generated_cypher
+- max_hops
+
+Never rename AgentPlan fields. In particular, do not use alternatives such as goal,
+action, route, task, or generated_cypher.
+
+Allowed intent values:
+- GRAPH_LOOKUP
+- RISK_ANALYSIS
+- EVENT_LOOKUP
+- DOCUMENT_LOOKUP
+- GENERAL
+
+Allowed tool values:
+- GRAPH_QUERY
+- COMPANY_NETWORK
+- RISK_ENGINE
+- EVENT_SEARCH
+- DOCUMENT_SEARCH
+- NONE
+
+Each entities item must contain a non-empty name and may contain entity_type.
+requires_generated_cypher must be a boolean.
+max_hops must be an integer from 0 through 3.
 
 Choose deterministic tools whenever they already match the question:
 - COMPANY_NETWORK for known company network/topology questions.
@@ -36,6 +71,16 @@ Generation rules:
 GRAPH SCHEMA
 {schema}
 """
+
+
+def build_planner_system_prompt() -> str:
+    """Return the planner instructions with the authoritative Pydantic JSON schema."""
+    schema = json.dumps(
+        AgentPlan.model_json_schema(),
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+    return f"{PLANNER_SYSTEM_PROMPT}\n\nAGENTPLAN JSON SCHEMA\n{schema}"
 
 
 def build_cypher_system_prompt() -> str:
