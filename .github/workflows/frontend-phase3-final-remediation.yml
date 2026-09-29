@@ -1,0 +1,66 @@
+name: Frontend Phase 3 Final Remediation
+
+on:
+  push:
+    branches:
+      - fix/frontend-phase3-final-remediation
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-full-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - name: Install backend dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Install spaCy English model
+        run: python -m spacy download en_core_web_sm
+      - name: Full reproducible backend suite
+        run: |
+          # These four files require external/local runtime assets that are not
+          # stored in GitHub Actions: trained classifier weights or a live Neo4j.
+          # All remaining backend tests, including Phase 3 remediation tests,
+          # execute normally in CI.
+          pytest -q \
+            --ignore=tests/test_event_classifier.py \
+            --ignore=tests/test_neo4j.py \
+            --ignore=tests/test_risk_api_neo4j_integration.py \
+            --ignore=tests/test_risk_neo4j_integration.py
+
+  frontend-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Phase 2 + Phase 3 tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Verify clean working tree
+        working-directory: .
+        run: test -z "$(git status --porcelain)"
