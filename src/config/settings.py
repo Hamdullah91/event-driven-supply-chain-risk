@@ -87,12 +87,13 @@ class Settings:
     # LLM / Agentic RAG
     # ============================================
 
-    # OpenAI is the production provider supported by src/agent/openai_llm.py.
-    # The default model is intentionally cost-conscious and Responses-API compatible.
-    # LLM_API_KEY remains mandatory and must be supplied through the local environment.
-    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "openai")
+    # Supported production providers: gemini and openai.
+    # Gemini 2.5 Flash-Lite is the default because it is suitable for structured
+    # planner/Cypher calls and is available on the Gemini API free tier.
+    # LLM_API_KEY must always be supplied through the local environment.
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "gemini")
     LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
-    LLM_MODEL: str = os.getenv("LLM_MODEL", "gpt-5.6-luna")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "gemini-2.5-flash-lite")
 
     # ============================================
     # API
