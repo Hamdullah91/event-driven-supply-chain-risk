@@ -4,7 +4,9 @@ from fastapi import HTTPException, status
 
 from src.agent.controller import AgentController
 from src.agent.cypher_generator import CypherGenerator
+from src.agent.gemini_llm import GeminiStructuredLLM
 from src.agent.graph_inspector import GraphInspector
+from src.agent.llm import StructuredLLM
 from src.agent.openai_llm import OpenAIStructuredLLM
 from src.agent.planner import AgentPlanner
 from src.api.services.agent import AgentQueryService
@@ -52,19 +54,28 @@ def get_risk_service() -> RiskAnalyticsService:
 
 
 @lru_cache(maxsize=1)
-def get_structured_llm() -> OpenAIStructuredLLM:
+def get_structured_llm() -> StructuredLLM:
     provider = settings.LLM_PROVIDER.strip().lower()
-    if provider != "openai":
+    api_key = settings.LLM_API_KEY.strip()
+    model = settings.LLM_MODEL.strip()
+
+    if provider not in {"openai", "gemini"}:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Agentic RAG provider is not configured. Set LLM_PROVIDER=openai.",
+            detail=(
+                "Agentic RAG provider is not configured. "
+                "Set LLM_PROVIDER=openai or LLM_PROVIDER=gemini."
+            ),
         )
-    if not settings.LLM_API_KEY.strip() or not settings.LLM_MODEL.strip():
+    if not api_key or not model:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Agentic RAG requires LLM_API_KEY and LLM_MODEL.",
         )
-    return OpenAIStructuredLLM(api_key=settings.LLM_API_KEY, model=settings.LLM_MODEL)
+
+    if provider == "gemini":
+        return GeminiStructuredLLM(api_key=api_key, model=model)
+    return OpenAIStructuredLLM(api_key=api_key, model=model)
 
 
 def get_agent_service() -> AgentQueryService:
