@@ -37,15 +37,16 @@ def detailed_health(
 
     provider = settings.LLM_PROVIDER.strip().lower()
     model = settings.LLM_MODEL.strip()
-    if provider == "openai" and settings.LLM_API_KEY.strip() and model:
+    supported_providers = {"openai", "gemini"}
+    if provider in supported_providers and settings.LLM_API_KEY.strip() and model:
         services["agent_llm"] = ServiceHealth(
             status="configured",
-            detail=f"provider=openai; model={model}",
+            detail=f"provider={provider}; model={model}",
         )
     else:
         missing: list[str] = []
-        if provider != "openai":
-            missing.append("LLM_PROVIDER=openai")
+        if provider not in supported_providers:
+            missing.append("LLM_PROVIDER=openai|gemini")
         if not settings.LLM_API_KEY.strip():
             missing.append("LLM_API_KEY")
         if not model:
