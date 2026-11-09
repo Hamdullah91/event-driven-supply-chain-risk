@@ -73,6 +73,11 @@
   display: block;
 }
 
+.events-page--live .events-filter:hover:not(:disabled) {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
 .events-page--live .events-filter select {
   width: 100%;
   min-width: 0;
@@ -287,6 +292,12 @@
   font-weight: 600;
   line-height: 18px;
   overflow-wrap: anywhere;
+}
+
+.events-page--live .event-detail-grid strong .event-severity-badge {
+  color: inherit;
+  font-size: 10px;
+  line-height: 14px;
 }
 
 .events-page--live .event-entity-list {
