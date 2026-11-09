@@ -7,6 +7,7 @@ import { LiveIntelligencePage } from "../pages/live/LiveIntelligencePage";
 import { LiveNetworkPage } from "../pages/live/LiveNetworkPage";
 import { LiveOverviewPage } from "../pages/live/LiveOverviewPage";
 import { LiveRiskAnalysisPage } from "../pages/live/LiveRiskAnalysisPage";
+import { InspectorRouteReconciler } from "../router/InspectorRouteReconciler";
 import { useUiStore, type InspectorRef } from "../state/uiStore";
 
 function sectionFromPath(pathname: string): NavigationSection { if (pathname.startsWith("/events")) return "events"; if (pathname.startsWith("/network")) return "network"; if (pathname.startsWith("/companies")) return "companies"; if (pathname.startsWith("/risk-analysis")) return "risk"; if (pathname.startsWith("/intelligence")) return "intelligence"; return "overview"; }
@@ -36,5 +37,8 @@ export function LiveApp() {
     else if (action === "Open Impact" && ref.kind === "exposure" && ref.context?.eventId) navigate(`/network?mode=impact&focusType=Event&focusId=${encodeURIComponent(ref.context.eventId)}&eventId=${encodeURIComponent(ref.context.eventId)}&maxHops=3`);
   };
 
-  return <LiveAppShell activeSection={sectionFromPath(location.pathname)} onSectionChange={onSectionChange} inspectorRef={inspectorRef} onInspect={setInspectorRef} onCloseInspector={() => setInspectorRef(null)} onInspectorAction={inspectorAction}><Routes><Route path="/overview" element={<LiveOverviewPage />} /><Route path="/events" element={<LiveEventsPage />} /><Route path="/events/:eventId" element={<LiveEventsPage />} /><Route path="/network" element={<LiveNetworkPage />} /><Route path="/companies" element={<LiveCompaniesPage />} /><Route path="/companies/:companyId" element={<LiveCompaniesPage />} /><Route path="/risk-analysis" element={<LiveRiskAnalysisPage />} /><Route path="/intelligence" element={<LiveIntelligencePage />} /><Route path="/" element={<Navigate to="/overview" replace />} /><Route path="*" element={<Navigate to="/overview" replace />} /></Routes></LiveAppShell>;
+  return <>
+    <InspectorRouteReconciler />
+    <LiveAppShell activeSection={sectionFromPath(location.pathname)} onSectionChange={onSectionChange} inspectorRef={inspectorRef} onInspect={setInspectorRef} onCloseInspector={() => setInspectorRef(null)} onInspectorAction={inspectorAction}><Routes><Route path="/overview" element={<LiveOverviewPage />} /><Route path="/events" element={<LiveEventsPage />} /><Route path="/events/:eventId" element={<LiveEventsPage />} /><Route path="/network" element={<LiveNetworkPage />} /><Route path="/companies" element={<LiveCompaniesPage />} /><Route path="/companies/:companyId" element={<LiveCompaniesPage />} /><Route path="/risk-analysis" element={<LiveRiskAnalysisPage />} /><Route path="/intelligence" element={<LiveIntelligencePage />} /><Route path="/" element={<Navigate to="/overview" replace />} /><Route path="*" element={<Navigate to="/overview" replace />} /></Routes></LiveAppShell>
+  </>;
 }

@@ -57,12 +57,12 @@ class FakeRiskStreamService:
     def __init__(self) -> None:
         self.calls = []
 
-    async def publish_company_risk(self, **kwargs):
+    async def publish_event_risk(self, **kwargs):
         self.calls.append(kwargs)
-        return {"type": "risk.updated", **kwargs}
+        return [{"type": "risk.updated", **kwargs}]
 
 
-def test_new_event_automatically_publishes_risk_for_linked_companies() -> None:
+def test_new_event_automatically_publishes_event_risk_scope() -> None:
     stream = FakeRiskStreamService()
     poller = NewsPoller(
         client=FakeClient(),
@@ -76,14 +76,18 @@ def test_new_event_automatically_publishes_risk_for_linked_companies() -> None:
 
     asyncio.run(poller.poll_once())
 
-    assert [call["company_id"] for call in stream.calls] == ["tsmc", "nvidia"]
-    assert all(call["event_id"] == "event-a5" for call in stream.calls)
-    assert all(call["event_type"] == "supply_disruption" for call in stream.calls)
+    assert stream.calls == [
+        {
+            "event_id": "event-a5",
+            "event_type": "supply_disruption",
+            "max_hops": 3,
+        }
+    ]
 
 
 def test_stream_failure_does_not_fail_persisted_event() -> None:
     class FailingStream(FakeRiskStreamService):
-        async def publish_company_risk(self, **kwargs):
+        async def publish_event_risk(self, **kwargs):
             raise RuntimeError("stream unavailable")
 
     poller = NewsPoller(

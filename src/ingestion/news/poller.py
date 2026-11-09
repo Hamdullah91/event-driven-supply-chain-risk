@@ -46,21 +46,19 @@ class NewsPoller:
             return
         event_id = str(pipeline_result.event.event_id)
         event_type = pipeline_result.event.event_type.value
-        for company_id in pipeline_result.linked_company_ids:
-            try:
-                await self.risk_stream_service.publish_company_risk(
-                    company_id=company_id,
-                    event_id=event_id,
-                    event_type=event_type,
-                )
-            except Exception:
-                # Streaming must never roll back or mark an already-persisted
-                # event as failed. The next event/update can recover naturally.
-                logger.exception(
-                    "Risk stream publish failed event_id=%s company_id=%s",
-                    event_id,
-                    company_id,
-                )
+        try:
+            await self.risk_stream_service.publish_event_risk(
+                event_id=event_id,
+                event_type=event_type,
+                max_hops=3,
+            )
+        except Exception:
+            # Streaming must never roll back or mark an already-persisted
+            # event as failed. The next event/update can recover naturally.
+            logger.exception(
+                "Risk stream scope/publish failed event_id=%s",
+                event_id,
+            )
 
     async def poll_once(self) -> None:
         cycle_started = monotonic()
