@@ -83,11 +83,13 @@ export function LiveNetworkPage() {
   };
 
   const changeDepth = (value: 1 | 2 | 3) => {
+    // Preserve an Impact selection while the new hop-bounded result loads.
+    // ImpactWorkspace clears it only if the selected target/path is absent
+    // from the authoritative response at the new max-hop limit.
     updateUrl({
       ...state,
-      ...(state.mode === "structure" ? { depth: value } : { maxHops: value, selectedTargetId: undefined, pathId: undefined }),
+      ...(state.mode === "structure" ? { depth: value } : { maxHops: value }),
     });
-    if (state.mode === "impact") clearSelection();
   };
 
   const reset = () => {
@@ -156,9 +158,27 @@ function ImpactWorkspace({ state, selectedId, highlightedPathId, onSelect, onRes
   const urlTarget = useMemo(() => analysis?.targets.find((target) => target.company.id === state.selectedTargetId && (!state.pathId || target.pathId === state.pathId)), [analysis, state.pathId, state.selectedTargetId]);
 
   useEffect(() => {
-    if (!urlTarget) return;
-    if (selectedId !== urlTarget.company.id || highlightedPathId !== urlTarget.pathId) onRestore(urlTarget);
-  }, [highlightedPathId, onRestore, selectedId, urlTarget]);
+    // Wait for a successful response before deciding that a URL-restored
+    // selection is invalid. A pending request or API error must not erase it.
+    if (!analysis || !state.selectedTargetId) return;
+
+    if (!urlTarget) {
+      onClear();
+      return;
+    }
+
+    if (selectedId !== urlTarget.company.id || highlightedPathId !== urlTarget.pathId) {
+      onRestore(urlTarget);
+    }
+  }, [
+    analysis,
+    highlightedPathId,
+    onClear,
+    onRestore,
+    selectedId,
+    state.selectedTargetId,
+    urlTarget,
+  ]);
 
   if (state.focusType !== "Company" && state.focusType !== "Event") return <NetworkState title="Impact origin not supported" detail={`Impact requires a Company or Event origin. ${state.focusType ?? "Unknown"}:${state.focusId} remains preserved; no origin is substituted.`} />;
   if (query?.isPending) return <NetworkState title="Loading Impact analysis" detail="Retrieving backend-authoritative propagation results…" />;
