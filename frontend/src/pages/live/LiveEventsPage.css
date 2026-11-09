@@ -279,7 +279,7 @@
   border-bottom: 0;
 }
 
-.events-page--live .event-detail-grid span {
+.events-page--live .event-detail-grid > div > span:first-child {
   color: var(--color-text-muted);
   font-size: 11px;
   line-height: 16px;
@@ -292,12 +292,6 @@
   font-weight: 600;
   line-height: 18px;
   overflow-wrap: anywhere;
-}
-
-.events-page--live .event-detail-grid strong .event-severity-badge {
-  color: inherit;
-  font-size: 10px;
-  line-height: 14px;
 }
 
 .events-page--live .event-entity-list {
